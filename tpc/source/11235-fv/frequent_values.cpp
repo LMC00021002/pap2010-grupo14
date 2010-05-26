@@ -1,118 +1,168 @@
-#define FILEINPUT
+//#define FILEINPUT
 #ifdef FILEINPUT
 #include <fstream>
+#include <time.h>
 #else
 #include <iostream>
 #endif
 
 #include <vector>
-#include <math.h>
 using namespace std;
 
 typedef pair< int, int > pii;
+typedef unsigned int uint;
+
+vector< vector< int > > tabla;
+vector< int > enteros;
+vector< int > mapRangos;
+vector< pii > rangos;
 
 inline int max( int a, int b ) { return a > b ? a : b; }
-inline pii& max( pii& a, pii& b ){ return a.second > b.second ? a : b; }
+inline int log2( int a ){ int potencia = 0; while( 1 << ++potencia <= a ){} return potencia - 1; }
+inline pii& rangoEnQueCae( int a ) { return rangos[ mapRangos[ a ] ]; }
 
-class Data
+void convertirARMQ( const vector< int >& arreglo )
 {
-public:
-    Data(){};
-    Data( pii primero, pii ultimo, pii mejor ) : prim( primero ), ult( ultimo ), mejor( mejor ){};
+    int n = arreglo.size();
+    int k = 0;
+    int ultimoDiferente = 0;
+    enteros.push_back(1);
+    mapRangos.resize( n, 0 );
 
-    pii prim;
-    pii mejor;
-    pii ult;
-};
-
-vector< vector< Data > > tabla;
-
-
-void procesarTabla( const vector<int>& enteros )
-{
-    int n = enteros.size();
-    int log2n = log10f( n )/log10f(2) + 1;
-    tabla = vector< vector< Data > >( n, vector< Data >( log2n ) );
-    // inicializo la tabla para los intervalos de longitud 1
-    for( int i = 0; i < n; i++ )
-        tabla[i][0] = Data( pii(enteros[i], 1), pii(enteros[i], 1), pii(enteros[i], 1) ) ;
-
-    // ahora calculo los valores a partir de intervalos de la mitad de tamaño
-    for( int j = 1; 1 << j <= n; j++ )
+    rangos.push_back( pii( 0, 0 ) );
+    for( int i = 1; i < n; i++ )
     {
-        int powj = 1 << (j - 1);
-        for( int i = 0; i + (1 << j) - 1 < n; i++ )
+        if( arreglo[ ultimoDiferente ] != arreglo[i] )
         {
-            if( tabla[i][j - 1].ult.first == tabla[i + powj][j - 1].prim.first)
-            {
-                if( tabla[i][j - 1].prim.first == tabla[i + powj][j - 1].ult.first )
-                {
-                    int cantOcurrencias = tabla[i][j - 1].prim.second + tabla[i + powj][j - 1].ult.second;
-                    pii tupla( tabla[i][j - 1].ult.first, cantOcurrencias );
-                    tabla[i][j].prim = tupla;
-                    tabla[i][j].ult = tupla;
-                    tabla[i][j].mejor = tupla;
-                }
-                else
-                {
-                    pii tuplaMedio( tabla[i][j - 1].ult.first, tabla[i][j - 1].ult.second + tabla[i + powj][j - 1].prim.second );
-                    tabla[i][j].prim = tuplaMedio.first == tabla[i][j - 1].prim.first ? tuplaMedio : tabla[i][j - 1].prim;
-                    tabla[i][j].ult = tuplaMedio.first == tabla[i + powj][j - 1].ult.first ? tuplaMedio : tabla[i + powj][j - 1].ult;
-                    tabla[i][j].mejor = max( tabla[i][j].prim, max( tabla[i][j].ult, tuplaMedio ) );
-                }
-            }
-            else
-            {
-                tabla[i][j].prim = tabla[i][j - 1].prim;
-                tabla[i][j].ult = tabla[i + powj][j - 1].ult;
-                tabla[i][j].mejor = max( tabla[i][j - 1].mejor, tabla[i + powj][j - 1].mejor );
-            }
+            rangos[ k ].second = i - 1;
+            ultimoDiferente = i;
+            enteros.push_back(0);
+            k++;
+            rangos.push_back( pii( i, i ) );
         }
+
+        enteros[ k ]++;
+        mapRangos[ i ] = k;
     }
+
+    rangos[ k ].second = n - 1;
 }
 
+void procesarTabla()
+{
+    int n = enteros.size();
 
+    tabla.resize( n, vector< int >( log2(n) + 1 ) );
+
+    for( int i = 0; i < n; i++ )
+        tabla[i][0] = enteros[ i ];
+
+    for( int j = 1; 1 << j <= n; j++ )
+        for( int i = 0; i + (1 << j) - 1 < n; i++ )
+            tabla[i][j] = max( tabla[i][j - 1], tabla[i + (1 << (j - 1))][j - 1] );
+}
+
+int calcularMaximo( int i, int j )
+{
+    if ( i > j )
+        return 1;
+
+    i = mapRangos[ i ];
+    j = mapRangos[ j ];
+
+    int k = log2( j - i + 1 );
+    return max( tabla[ i ][ k ], tabla[ j - (1<<k) + 1 ][ k ] );
+}
 
 int calcularFV( int i, int j )
 {
-    int k = static_cast<int>( log10f( static_cast<float>(j - i + 1) )/log10f(2) );
-    int dosALaK = 1 << k;
-    Data& parte1 = tabla[i][k];
-    Data& parte2 = tabla[j - dosALaK + 1][k];
+    pii& a = rangoEnQueCae( i );
+    pii& b = rangoEnQueCae( j );
 
-    return max( parte1.mejor.second, parte2.mejor.second );
+    if ( a == b )
+        return j - i + 1;
+
+    int maximoParcial = calcularMaximo( a.second + 1, b.first - 1 );
+    return max( maximoParcial, max( a.second - i + 1, j - b.first + 1) );
 }
+#ifdef FILEINPUT
+void generarTest( const char* nombreArchivo )
+{
+    srand ( time(NULL) );
 
+    int NMAX = 50;
+    int MAXINCREMENTO = 2;
+    int PROBABILIDADIGUALES = 65;
+
+    ofstream salida( nombreArchivo, ios_base::out );
+    int n = rand() % NMAX + 1;
+    int q = n*(n+1)/2;
+
+    salida << n << " " << q << endl;
+    
+    int num = -NMAX*MAXINCREMENTO/10;
+    salida << num;
+
+    for( int i = 1; i < n; i++ )
+    {
+        if( (rand() % 100) > PROBABILIDADIGUALES )
+            num += rand() % MAXINCREMENTO + 1;
+        
+        salida << " " << num;
+    }
+
+    salida << endl;
+    for( int i = 1; i <= n; i++ )
+        for( int j = i; j <= n; j++ )
+            salida << i << " " << j << endl;
+    salida << "0";
+    salida.close();
+}
+#endif
 
 int main()
 {
 #ifdef FILEINPUT
-    ifstream entrada("test2", ios_base::in);
+    generarTest("test");
+    ifstream entrada( "test", ios_base::in );
+    ofstream salida( "testOut", ios_base::out );
 #else
     istream& entrada = cin;
+    ostream& salida = cout;
 #endif
     int n, q;
 
-    entrada >> n >> q;
-
-    vector< int > enteros( n );
-    for( int i = 0; i < n; i++ )
+    while( entrada >> n )
     {
-        entrada >> enteros[ i ];
-    }
+        if( n == 0 )
+            break;
+        
+        tabla.clear();
+        enteros.clear();
+        mapRangos.clear();
+        rangos.clear();
 
-    procesarTabla( enteros );
+        entrada >> q;
+        vector< int > arregloEntrada( n );
+        for( int i = 0; i < n; i++ )
+        {
+            entrada >> arregloEntrada[ i ];
+        }
 
-    for( int i = 0; i < q; i++ )
-    {
-        int desde, hasta;
-        entrada >> desde >> hasta;
+        convertirARMQ( arregloEntrada );
+        procesarTabla();
 
-        printf("%d\n", calcularFV(--desde, --hasta) );
+        for( int i = 0; i < q; i++ )
+        {
+            int desde, hasta;
+            entrada >> desde >> hasta;
+
+            salida << calcularFV(--desde, --hasta) << endl;
+        }
     }
 #ifdef FILEINPUT
     entrada.close();
-    system("PAUSE");
+    salida.close();
 #endif
     return 0;
 }
