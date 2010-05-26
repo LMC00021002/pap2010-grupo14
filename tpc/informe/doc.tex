@@ -1,0 +1,75 @@
+\documentclass[12pt,spanish]{article}
+\usepackage[spanish,activeacute]{babel}
+\renewcommand\shorthandsspanish{}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{fancyhdr,a4wide,enumerate}
+\usepackage{lastpage}
+\usepackage{caratula}
+\usepackage{amsthm,amsmath,pxfonts,amssymb}
+%\usepackage[x11names,rgb]{xcolor}
+%\usepackage{tikz}
+\usepackage[ruled]{algorithm2e}
+\usepackage[protrusion=true,expansion=true]{microtype}
+
+\setlength{\headheight}{16pt}
+\pagestyle{fancy}
+\lhead{Trabajo Práctico C}
+\rhead{Eugenio Costa, Emiliano González, Lisandro Sebrié}
+\cfoot{\thepage\ de \pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+
+\theoremstyle{plain}
+\newtheorem*{theorem}{Teorema}
+\newtheorem*{lemma}{Lema}
+\newtheorem*{proposition}{Proposición}
+\newtheorem*{corollary}{Corolario}
+
+\theoremstyle{definition}
+\newtheorem*{definition}{Definición}
+
+%\lstset{
+%language=C++,
+%tabsize=4,
+%basicstyle=\footnotesize,
+%breaklines=true,
+%breakatwhitespace=true,
+%}
+
+\dontprintsemicolon
+\linesnumberedhidden
+\nocaptionofalgo
+\SetKwIF{If}{ElseIf}{Else}{si}{luego}{sino si}{sino}{fin si}
+\SetKw{Return}{devolver}
+\SetKwFor{For}{para}{hacer}{fin para}
+\SetKwFor{ForEach}{para cada}{hacer}{fin para}
+\SetKwFor{ForAll}{repetir}{veces}{fin repetir}
+\SetKwFor{While}{mientras}{hacer}{fin mientras}
+\SetKwFor{Rep}{repetir}{veces}{fin repetir}
+\SetKwRepeat{Repeat}{repetir}{hasta que}
+\SetKw{KwTo}{hasta}
+\SetKwInOut{Input}{entrada}
+\SetKwInOut{Output}{salida}
+
+\DeclareMathOperator{\set}{set}
+\DeclareMathOperator{\sgn}{sgn}
+\newcommand{\nat}{\mathbb{N}}
+\newcommand{\integ}{\mathbb{Z}}
+
+\begin{document}
+
+\materia{Problemas, Algoritmos y Programación}
+\titulo{Trabajo Práctico C}
+\grupo{Grupo 14}
+\integrante{Eugenio Costa (ex grupo 4)}{839/06}{tutecosta@gmail.com}
+\integrante{Emiliano González (ex grupo 7)}{426/06}{xjesse\_jamesx@hotmail.com}
+\integrante{Lisandro Sebrié (ex grupo 12)}{358/03}{lsebrie@hotmail.com}
+
+\maketitle
+
+\newpage
+\section*{32 -- ``A Needle in the Haystack''}
+\input{kmp.tex}
+
+\end{document}
