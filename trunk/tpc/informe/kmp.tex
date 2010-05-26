@@ -1,0 +1,109 @@
+Para resolver este problema implementamos el algoritmo de Knuth-Morris-Pratt.
+
+Since the two portions of the algorithm have, respectively, complexities of
+$O(k)$ and $O(n)$, the complexity of the overall algorithm is $O(n+k)$.
+
+(Hacer modelo en representacino del problema, luego algoritmo, luego analisis de
+complejidad, luego relacionar las variables del analisis, que son del modelo,
+con las del input, que son del problema, para obtener la complejidad en funcion
+del input.)
+
+\begin{verbatim}
+The input consists of a number of test cases. Each test case is composed of
+three lines, containing:
+ * the length of the needle,
+ * the needle itself,
+ * the haystack.
+
+The length of the needle is only limited by the memory available to
+your program, so do not make any assumptions - instead, read the length
+and allocate memory as needed. The haystack is not limited in size, which
+implies that your program should not read the whole haystack at once. The
+KMP algorithm is stream-based, i.e. it processes the haystack character by
+character, so this is not a problem.
+
+
+Create the failure function for target string. The failure function
+is defined as follows, for i = 1 to m, where m is the length of
+the target string: Let the target string be b_1...b_m. Then f(i) is
+the length of the longest proper suffix of b_1...b_i which is a prefix
+of the target string.
+
+If you are trying to find the first occurence of a target string in
+a stream of input characters and the i+1st character is wrong, you
+need not start over looking for the beginning of the target from the
+next received character on, because the last few characters received
+might still be a valid head start on forming the target. The failure
+function tells exactly how many characters head start you have.
+
+In more colorful language, the idea behind this algorithm is: Don't
+throw the baby out with the bathwater.
+
+The code below was translated into C from psuedo code given on page
+151 of Aho, Sethi, and Ullman. Unfortunately, the C-convention of
+starting array indices from 0 makes the code harder to follow than it
+should be. To make it easier, we never use f[0].
+
+
+t = f[t];  /* This is the subtle part of the
+algorithm. The target does not begin
+t_0...t_t t_s. We could examine t_1...t_s,
+t_2...t_s,... successively to see which (if any)
+gives a valid prefix. But this is not
+necessary. Say the longest valid prefix is
+t_k...t_t t_s. Then t_k...t_t is also a valid
+prefix. But f(t) gave the length of the
+longest valid prefix of the form t_k...t_t.
+
+Thus no k such that t_k..t_t is longer than
+f(t) need be considered. Now iterate this
+reasoning to conclude that only candidates
+t_k...t_t of lengths f(t), f(f(t)),...
+need be considered. */
+
+
+Theoretical note: the assignment t = f[t] can be done at most m-1
+times, where m is the length of the target string (although the
+while loop can iterate more than once on given pass. For example,
+if the target is abababb, then f(6)=4, f(f(6))=2, and f(f(f(6)))= 0.
+The assignment is done 3 times when s = 6.) It is then easy to see that
+the running time of the routine make_f is O(m).
+
+Lemma. Let f be a non-negative integer valued function such that
+
+f(1) = 0, and so that f is "continuous upwards", i.e., f(t+1) <= f(t) + 1.
+Then
+
+		__
+  A = \ [ f(s) - f(s+1) ]+ <= (l-1),
+		/__
+
+  where a+ denotes the maximum of a and 0, and a- denotes the minimum
+  of a and 0. Here and below, all sums run from 1 to l-1.
+
+	Proof: Since a = (a+) + (a-) for any number a, we have
+				__
+	-f(l) = f(1) - f(l) = \ [ f(s) - f(s+1) ] =
+				/__
+		__
+     A + \ [ f(s) - f(s+1) ]- >= A - (l-1).
+		/__
+
+	Using f(l) >= 0 and rearranging, we obtain the desired inequality.
+
+								QED.
+
+Consider now a given iteration of the 'for' loop with a given value
+of s. Let n be the number of times the assignment t = f(t) is done.
+			    (n) (n) (n)
+Note that f(s+1) is either f (s) + 1, or 0 = f(s), where f denotes the
+n-1 fold iterate of f. Since f(t) < t (only proper suffixes are
+considered,) we have
+
+	 (n)
+	f (s) <= f(s) - n + 1.
+
+Thus, in either case, f(s) - f(s+1) >= n. Now apply the lemma to obtain
+the desired bound on the sum of n.
+
+\end{verbatim}
