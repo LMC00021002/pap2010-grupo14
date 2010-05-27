@@ -44,8 +44,8 @@ int main(int argc, char **argv) {
 				if (i > 0) i = pi[i];
 			}
 		}
+		free(pi);
 		if(!encontro) putchar('\n');
 	}
-	free(pi);
 	return 0;
 }
