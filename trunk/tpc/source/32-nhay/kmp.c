@@ -46,5 +46,6 @@ int main(int argc, char **argv) {
 		}
 		if(!encontro) putchar('\n');
 	}
+	free(pi);
 	return 0;
 }
