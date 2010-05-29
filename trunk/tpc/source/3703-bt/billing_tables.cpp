@@ -6,6 +6,7 @@
 #endif
 
 #include <math.h>
+#include <string.h>
 
 using namespace std;
 
@@ -262,10 +263,11 @@ int main() {
         }
         printf( "%d\n", cardinal );
 
+        char vacio[1] = "";
         for( i = 0; i < MAXHIJOSNODO; i++ )
         {
             if( raiz.hijos[i] && ( !raiz.hijos[i]->b || strcmp(raiz.hijos[i]->b, "invalid") != 0 ) )
-                print( raiz.hijos[i], "" );
+                print( raiz.hijos[i], vacio );
         }
         printf( "\n" );
         destruir(&raiz);
