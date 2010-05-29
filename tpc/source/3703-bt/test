@@ -1,0 +1,28 @@
+7
+1 - 1 cis
+1234 - 1234 cell
+2 - 2 invalid
+200 - 780 invalid
+810 - 908 rsv
+700 - 907 spec
+9 - 9 priv
+
+8
+1234 - 1234 cell
+1 - 1 cis
+2 - 2 invalid
+3 - 3 invalid
+4 - 7 invalid
+781 - 907 spec
+810 - 908 rsv
+9 - 9 priv
+
+8
+7919 - 921 cell
+7921800 - 999 priv
+1 - 1 usa
+760 - 9 rsv
+7928 - 29 rsv
+7600 - 7899 spec
+73 - 77 invalid
+7 - 7 cis
