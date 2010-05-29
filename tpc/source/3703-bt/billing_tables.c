@@ -1,8 +1,9 @@
 #include <math.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 #define MAXHIJOSNODO 10
-#define NULL 0
 
 struct nodo {
     // prefijo
@@ -176,8 +177,9 @@ void print( nodo* t, char* p )
 {
 	int i;
     char conc[11];
+    char invalid[7] = "invalid";
 
-    if( t->b != "invalid" )
+    if( t->b != invalid )
     {
         if( t->b )
             printf( "%s%s %s\n", p, t->s, t->b );
@@ -214,7 +216,7 @@ int main() {
         while( n-- > 0 )
         {
             getchar(); // ignoramos el '\n'
-            scanf( "%d - %d %s", &pi, &pj, &bp );
+            scanf( "%d - %d %s", &pi, &pj, bp );
 
             pj = pi - primerosNDigitos( digitos(pj), pi ) + pj;
             dif = pj - pi + 1;
