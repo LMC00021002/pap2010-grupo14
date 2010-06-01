@@ -167,7 +167,7 @@ int primerosNDigitos( int n, int numero )
     return numero % ((int) pow( 10.0f,n ) );
 }
 
-void print( nodo* t, char* p )
+void printAux( nodo* t, char* p )
 {
 	int i;
     char conc[11];
@@ -180,23 +180,35 @@ void print( nodo* t, char* p )
                 if( p ) {
                     strcpy( conc, p );
                     strcat( conc, t->s );
-                    print( t->hijos[i], conc );
+                    printAux( t->hijos[i], conc );
                 }
                 else {
-                    print( t->hijos[i], p );
+                    printAux( t->hijos[i], p );
                 }
             }
         }
     }
 }
 
+void print( nodo* t )
+{
+    int i;
+    for( i = 0; i < MAXHIJOSNODO; i++ )
+        printAux( raiz.hijos[i], "" );
+}
+
 int main() {
 
-    int n, pi, pj, dif, i;
+    int n, pi, pj, dif, i, numTest;
     char p[11], bp[1024];
 
+    numTest = 0;
     while( scanf( "%d", &n ) == 1 )
     {
+        if( numTest > 0 )
+            printf( "\n" );
+
+        numTest++;
         cardinal = 0;
         while( n-- > 0 )
         {
@@ -228,8 +240,8 @@ int main() {
         printf( "%d\n", cardinal );
 
         /* Imprimo el arbol por el stdout */
-        for( i = 0; i < MAXHIJOSNODO; i++ ) { print( raiz.hijos[i], "" ); }
-        printf( "\n" );
+        print( &raiz );
+
         destruir( &raiz );
     }
 
