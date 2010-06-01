@@ -46,7 +46,7 @@ void agregar( char *t, char *b ) {
 
 		/*
 		 * Si tienen prefijo en comun pero ninguno de
-		 * los dos es prefijo del otro parto el nodo
+		 * los dos es prefijo del otro, parto el nodo
 		 */
 		if( *p ) {
 			nuevo = malloc( sizeof(nodo) );
@@ -134,7 +134,6 @@ void agregar( char *t, char *b ) {
 
 void destruir( nodo *padre ) {
 	int i;
-
 	for( i = 0; i < MAXHIJOSNODO; i++ ) {
 		if( padre->hijos[i] ) {
 			destruir( padre->hijos[i] );
@@ -147,28 +146,20 @@ void destruir( nodo *padre ) {
 	}
 }
 
-void generarTest( const char* nombreArchivo ) {
-}
-
-int digitos( int n )
-{
-	int d;
-
+int digitos( int n ) {
 	if( n == 0 )
 		return 1;
-
+	int d;
 	for( d = 0; n > 0; d++ )
 		n /= 10;
 	return d;
 }
 
-int primerosNDigitos( int n, int numero )
-{
+int primerosNDigitos( int n, int numero ) {
 	return numero % ((int) pow( 10.0f,n ) );
 }
 
-void printAux( nodo* t, char* p )
-{
+void printAux( nodo* t, char* p ) {
 	int i;
 	char conc[11];
 
@@ -190,15 +181,13 @@ void printAux( nodo* t, char* p )
 	}
 }
 
-void print( nodo* t )
-{
+void print( nodo* t ) {
 	int i;
 	for( i = 0; i < MAXHIJOSNODO; i++ )
 		printAux( raiz.hijos[i], "" );
 }
 
 int main() {
-
 	int n, pi, pj, dif, i, numTest;
 	char p[11], bp[1024];
 
@@ -239,11 +228,10 @@ int main() {
 		}
 		printf( "%d\n", cardinal );
 
-		/* Imprimo el arbol por el stdout */
+		/* Imprimo árbol por stdout */
 		print( &raiz );
 
 		destruir( &raiz );
 	}
-
 	return 0;
 }
