@@ -1,4 +1,4 @@
-#define FILEINPUT
+// #define FILEINPUT
 #ifdef FILEINPUT
 #include <fstream>
 #else
@@ -7,6 +7,8 @@
 
 #include <math.h>
 #include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 using namespace std;
 
