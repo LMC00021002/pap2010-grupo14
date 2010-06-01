@@ -6,13 +6,13 @@
 #define MAXHIJOSNODO 10
 
 struct nodo {
-	/* prefijo */
+    /* prefijo */
 	char *s;
 
-	/* bill plan */
-	char *b;
+    /* bill plan */
+    char *b;
 
-	/* punteros a hijos */
+    /* punteros a hijos */
 	struct nodo *hijos[ MAXHIJOSNODO ];
 };
 
@@ -33,21 +33,21 @@ void agregar( char *t, char *b ) {
 
 	previo = &raiz;
 
-	actual = previo->hijos[ ord(*t) ];
-	while( actual && *t ) {
+    actual = previo->hijos[ ord(*t) ];
+    while( actual && *t ) {
 		for( p = actual->s; *t == *p && *t; t++,p++ );
 
-		/*
-		 * Si el prefijo que quiero agregar tiene
-		 * como prefijo a otro que ya agregue
-		 */
-		if( actual->b && !*p )
-			return;
+        /*
+         * Si el prefijo que quiero agregar tiene
+         * como prefijo a otro que ya agregue
+         */
+        if( actual->b && !*p )
+            return;
 
-		/*
-		 * Si tienen prefijo en comun pero ninguno de
-		 * los dos es prefijo del otro, parto el nodo
-		 */
+        /*
+         * Si tienen prefijo en comun pero ninguno de
+         * los dos es prefijo del otro parto el nodo
+         */
 		if( *p ) {
 			nuevo = malloc( sizeof(nodo) );
 			nuevo->s = malloc( strlen(p) + 1);
@@ -56,84 +56,88 @@ void agregar( char *t, char *b ) {
 				nuevo->hijos[i] = actual->hijos[i];
 				actual->hijos[i] = NULL;
 			}
-			nuevo->b = actual->b;
-			actual->b = NULL;
+            nuevo->b = actual->b;
+            actual->b = NULL;
 			actual->hijos[ ord(*p) ] = nuevo;
 			*p = '\0';
 		}
 
 		previo = actual;
-		actual = previo->hijos[ ord(*t) ];
+        if( *t )
+            actual = previo->hijos[ ord(*t) ];
+        else
+            actual = NULL;
 	}
 
-	if( !*t ) {
-		/*
-		 * Si viene un numero que es prefijo de los demas
-		 * tengo que extender el arbol en todos los lugares
-		 * donde se pueden agregar hojas
-		 */
-		top = 0;
-		pila[ top ] = previo;
-		while( top >= 0 )
-		{
-			actual = pila[ top ];
-			top--;
-			if( !actual->b || ( actual->s && strlen(actual->s) > 1 ) )
-			{
-				if( actual->s && strlen(actual->s) > 1 )
-				{
-					/* parto el nodo */
-					nuevo = malloc( sizeof(nodo) );
-					nuevo->s = malloc( strlen(actual->s + 1) + 1 );
-					strcpy( nuevo->s, actual->s + 1 );
-					for( i = 0; i < MAXHIJOSNODO; i++ ) {
-						nuevo->hijos[i] = actual->hijos[i];
-						actual->hijos[i] = NULL;
-					}
-					nuevo->b = actual->b;
-					actual->b = NULL;
-					actual->s[1] = '\0';
-					actual->hijos[ ord( *nuevo->s ) ] = nuevo;
-				}
+    if( !*t ) {
+        /*
+         * Si viene un numero que es prefijo de los demas
+         * tengo que extender el arbol en todos los lugares
+         * donde se pueden agregar hojas
+         */
+        top = 0;
+        pila[ top ] = previo;
+        while( top >= 0 )
+        {
+            actual = pila[ top ];
+            top--;
+            if( !actual->b || ( actual->s && strlen(actual->s) > 1 ) )
+            {
+                if( actual->s && strlen(actual->s) > 1 )
+                {
+                    /* parto el nodo */
+			        nuevo = malloc( sizeof(nodo) );
+			        nuevo->s = malloc( strlen(actual->s + 1) + 1 );
+                    strcpy( nuevo->s, actual->s + 1 );
+			        for( i = 0; i < MAXHIJOSNODO; i++ ) {
+				        nuevo->hijos[i] = actual->hijos[i];
+				        actual->hijos[i] = NULL;
+			        }
+                    nuevo->b = actual->b;
+                    actual->b = NULL;
+                    actual->s[1] = '\0';
+			        actual->hijos[ ord( *nuevo->s ) ] = nuevo;
+                }
 
-				for( i = MAXHIJOSNODO - 1; i >= 0; i-- )
-				{
-					if( actual->hijos[i] )
-						pila[ ++top ] = actual->hijos[i];
-					else
-					{
-						nuevo = malloc( sizeof(nodo) );
-						nuevo->s = malloc( 2 );
-						sprintf( nuevo->s, "%d", i );
-						nuevo->b = malloc( strlen(b) + 1 );
-						strcpy( nuevo->b, b );
-						for( j = 0; j < MAXHIJOSNODO; j++ )
-							nuevo->hijos[j] = NULL;
-						actual->hijos[i] = nuevo;
-						if( strcmp( b, "invalid" ) != 0 )
-							cardinal++;
-					}
-				}
-			}
-		}
-	} else {
-		if( !actual ) {
-			nuevo = malloc(sizeof(nodo));
-			nuevo->s = malloc( strlen(t) + 1 );
-			nuevo->b = malloc( strlen(b) + 1 );
-			strcpy( nuevo->s, t );
-			strcpy( nuevo->b, b );
-			for( i = 0; i < MAXHIJOSNODO; i++ )
-				nuevo->hijos[i] = NULL;
-			previo->hijos[ ord(*t) ] = nuevo;
-			if( strcmp( b, "invalid" ) != 0 )
-				cardinal++;
-		}
-	}
+                for( i = MAXHIJOSNODO - 1; i >= 0; i-- )
+                {
+                    if( actual->hijos[i] )
+                        pila[ ++top ] = actual->hijos[i];
+                    else
+                    {
+			            nuevo = malloc( sizeof(nodo) );
+			            nuevo->s = malloc( 2 );
+                        sprintf( nuevo->s, "%d", i );
+                        nuevo->b = malloc( strlen(b) + 1 );
+                        strcpy( nuevo->b, b );
+			            for( j = 0; j < MAXHIJOSNODO; j++ )
+				            nuevo->hijos[j] = NULL;
+                        actual->hijos[i] = nuevo;
+                        if( strcmp( b, "invalid" ) != 0 )
+                            cardinal++;
+                    }
+                }
+            }
+        }
+    } else {
+        if( !actual ) {
+            nuevo = malloc(sizeof(nodo));
+	        nuevo->s = malloc( strlen(t) + 1 );
+	        nuevo->b = malloc( strlen(b) + 1 );
+	        strcpy( nuevo->s, t );
+            strcpy( nuevo->b, b );
+	        for( i = 0; i < MAXHIJOSNODO; i++ )
+		        nuevo->hijos[i] = NULL;
+            previo->hijos[ ord(*t) ] = nuevo;
+            if( strcmp( b, "invalid" ) != 0 )
+                cardinal++;
+        }
+    }
 }
 
 void destruir( nodo *padre ) {
 	int i;
+
 	for( i = 0; i < MAXHIJOSNODO; i++ ) {
 		if( padre->hijos[i] ) {
 			destruir( padre->hijos[i] );
@@ -146,92 +150,103 @@ void destruir( nodo *padre ) {
 	}
 }
 
-int digitos( int n ) {
-	if( n == 0 )
-		return 1;
-	int d;
-	for( d = 0; n > 0; d++ )
-		n /= 10;
-	return d;
+void generarTest( const char* nombreArchivo ) {
 }
 
-int primerosNDigitos( int n, int numero ) {
-	return numero % ((int) pow( 10.0f,n ) );
+int digitos( int n )
+{
+    int d;
+
+    if( n == 0 )
+        return 1;
+
+    for( d = 0; n > 0; d++ )
+        n /= 10;
+    return d;
 }
 
-void printAux( nodo* t, char* p ) {
+int primerosNDigitos( int n, int numero )
+{
+    return numero % ((int) pow( 10.0f,n ) );
+}
+
+void printAux( nodo* t, char* p )
+{
 	int i;
-	char conc[11];
+    char conc[11];
 
-	if(t && ( !t->b || strcmp( t->b, "invalid" ) != 0 ) ) {
-		if( t->b )
-			printf( "%s%s %s\n", p, t->s, t->b );
-		else {
-			for( i = 0; i < MAXHIJOSNODO; i++ ) {
-				if( p ) {
-					strcpy( conc, p );
-					strcat( conc, t->s );
-					printAux( t->hijos[i], conc );
-				}
-				else {
-					printAux( t->hijos[i], p );
-				}
-			}
-		}
-	}
+    if(t && ( !t->b || strcmp( t->b, "invalid" ) != 0 ) ) {
+        if( t->b )
+            printf( "%s%s %s\n", p, t->s, t->b );
+        else {
+            for( i = 0; i < MAXHIJOSNODO; i++ ) {
+                if( p ) {
+                    strcpy( conc, p );
+                    strcat( conc, t->s );
+                    printAux( t->hijos[i], conc );
+                }
+                else {
+                    printAux( t->hijos[i], p );
+                }
+            }
+        }
+    }
 }
 
-void print( nodo* t ) {
-	int i;
-	for( i = 0; i < MAXHIJOSNODO; i++ )
-		printAux( raiz.hijos[i], "" );
+void print( nodo* t )
+{
+    int i;
+    for( i = 0; i < MAXHIJOSNODO; i++ )
+        printAux( raiz.hijos[i], "" );
 }
 
 int main() {
-	int n, pi, pj, dif, i, numTest;
-	char p[11], bp[1024];
 
-	numTest = 0;
-	while( scanf( "%d", &n ) == 1 )
-	{
-		if( numTest > 0 )
-			printf( "\n" );
+    int n, pi, pj, dif, i, numTest;
+    char p[11], bp[1024];
 
-		numTest++;
-		cardinal = 0;
-		while( n-- > 0 )
-		{
-			getchar(); /* Ignoramos el '\n' */
-			scanf( "%d - %d %s", &pi, &pj, bp );
+    numTest = 0;
+    while( scanf( "%d", &n ) == 1 )
+    {
+        if( numTest > 0 )
+            printf( "\n" );
 
-			pj = pi - primerosNDigitos( digitos(pj), pi ) + pj;
-			dif = pj - pi + 1;
-			i = 0;
-			while( dif > 0 ) {
-				while( !( pi % 10 > 0 ) && dif >= pow(10.0f, i) )
-				{
-					i++;
-					pi /= 10;
-				}
+        numTest++;
+        cardinal = 0;
+        while( n-- > 0 )
+        {
+            getchar(); /* Ignoramos el '\n' */
+            scanf( "%d - %d %s", &pi, &pj, bp );
 
-				while( dif < pow(10.0f, i) )
-				{
-					i--;
-					pi *= 10;
-				}
+            pj = pi - primerosNDigitos( digitos(pj), pi ) + pj;
+            dif = pj - pi + 1;
+            i = 0;
+            while( dif > 0 ) {
+                while( !( pi % 10 > 0 ) && dif >= pow(10.0f, i) )
+                {
+                    i++;
+                    pi /= 10;
+                }
 
-				sprintf( p, "%d", pi );
-				agregar( p, bp );
-				dif -= pow(10.0f, i);
-				pi++;
-			}
-		}
-		printf( "%d\n", cardinal );
+                while( dif < pow(10.0f, i) )
+                {
+                    i--;
+                    pi *= 10;
+                }
 
-		/* Imprimo árbol por stdout */
-		print( &raiz );
+                sprintf( p, "%d", pi );
+                agregar( p, bp );
+                dif -= pow(10.0f, i);
+                pi++;
+            }
+        }
+        printf( "%d\n", cardinal );
 
-		destruir( &raiz );
-	}
-	return 0;
+        /* Imprimo el arbol por el stdout */
+        print( &raiz );
+
+        destruir( &raiz );
+    }
+
+    return 0;
 }
