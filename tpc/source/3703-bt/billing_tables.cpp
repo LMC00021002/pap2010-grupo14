@@ -1,19 +1,16 @@
-// #define FILEINPUT
+//#define FILEINPUT
 #ifdef FILEINPUT
 #include <fstream>
 #else
 #include <iostream>
 #endif
 
-#include <math.h>
-#include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <math.h>
 
 using namespace std;
-
-typedef pair< int, int > pii;
-typedef unsigned int uint;
 
 #define MAXHIJOSNODO 10
 
@@ -30,29 +27,28 @@ struct nodo {
 
 nodo raiz;
 
-int cardinal; 
-
-inline bool number( char c )
-{
-    return '0' <= c && c <= '9';
-}
+long long int cardinal; 
 
 inline int ord( char c ) {
 	return c - '0';
-} 
+}
 
-inline char ordInv( int i ) {
-	return i + '0';
-} 
+inline long long int pow10( int i )
+{
+    long long int res = 1;
+    while( i-- > 0 )
+        res *= 10;
+
+    return res;
+}
 
 void agregar( char *t, char *b ) {
-	nodo *actual, *nuevo, *previo, *pila[ 10*11 ];
+	nodo *actual, *previo;
 	char *p;
-	int i, j, top;
 
 	previo = &raiz;
-
     actual = previo->hijos[ ord(*t) ];
+
     while( actual && *t ) {
 		for( p = actual->s; *t == *p && *t; t++,p++ );
 
@@ -64,10 +60,10 @@ void agregar( char *t, char *b ) {
         // Si tienen prefijo en comun pero ninguno de
         // los dos es prefijo del otro parto el nodo
 		if( *p ) {
-			nuevo = new nodo;
+			nodo *nuevo = new nodo;
 			nuevo->s = new char[ strlen(p) + 1 ];
 			strcpy( nuevo->s, p );
-			for( i = 0; i < MAXHIJOSNODO; i++ ) {
+			for( int i = 0; i < MAXHIJOSNODO; i++ ) {
 				nuevo->hijos[i] = actual->hijos[i];
 				actual->hijos[i] = NULL;
 			}
@@ -78,13 +74,18 @@ void agregar( char *t, char *b ) {
 		}
 
 		previo = actual;
-        actual = previo->hijos[ ord(*t) ];
+        if( *t )
+            actual = previo->hijos[ ord(*t) ];
 	}
 
     if( !*t ) {
-        // extender el arbol si viene un
-        // numero que es prefijo de los demas
-        top = 0;
+        /*
+         * Si viene un numero que es prefijo de los demas
+         * tengo que extender el arbol en todos los lugares
+         * donde se pueden agregar hojas
+         */
+        int top = 0;
+        nodo *pila[ 10*11 ];
         pila[ top ] = previo;
         while( top >= 0 )
         {
@@ -95,10 +96,10 @@ void agregar( char *t, char *b ) {
                 if( actual->s && strlen(actual->s) > 1 )
                 {
                     // parto el nodo
-			        nuevo = new nodo;
+			        nodo *nuevo = new nodo;
 			        nuevo->s = new char[ strlen(actual->s + 1) + 1 ];
                     strcpy( nuevo->s, actual->s + 1 );
-			        for( i = 0; i < MAXHIJOSNODO; i++ ) {
+			        for( int i = 0; i < MAXHIJOSNODO; i++ ) {
 				        nuevo->hijos[i] = actual->hijos[i];
 				        actual->hijos[i] = NULL;
 			        }
@@ -108,18 +109,18 @@ void agregar( char *t, char *b ) {
 			        actual->hijos[ ord( *nuevo->s ) ] = nuevo;
                 }
 
-                for( i = MAXHIJOSNODO - 1; i >= 0; i-- )
+                for( int i = MAXHIJOSNODO - 1; i >= 0; i-- )
                 {
                     if( actual->hijos[i] )
                         pila[ ++top ] = actual->hijos[i];
                     else
                     {
-			            nuevo = new nodo;
+			            nodo *nuevo = new nodo;
 			            nuevo->s = new char[ 2 ];
                         sprintf( nuevo->s, "%d", i );
                         nuevo->b = new char[ strlen(b) + 1 ];
                         strcpy( nuevo->b, b );
-			            for( j = 0; j < MAXHIJOSNODO; j++ )
+			            for( int j = 0; j < MAXHIJOSNODO; j++ )
 				            nuevo->hijos[j] = NULL;
                         actual->hijos[i] = nuevo;
                         if( strcmp( b, "invalid" ) != 0 )
@@ -130,12 +131,12 @@ void agregar( char *t, char *b ) {
         }
     } else {
         if( !actual ) {
-            nuevo = new nodo;
+            nodo *nuevo = new nodo;
 	        nuevo->s = new char[ strlen(t) + 1 ];
 	        nuevo->b = new char[ strlen(b) + 1 ];
 	        strcpy( nuevo->s, t );
             strcpy( nuevo->b, b );
-	        for( i = 0; i < MAXHIJOSNODO; i++ )
+	        for( int i = 0; i < MAXHIJOSNODO; i++ )
 		        nuevo->hijos[i] = NULL;
             previo->hijos[ ord(*t) ] = nuevo;
             if( strcmp( b, "invalid" ) != 0 )
@@ -155,6 +156,7 @@ void destruir( nodo *padre ) {
 	}
 	if( padre != &raiz ) {
 		delete[] padre->s;
+        delete[] padre->b;
 		delete padre;
 	}
 }
@@ -162,7 +164,7 @@ void destruir( nodo *padre ) {
 void generarTest( const char* nombreArchivo ) {
 }
 
-inline int digitos( int n )
+inline int digitos( long long int n )
 {
     int d;
     
@@ -174,105 +176,94 @@ inline int digitos( int n )
     return d;
 }
 
-inline int primerosNDigitos( int n, int numero )
+inline long long int primerosNDigitos( int n, long long int numero )
 {
-    return numero % ((int) pow( 10.0f,n ) );
+    return numero % ( pow10(n) );
 }
 
-void print( nodo* t, char* p )
+void printAux( nodo* t, char* p )
 {
 	int i;
     char conc[11];
 
-    if( t->b != "invalid" )
-    {
+    if(t && ( !t->b || strcmp( t->b, "invalid" ) != 0 ) ) {
         if( t->b )
-            printf( "%s%s %s\n", p, t->s, t->b );
-        else
-        {
-            for( i = 0; i < MAXHIJOSNODO; i++ )
-            {
-                if( t->hijos[i] && ( !t->hijos[i]->b || strcmp( t->hijos[i]->b, "invalid" ) != 0 ) )
-                {
-                    if( p )
-                    {
-                        strcpy( conc, p );
-                        strcat( conc, t->s );
-                        print( t->hijos[i], conc );
-                    }
-                    else
-                    {
-                        print( t->hijos[i], p );
-                    }
+            cout << p << t->s << " " << t->b << endl;
+        else {
+            for( i = 0; i < MAXHIJOSNODO; i++ ) {
+                if( p ) {
+                    strcpy( conc, p );
+                    strcat( conc, t->s );
+                    printAux( t->hijos[i], conc );
+                }
+                else {
+                    printAux( t->hijos[i], p );
                 }
             }
         }
     }
 }
 
+void print( nodo* t )
+{
+    int i;
+    for( i = 0; i < MAXHIJOSNODO; i++ )
+        printAux( raiz.hijos[i], "" );
+}
+
 int main() {
 #ifdef FILEINPUT
     generarTest("test");
     ifstream entrada( "test", ios_base::in );
+#else
+    istream& entrada = cin;
 #endif
 
-    int n, pi, pj, dif, i;
+    int n, i;
+    long long int pi, pj, dif;
     char p[11], bp[1024];
 
-#ifdef FILEINPUT
     while( entrada >> n )
     {
-#else
-    while( scanf( "%d", n ) )
-    {
-#endif
         cardinal = 0;
         while( n-- > 0 )
         {
-#ifdef FILEINPUT
             entrada.ignore(); // ignoramos el '\n'
             entrada >> pi;
             entrada.ignore();
             entrada.ignore();
             entrada >> pj;
             entrada >> bp;
-#else
-            getchar(); // ignoramos el '\n'
-            scanf( "%d - %d %s", pi, pj, bp );
-#endif
 
             pj = pi - primerosNDigitos( digitos(pj), pi ) + pj;
             dif = pj - pi + 1;
             i = 0;
             while( dif > 0 ) {
-                while( !( pi % 10 > 0 ) && dif >= pow(10.0f, i) )
+                while( !( pi % 10 > 0 ) && dif >= pow10(i) )
                 {
                     i++;
                     pi /= 10;
                 }
 
-                while( dif < pow(10.0f, i) )
+                while( dif < pow10(i) )
                 {
                     i--;
                     pi *= 10;
                 }
 
-                sprintf( p, "%d", pi );
+                sprintf( p, "%lld", pi );
                 agregar( p, bp );
                 dif -= pow(10.0f, i);
                 pi++;
             }
         }
-        printf( "%d\n", cardinal );
+        cout << cardinal << endl;
 
-        char vacio[1] = "";
-        for( i = 0; i < MAXHIJOSNODO; i++ )
-        {
-            if( raiz.hijos[i] && ( !raiz.hijos[i]->b || strcmp(raiz.hijos[i]->b, "invalid") != 0 ) )
-                print( raiz.hijos[i], vacio );
-        }
-        printf( "\n" );
-        destruir(&raiz);
+        /* Imprimo el arbol por el stdout */
+        print( &raiz );
+        cout << endl;
+
+        destruir( &raiz );
     }
 
 #ifdef FILEINPUT
