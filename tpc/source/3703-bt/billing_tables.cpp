@@ -1,5 +1,7 @@
+#define _CRT_SECURE_NO_WARNINGS
 //#define FILEINPUT
 #ifdef FILEINPUT
+#include <time.h>
 #include <fstream>
 #endif
 
@@ -184,49 +186,92 @@ void destruir( nodo *padre ) {
 	}
 }
 
-void printAux( nodo* t, char* p )
+void printAux( nodo* t, char* p, ostream& salida )
 {
 	int i;
 	char conc[MAXLONGPREFIJO + 1];
 
 	if(t && ( !t->b || strcmp( t->b, "invalid" ) != 0 ) ) {
 		if( t->b )
-    	    cout << p << t->s << " " << t->b << endl;
+    	    salida << p << t->s << " " << t->b << endl;
 		else {
 			for( i = 0; i < MAXHIJOSNODO; i++ ) {
 				if( p ) {
 					strcpy( conc, p );
 					strcat( conc, t->s );
-					printAux( t->hijos[i], conc );
+					printAux( t->hijos[i], conc, salida );
 				}
 				else {
-					printAux( t->hijos[i], p );
+					printAux( t->hijos[i], p, salida );
 				}
 			}
 		}
 	}
 }
 
-void print( nodo* t )
+void print( nodo* t, ostream& salida )
 {
 	for( int i = 0; i < MAXHIJOSNODO; i++ )
-		printAux( raiz.hijos[i], "" );
+		printAux( raiz.hijos[i], "", salida );
 }
+
+#ifdef FILEINPUT
+void crearPrefijos( char* pi, char* pj )
+{
+    for( int i = 0; i < MAXLONGPREFIJO; i++ )
+        pi[i] = rand() % 10 + '0';
+    pi[11] = '\0';
+
+    int offset = rand() % MAXLONGPREFIJO;
+    for( int i = offset; i < MAXLONGPREFIJO; i++ ) {
+        pj[i - offset] = pi[i] + rand() % 3;
+        if( pj[i - offset] > '9' )
+            pj[i - offset] = '9';
+    }
+    pj[MAXLONGPREFIJO - offset] = '\0';
+}
+
+void generarTest( char* nombreArchivo )
+{
+    ofstream salida( nombreArchivo, ios_base::out );
+    srand(time(NULL));
+    int cantTests = rand() % 5 + 1;
+    while( cantTests-- > 0 )
+    {
+        int n = rand() % 100;
+
+        salida << n << endl;
+
+        while( n-- > 0 ) {
+            char pi[12], pj[12];
+            crearPrefijos( pi, pj );
+            salida << pi << " - " << pj << " ";
+            (rand() % 100 > 30) ? salida << (char)(rand() % 26 + 'a') : salida << "invalid";
+            salida << endl;
+        }
+        salida << endl;
+    }
+    salida.close();
+}
+#endif
 
 int main() {
 #ifdef FILEINPUT
-	ifstream entrada( "test", ios_base::in );
+    generarTest("testGenerado");
+	ifstream entrada( "testGenerado", ios_base::in );
+	ofstream salida( "testGeneradoOut", ios_base::out );
 #else
 	istream& entrada = cin;
+	ostream& salida = cout;
 #endif
 
-	int n, i, ceros, numTest=0;
+	int n, i, numTest=0;
 	long long int pi, pj, dif;
-	char p[MAXLONGPREFIJO + 1], bp[1024];
+	char p[MAXLONGPREFIJO + 1], bp[21];
 
 	while( entrada >> n ) {
 		if (numTest++ > 0)
-			cout << endl;
+			salida << endl;
 
 		cardinal = 0;
 		while( n-- > 0 ){
@@ -258,20 +303,21 @@ int main() {
 				int cerosNuevo = di - digitos(pi) - i;
 				sprintf( p + cerosNuevo, "%lld", pi );
 				agregar( p, bp );
-				dif -= pow(10.0f, i);
+				dif -= pow10(i);
 				pi++;
 			}
 		}
-		cout << cardinal << endl;
+		salida << cardinal << endl;
 
 		/* Imprime árbol por stdout */
-		print( &raiz );
+		print( &raiz, salida );
 
 		destruir( &raiz );
 	}
 
 #ifdef FILEINPUT
 	entrada.close();
+	salida.close();
 #endif
 	return 0;
 }
