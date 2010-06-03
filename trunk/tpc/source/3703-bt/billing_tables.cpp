@@ -43,6 +43,32 @@ inline long long int pow10( int i )
 	return res;
 }
 
+inline int digitos( long long int n )
+{
+	int d;
+	
+	if( n == 0 )
+		return 1;
+
+	for( d = 0; n > 0; d++ )
+		n /= 10;
+	return d;
+}
+
+inline long long int primerosNDigitos( int n, long long int numero )
+{
+    return numero % ( pow10(n) );
+}
+
+inline long long atoll( char* n )
+{
+    long long number = 0;
+    while( *n != '\0' )
+        number = number * 10 + *n++ - '0';
+
+    return number;
+}
+
 void agregar( char *t, char *b ) {
 	nodo *actual, *previo;
 	char *p;
@@ -158,26 +184,6 @@ void destruir( nodo *padre ) {
 	}
 }
 
-void generarTest( const char* nombreArchivo ) {
-}
-
-inline int digitos( long long int n )
-{
-	int d;
-	
-	if( n == 0 )
-		return 1;
-
-	for( d = 0; n > 0; d++ )
-		n /= 10;
-	return d;
-}
-
-inline long long int primerosNDigitos( int n, long long int numero )
-{
-	return numero % ( pow10(n) );
-}
-
 void printAux( nodo* t, char* p )
 {
 	int i;
@@ -185,7 +191,7 @@ void printAux( nodo* t, char* p )
 
 	if(t && ( !t->b || strcmp( t->b, "invalid" ) != 0 ) ) {
 		if( t->b )
-			cout << p << t->s << " " << t->b << endl;
+    	    cout << p << t->s << " " << t->b << endl;
 		else {
 			for( i = 0; i < MAXHIJOSNODO; i++ ) {
 				if( p ) {
@@ -203,15 +209,13 @@ void printAux( nodo* t, char* p )
 
 void print( nodo* t )
 {
-	int i;
-	for( i = 0; i < MAXHIJOSNODO; i++ )
+	for( int i = 0; i < MAXHIJOSNODO; i++ )
 		printAux( raiz.hijos[i], "" );
 }
 
 int main() {
 #ifdef FILEINPUT
-//	generarTest("test");
-	ifstream entrada( "input_mati", ios_base::in );
+	ifstream entrada( "test", ios_base::in );
 #else
 	istream& entrada = cin;
 #endif
@@ -229,7 +233,7 @@ int main() {
 			entrada.ignore(); // ignoramos el '\n'
 			entrada >> p;
 
-			pi = atoi(p);
+			pi = atoll(p);
 			int di = strlen(p);
 
 			entrada.ignore(); /* Guion y espacio */
