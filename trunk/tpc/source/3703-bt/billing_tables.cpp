@@ -1,4 +1,4 @@
-#define _CRT_SECURE_NO_WARNINGS
+//#define _CRT_SECURE_NO_WARNINGS
 //#define FILEINPUT
 #ifdef FILEINPUT
 #include <time.h>
@@ -8,7 +8,6 @@
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
-#include <assert.h>
 #define forn(i, n) for(int i = 0; i < (int)(n); ++i)
 
 using namespace std;
@@ -196,7 +195,9 @@ void completar( Nodo* inicial, char* billPlan )
                     nuevo->mCantHijosHojaAtomica = actual->mCantHijosHojaAtomica;
                     nuevo->mEsHoja = actual->mEsHoja;
                     nuevo->mBP = actual->mBP;
-				    for( int i = 0; i < MAXHIJOSNODO; i++ ) {
+                    nuevo->mBPQueDefine = actual->mBP;
+
+                    for( int i = 0; i < MAXHIJOSNODO; i++ ) {
 					    nuevo->mHijos[i] = actual->mHijos[i];
 					    actual->mHijos[i] = NULL;
 				    }
@@ -205,7 +206,7 @@ void completar( Nodo* inicial, char* billPlan )
                     actual->mEsHoja = false;
 				    actual->mPrefijo[1] = '\0';
 				    actual->mHijos[ ord( *nuevo->mPrefijo ) ] = nuevo;
-                    actual->mCantHijosHojaAtomica = actual->mEsHoja && nuevo->mPrefijo[1] == 0;
+                    actual->mCantHijosHojaAtomica = nuevo->mEsHoja && nuevo->mPrefijo[1] == 0;
 			    }
 
 			    for( int i = 0; i < MAXHIJOSNODO; i++ ) {
@@ -255,6 +256,7 @@ void agregar( char *key, char *billPlan )
             nuevo->mCantHijosHojaAtomica = actual->mCantHijosHojaAtomica;
             nuevo->mEsHoja = actual->mEsHoja;
             nuevo->mBP = actual->mBP;
+            nuevo->mBPQueDefine = actual->mBP;
 			for( int i = 0; i < MAXHIJOSNODO; i++ )
             {
 				nuevo->mHijos[i] = actual->mHijos[i];
@@ -281,10 +283,12 @@ void agregar( char *key, char *billPlan )
 	 * tengo que completar el arbol en todos los lugares
 	 * donde se pueden agregar hojas
 	 */
-    if( !*key ) {
+    if( !*key )
         completar( previo, billPlan );
-	} else {
-		if( !actual ) {
+	else
+    {
+		if( !actual )
+        {
             if( previo->mBPQueDefine && strcmp(previo->mBPQueDefine, billPlan) == 0 && previo->mCantHijosHojaAtomica == 9 && key[1] == 0 )
                 comprimir( previo );
             else
@@ -460,6 +464,64 @@ void llitoChar( char* c, long long int p, int digitosPi )
         i--;
     }
 }
+/*
+
+void invariante( Nodo* nodo )
+{
+    if( !nodo )
+        return;
+
+    if( !*nodo->mPrefijo )
+        throw "Hay un prefijo vacio";
+
+    bool esHoja = true;
+    for( int i = 0; i < MAXHIJOSNODO && esHoja; i++ )
+        esHoja = esHoja && nodo->mHijos[i] == NULL;
+
+    if( esHoja != nodo->mEsHoja )
+        throw "El nodo es una hoja y mEsHoja es false";
+
+    if( nodo->mBP && !nodo->mBPQueDefine )
+        throw "nodo->mBP && !nodo->mBPQueDefine  == true";
+
+    if( nodo->mBPQueDefine )
+    {
+        bool defineMB = !(nodo->mBP) || ( nodo->mBP && nodo->mBPQueDefine );
+        if( nodo->mBP )
+            defineMB = defineMB && strcmp( nodo->mBP, nodo->mBPQueDefine ) == 0;
+        for( int i = 0; i < MAXHIJOSNODO && defineMB; i++ )
+        {
+            if( nodo->mHijos[i] )
+            {
+                if( !nodo->mHijos[i]->mBPQueDefine )
+                    throw "El mBPQueDefine esta andando mal, su hijo tiene mBPQueDefine NULL";
+
+                defineMB = defineMB && strcmp( nodo->mHijos[i]->mBPQueDefine, nodo->mBPQueDefine ) == 0;
+                if( nodo->mHijos[i]->mBP )
+                    defineMB = defineMB && strcmp( nodo->mHijos[i]->mBP, nodo->mBPQueDefine ) == 0;
+            }
+        }
+
+        if( !defineMB )
+            throw "El mBPQueDefine esta andando mal";
+    }
+
+    if( !nodo->mPadre && nodo != &raiz )
+        throw "Hay un nodo con padre NULL que no es raiz";
+
+    int cantHijosHojaAtomica = 0;
+    forn( i, MAXHIJOSNODO )
+    {
+        if( nodo->mHijos[i] && nodo->mHijos[i]->mEsHoja && nodo->mHijos[i]->mPrefijo[1] == 0 )
+            cantHijosHojaAtomica++;
+    }
+    if( cantHijosHojaAtomica != nodo->mCantHijosHojaAtomica )
+        throw "El atributo mCantHijosHojaAtomica esta andando mal";
+
+    forn( i, MAXHIJOSNODO )
+        invariante( nodo->mHijos[i] );
+}
+*/
 
 int main() {
 #ifdef FILEINPUT
@@ -530,6 +592,10 @@ int main() {
 			    int cerosNuevo = di - dpi - i;
 		        llitoChar( p + cerosNuevo, pi, dpi );
 			    agregar( p, bp );
+/*
+                forn( j, MAXHIJOSNODO )
+                    invariante(raiz.mHijos[j]);
+*/
 			    dif -= pow10(i);
 			    pi++;
 		    }
