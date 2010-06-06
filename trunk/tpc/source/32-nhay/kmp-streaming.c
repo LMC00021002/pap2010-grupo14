@@ -1,6 +1,6 @@
 #include<stdio.h>
 #include<stdlib.h>
-#define MAX_HAYSTACK 1024000
+#define BUFFER_SIZE 4
 int *pi;
 
 void make_pi(const char *needle, int length) {
@@ -22,17 +22,18 @@ void make_pi(const char *needle, int length) {
 }
 
 int main(int argc, char **argv) {
-	char haystack[MAX_HAYSTACK];
+	char haystack[BUFFER_SIZE];
 	int length = 0;
 	while (scanf("%i", &length) == 1) {
-		int i=0, m=0, encontro=0;
+		int i=0, m=0, it=0, encontro=0;
 		char needle[length];
 		scanf("%s", needle);
 		make_pi(needle, length);
+		getchar(); /* Lee '\n' remanente */
 
-		scanf("%s", haystack);
-		while (haystack[m + i] != '\0' && needle[i] != '\0') {
-			if (haystack[m + i] == needle[i]) {
+		fgets(haystack, BUFFER_SIZE, stdin);
+		while (haystack[it] != '\0' && needle[i] != '\0') {
+			if (haystack[it] == needle[i]) {
 				i++;
 				if (i == length) { /* string found */
 					printf("%i\n", m); encontro = 1;
@@ -43,6 +44,12 @@ int main(int argc, char **argv) {
 				m += i - pi[i];
 				if (i > 0) i = pi[i];
 			}
+			it = m + i;
+			if (it >= BUFFER_SIZE-1) {
+				it = it % (BUFFER_SIZE-1);
+				fgets(haystack, BUFFER_SIZE, stdin);
+			}
+			printf("\tit: %d - m: %d - i: %d - Haystack: %s\n", it, m, i, haystack);
 		}
 		free(pi);
 		if(!encontro) putchar('\n');
