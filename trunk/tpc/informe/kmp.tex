@@ -1,49 +1,16 @@
-El problema consiste en encontrar todas las ocurrencias de un string $s$ (de
-largo $n$) en un texto $t$ con largo $m$. Como sugiere el enunciado, lo
-resolvemos con el algoritmo de Knuth-Morris-Pratt.
-
-
-\vspace{.3cm}
-The assignment $t = f[t]$ can be done at most $n-1$ times (although the
-while loop can iterate more than once on given pass, for example,
-if the target is abababb, then f(6)=4, f(f(6))=2, and f(f(f(6)))= 0.
-The assignment is done 3 times when s = 6.) It is then easy to see that
-the running time of the routine make\_pi is O(m).
-
-Lemma. Let f be a non-negative integer valued function such that
-f(1) = 0, and so that f is "continuous upwards", i.e., $f(t+1) \le f(t) + 1$.
-Then $A=\sum{(f(s) - f(s+1))+ \le (l-1)}$
-
-Definimos $a+ = max(a,0)$ y $a- = min(a,0)$. (All sums run from 1 to l-1.)
-$a = (a+) + (a-)$ para todo número $a$.
-
-\begin{verbatim}
-	-f(l) = f(1) - f(l) = \ [ f(s) - f(s+1) ] =
-				/__
-		__
-     A + \ [ f(s) - f(s+1) ]- >= A - (l-1).
-		/__
-Using f(l) >= 0 and rearranging, we obtain the desired inequality.
-QED.
-
-Consider now a given iteration of the 'for' loop with a given value
-of s. Let n be the number of times the assignment t = f(t) is done.
-Note that f(s+1) is either f^n(s) + 1, or 0 = f^n(s), where f^n denotes the
-n-1 fold iterate of f. Since f(t) < t (only proper suffixes are
-considered,) we have f^n(s) <= f(s) - n + 1.
-
-Thus, in either case, f(s) - f(s+1) >= n. Now apply the lemma to obtain
-the desired bound on the sum of n.
-\end{verbatim}
+El problema consiste en encontrar todas las ocurrencias de un string $s$
+en un texto $t$ ($|s| = n, |t| = m$). Lo resolvemos implementando el algoritmo
+de Knuth-Morris-Pratt, que resuelve exactamente este problema, por lo que no
+tenemos necesidad de transformar los datos de entrada o de salida.
 
 \subsection*{Detalles de implementación}
 
 Si bien el enunciado sugiere buscar el string a medida que se lee el texto, para
 facilitar la implementación leemos tanto $s$ como $t$ mediante dos {\tt scanf}.
-Guardamos el $t$ en un arreglo de 1MB.
+Guardamos $t$ en un arreglo de 1MB.
 
 \subsection*{Análisis de complejidad}
 
 La tabla de prefijos se genera en tiempo lineal sobre el tamaño del string a
 buscar, $O(n)$; mientras que la búsqueda toma tiempo lineal sobre el tamaño
-del texto, $O(n+m)$, lo que redunda en una complejidad total de $O(n+m)$.
+del texto, $O(m)$. La complejidad del algoritmo resulta entonces de $O(n+m)$.
