@@ -1,6 +1,6 @@
 #include<stdio.h>
 #include<stdlib.h>
-#define BUFFER_SIZE 2048
+#define BUFFER_SIZE 256
 int *pi;
 
 void make_pi(const char *needle, int length) {

@@ -1,13 +1,23 @@
-El problema consiste en encontrar todas las ocurrencias de un string $s$
-en un texto $t$ ($|s| = n, |t| = m$). Lo resolvemos implementando el algoritmo
-de Knuth-Morris-Pratt, que resuelve exactamente este problema, por lo que no
-tenemos necesidad de transformar los datos de entrada o de salida.
+Un string $s$ ($|s|=n$) ocurre con desplazamiento $p$ en un texto $t$ ($|t|=m$)
+si los $n$ caracteres que siguen en $t$ desde la posición $p$ son iguales a los
+de $s$. El problema consiste en encontrar todas los desplazamientos en que
+ocurre un string $s$ en un texto $t$ (con $m$ en principio de tamaño ilimitado).
+
+Lo resolvemos aplicando el algoritmo de Knuth-Morris-Pratt, que resuelve
+precisamente este problema, por lo que su sola implementación redunda en
+soluciones válidas, y no se hace necesario preprocesar los datos de entrada o de
+salida para adaptarlos a los del problema en cuestión.
 
 \subsection*{Detalles de implementación}
 
-Si bien el enunciado sugiere buscar el string a medida que se lee el texto, para
-facilitar la implementación leemos tanto $s$ como $t$ mediante dos {\tt scanf}.
-Guardamos $t$ en un arreglo de 1MB.
+El enunciado sugiere buscar el string a medida que se lee el texto. Para
+facilitar la primera implementación leimos tanto $s$ como $t$ completamente
+antes de ejecutar KMP (mediante dos {\tt scanf}). Guardando $t$ en un arreglo de
+1MB el algoritmo fue aceptado en SPOJ.
+
+Mejoramos luego la implementación leyendo $t$ de a 256 bytes. La solución
+también fue aceptada por SPOJ, el uso de memoria fue menor y el tiempo de
+cómputo fue casi igual.
 
 \subsection*{Análisis de complejidad}
 
