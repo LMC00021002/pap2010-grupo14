@@ -21,6 +21,9 @@ cómputo fue casi igual.
 
 \subsection*{Análisis de complejidad}
 
-La tabla de prefijos se genera en tiempo lineal sobre el tamaño del string a
-buscar, $O(n)$; mientras que la búsqueda toma tiempo lineal sobre el tamaño
-del texto, $O(m)$. La complejidad del algoritmo resulta entonces de $O(n+m)$.
+El algoritmo se compone de dos partes. Primero calcula la tabla de prefijos del
+string a buscar, lo que toma tiempo lineal sobre el tamaño de la entrada
+($O(m)$). Luego hace la búsqueda propiamente dicha, y toma tiempo lineal sobre
+el tamaño del texto ($O(m)$).
+
+La complejidad del algoritmo resulta por tanto de $O(n+m)$.
