@@ -1,37 +1,52 @@
-Dado un arreglo de números no decrecientes $A$, y un conjunto de consultas de
-índices $i$ y $j$ $(1 \le i \le j \le n)$, el problema es encontrar, para cada
-consulta, el valor más frecuente en $A$ entre los índices $i$ y $j$.
+Dado un arreglo $A$ de números no decrecientes, y un conjunto de pares $(i,j)$
+(con $|A|=n$, $1 \le i \le j \le n$), el problema consiste en encontrar la
+cantidad de veces que aparece el valor más frecuente en $A$ entre los índices de
+cada consulta.
 
-Resolvemos el problema mediante {\sl Range Minimum Query} (RMQ), pero debemos
-antes preprocesar los datos de entrada. Dado que RMQ nos indica el valor máximo
-o mínimo en un arreglo, pero necesitamos conocer el que más veces aparece,
-generamos un arreglo a partir del primero que .
+Procesamos los datos de entrada del problema de modo de poder obtener la
+respuesta ejecutando {\sl Range Minimum Query}. RMQ indica el valor máximo o
+mínimo entre dos índices de un arreglo, pero necesitamos conocer la frecuencia
+con que aparece el más frecuente en ese rango. Para encontrarla, generamos un
+arreglo tal que buscar el máximo entre los $i$ y $j$ de cada consulta mediante
+RMQ sea la respuesta al problema.
 
+[Explicamos el preprocesamiento aquí o en "Detalles"?]
 
 \subsection*{Detalles de implementación}
 
-Si existen $k$ elementos distintos en $A$, el arreglo {\tt enteros} tiene largo
-$k$, y en cada posición se almacena la cantidad de apariciones del k-ésimo
-elemento distinto en $A$. Así, si el k-ésimo elemento distinto aparece $n$
-veces, se almacena: {\tt enteros[i]}$\gets n$.
+Definimos las siguientes estructuras:
 
-El vector {\tt rangos} contiene tuplas que denotan los rangos de elementos iguales en $A$.
+\begin{itemize}
+  \item[\tt enteros] tiene largo $k$, siendo $k$ el número de elementos
+  distintos en $A$, y en cada posición $i$ se almacena la cantidad de apariciones
+  del iésimo elemento (distinto) de $A$.
 
-El diccionario (sobre {\tt map}) {\tt mapIndices} indica, dada una posición de
-$A$, la posición correspondiente en {\tt enteros}. {\tt mapIndices[j]}$=k
-\Leftrightarrow A[j]$ contiene al k-ésimo elemento distinto.
+  \item[\tt rangos] es un vector que contiene pares cuyos elementos denotan
+  los índices de los subarreglos maximales con elementos iguales en $A$.
 
-FIXME: Explicar aquí que computamos la tabla RMQ (preprocesado: sparse table) con "enteros".
+  \item[\tt mapIndices] es un diccionario sobre {\tt map}, que, dada una
+  posición de $A$, indica la posición correspondiente en {\tt enteros}.
+  {\tt mapIndices[$j$]}$=k \Leftrightarrow A[j]$ contiene al k-ésimo elemento
+  distinto.
+\end{itemize}
 
-Dado un query (índices $i,j$) vemos en qué rangos caen,
-(vector de rangos). Si caen en un mismo rango, contiene a un único elemento,
-por lo que el valor más frecuente es ese y la cantidad de veces que aparece es
-$j-i$. Sino, los dos rangos cortados se calculan a
-mano ($O(1)$ con aritmética sencilla), y los del medio, mediante RMQ.
-Vector rangos es para un elemento en "enteros", de donde hasta donde estaba
-en el original (i y j). Quedan k+2 rangos, con k los rangos en el medio de a y
-b. Sacamos el maximo enrte los tres (la cantidad de veces) que es lo que nos
-piden.
+[FIXME: Explicar aquí que computamos la tabla RMQ (preprocesado: sparse table)
+con "enteros".]
+
+Dada una consulta $(i,j)$, computamos a qué pertenece cae cada índice (vector
+{\tt rangos}). Si un mismo rango contiene a ambos, entonces el rango ``encierra''
+a un conjunto de elementos iguales, por lo que el valor más frecuente es ese y
+su cantidad de apariciones es $j-i$. Si $i$ y $j$ pertenencen a rangos distintos
+(los llamamos $S$ y $T$), debemos encontrar la frecuencia del valor más
+frecuente en $S,T$, y en los rangos $R_i$ que queden contenidos completamente
+entre $S$ y $T$. Dicha frecuencia se computa en $O(1)$ en $S$ y $T$ [explicar
+aritmética], y se la obtiene en los intervalos $R_i$ ejecutando RMQ. La
+respuesta al problema es el máximo entre estos tres valores [demostrar mejor].
+
+[Otros comentarios: Vector rangos es para un elemento en "enteros", de donde
+hasta donde estaba en el original (i y j). Quedan k+2 rangos, con k los rangos
+en el medio de S y T.]
 
 \subsection*{Análisis de complejidad}
 
+[Completar.]
