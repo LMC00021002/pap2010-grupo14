@@ -1,103 +1,120 @@
 #include<iostream>
 #include<string>
-#include<cstdio>
-#include<cstring>
-#include<algorithm>
+# include <cstdio>
+#include <cstring>
+#include <algorithm>
 
 using namespace std;
 
 #define forn(N,X) for(int X=0; X<(int)(N); ++X)
 #define forinvn(N,X) for(int X=(int)(N)-1; X>=0; --X)
+//#define for_each(L, I) for(typeof((L).begin()) I=(L).begin(); I != (L).end(); I++)
 #define fromto(N,M,X) for (int X=N; X<M; X++)
-#define inf 0x3f3f3f3f
 
 #define MAXN 65536
 #define MAXLG 17
+char A[MAXN];
 
 struct entry {
 	int nr[2], p;
-} L[MAXN];
-char A[MAXN];
+}
+
+L[MAXN];
 int P[MAXLG][MAXN],R[MAXN],H[MAXN], N, i, stp, cnt,final,k,h;
 
-bool cmp(const struct entry &a, const struct entry &b) {
+int cmp(struct entry a, struct entry b)
+{
 	return a.nr[0] == b.nr[0] ? (a.nr[1] < b.nr[1] ? 1 : 0) : (a.nr[0] < b.nr[0] ? 1 : 0);
 }
 
-int lcp(int x, int y) {
+/*int lcp(int x, int y)
+{
 	int k, ret = 0;
 	if (x == y) return N - x;
-
-	for (k = stp-1; (k >= 0) && (x < N) && (y < N); k--)
-		if (P[k][x] == P[k][y]) {
-			x += (1 << k);
-			y += (1 << k);
-			ret += (1 << k);
-		}
-
+	
+	for (k = stp - 1; k >= 0 && x < N && y < N; k --)
+		if (P[k][x] == P[k][y])
+			x += 1 << k, y += 1 << k, ret += 1 << k;
+	
 	return ret;
-}
+}*/
 
-int main(void) {
+int main(void)
+{
 	int cases;
 	cin >> cases;
-	for (; cases > 0; cases--) {
-		cin >> A;
+	for (;cases > 0; cases--)
+	{
+		scanf("%s", A);
+		//for (int k = 0; k < 49999; k++)
+		//	A[k] = k % 26 + 'a';
+		//A[49999] = 0;
 		N = strlen(A);
 		forn (N, i)
 			P[0][i] = A[i] - 'a';
-		for (stp = 1, cnt = 1; cnt >> 1 < N; stp ++, cnt <<= 1) {
-			forn(N,i) {
+		for (stp = 1, cnt = 1; cnt >> 1 < N; stp ++, cnt <<= 1)
+		{
+			forn(N,i)
+			{
 				L[i].nr[0] = P[stp - 1][i];
 				L[i].nr[1] = i + cnt < N ? P[stp - 1][i + cnt] : -1;
 				L[i].p = i;
 			}
 			sort(L, L + N, cmp);
-
-			forn(N,i) {
-				if (i > 0 && L[i].nr[0] == L[i - 1].nr[0] && L[i].nr[1] == L[i - 1].nr[1])
-					P[stp][L[i].p] = P[stp][L[i - 1].p];
-				else
-					P[stp][L[i].p] = i;
-			}
+			
+			forn(N,i)
+				P[stp][L[i].p] = i > 0 && L[i].nr[0] == L[i - 1].nr[0] && L[i].nr[1] == L[i - 1].nr[1] ? P[stp][L[i - 1].p] : i;
 		}
-
+		
 		forn(N,i)
 			R[P[stp-1][i]] = i;
-
+			
 		h = 0;
 		final = 0;
-		forn(N,i) {
-			k = R[i];
-			if (k > 0) {
-				int j = P[stp-1][k-1];
-				while (A[i+h] == A[j+h] && i+h < N && j+h < N) h++;
+		forn(N,i)
+		{
+			k = P[stp-1][i];
+			if (k > 0)
+			{
+				int j = R[k-1];
+				while(A[i+h] == A[j+h] && i+h < N && j+h < N)h++;
 				H[k] = h;
-				if (h > 0) h--;
+				if (h > 0)h--;
 			}
-			final += N - i - H[i];
+			final += N - i - H[k];
 		}
 /*
-1. for(i=1;i<=n;i++) rank[sa[i]] = i;
-2. h=0;
-3. for(i=1;i<=n;i++) {
-4. k = rank[i];
-5. if(k==1) lcp[k]=-1;
-6. else {
-7. j = sa[k-1];
-8. while(i+h<=n && j+h<=n && t[i+h]==t[j+h]):
-9. h++;:
-10. lcp[k] = h;
-11. }
-12. if(h>0) h--;
-13. }
-*/
+5 for i:=1 to n do
+6 
+7 k := Pos[Rank[i]-1]
+8 while A[i+h] = A[j+h] do
+9 h := h+1
+10 od
+11 Height[Rank[i]] := h
+12 if h > 0 then h := h-1 fi
+13 fi
+14 od
+			
+			5 for i:=1 to n do
+6 if Rank[i] > 1 then
+7 k := Pos[Rank[i]-1]
+8 while A[i+h] = A[j+h] do
+9 h := h+1
+10 od
+11 Height[Rank[i]] := h
+12 if h > 0 then h := h-1 fi
+13 fi
+14 od
+*/		
+		
+		
+		/*final = 0;
+		fromto(1,N-1,i)
+			final += N - i - H[i];//lcp(P[stp-1][t],P[stp-1][t+1]);*/
+		
+		printf("%d", final);
+		if (cases > 0) printf("\n");
 
-/*
-fromto(1,N,i)
-	final += N - i - H[i];//lcp(P[stp-1][t],P[stp-1][t+1]);
-*/
-		cout << final << endl;
 	}
 	return 0;
 }
