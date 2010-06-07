@@ -3,8 +3,6 @@
 #include<string.h>
 
 #define forn(N,X) for(X=0; X<(int)(N); ++X)
-#define fromto(N,M,X) for (X=N; X<M; X++)
-
 #define MAXN 65536
 #define MAXLG 17
 
@@ -23,7 +21,7 @@ int cmp(entry *a, entry *b) {
 int main(void) {
 	int cases;
 	scanf("%d", &cases);
-	for (;cases > 0; cases--) {
+	while (cases--) {
 		scanf("%s", A);
 		N = strlen(A);
 		forn (N, i)
@@ -35,7 +33,7 @@ int main(void) {
 				L[i].p = i;
 			}
 			qsort(L, sizeof(entry)*N, sizeof(entry), cmp);
-			
+
 			forn(N,i)
 				P[stp][L[i].p] = i > 0 && L[i].nr[0] == L[i - 1].nr[0] && L[i].nr[1] == L[i - 1].nr[1] ? P[stp][L[i - 1].p] : i;
 		}
@@ -57,7 +55,7 @@ int main(void) {
 		}
 
 		printf("%d", final);
-		if (cases > 0) printf("\n");
+		if (cases >= 0) printf("\n");
 	}
 	return 0;
 }
