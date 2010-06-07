@@ -1,5 +1,6 @@
 //#define _CRT_SECURE_NO_WARNINGS
 //#define FILEINPUT
+//#define INVARIANTE
 #ifdef FILEINPUT
 #include <time.h>
 #include <fstream>
@@ -8,13 +9,13 @@
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
+#include <set>
 #define forn(i, n) for(int i = 0; i < (int)(n); ++i)
 
 using namespace std;
 
 #define MAXHIJOSNODO 10
 #define MAXLONGPREFIJO 11
-#define CANTCARACTERES 26
 
 inline int ord( char c ) {
     if( 'a' < c && c < 'z' )
@@ -44,11 +45,6 @@ inline int digitos( long long int n )
 	return d;
 }
 
-inline long long int primerosNDigitos( int n, long long int numero )
-{
-    return numero % ( pow10(n) );
-}
-
 inline long long atoll( char* n )
 {
     long long number = 0;
@@ -61,254 +57,217 @@ inline long long atoll( char* n )
 class Nodo
 {
 public:
-    Nodo( char *billPlan = NULL, Nodo *padre = NULL, char *prefijo = NULL )
-    {
-        if( billPlan )
-        {
-            mBP = new char[ strlen(billPlan) + 1 ];
-		    strcpy( mBP, billPlan );
-        }
-        else
-            mBP = NULL;
-
-        mBPQueDefine = mBP;
-
-        if( prefijo )
-        {
-            mPrefijo = new char[ strlen(prefijo) + 1 ];
-		    strcpy( mPrefijo, prefijo );
-        }
-        else
-            mPrefijo = NULL;
-
-        if( padre )
-            mPadre = padre;
-
-        mEsHoja = true;
-        mCantHijosHojaAtomica = 0;
+    Nodo( char keyChar = '$', Nodo *padre = NULL ) :
+      mBP( NULL ), mKeyChar( keyChar ), mPadre( padre ) {
+	    forn( i, MAXHIJOSNODO )
+		    mHijos[i] = NULL;
     }
 
     void destruir() {
         for( int i = 0; i < MAXHIJOSNODO; i++ ) {
 		    if( mHijos[i] ) {
 			    mHijos[i]->destruir();
+                delete mHijos[i];
                 mHijos[i] = NULL;
 		    }
 	    }
-        if( mPrefijo )
-		    delete [] mPrefijo;
-
-        if( mBP )
-            delete [] mBP;
 
         mBP = NULL;
-        mPrefijo = NULL;
-        mBPQueDefine = NULL;
         mPadre = NULL;
-        mCantHijosHojaAtomica = 0;
-        mEsHoja = true;
     }
 
     ~Nodo(){ destruir(); }
 
-    // prefijo
-	char *mPrefijo;
+    /*
+     * caracter que forma parte
+     * de las claves que vamos
+     * agregando al arbol
+     */
+	char mKeyChar;
 
 	// bill plan
-	char *mBP;
+	const string *mBP;
 
-	// punteros a hijos
+    // punteros a hijos
 	Nodo *mHijos[ MAXHIJOSNODO ];
 
     // puntero al padre
     Nodo *mPadre;
-
-    // si el nodo es hoja, es decir, si tiene todos hijos NULL
-    bool mEsHoja;
-
-    /*
-     * auxiliar al momento de comprimir
-     * guarda la cantidad de hijos que son
-     * hoja y que son atomicos, es decir,
-     * que la longitud del prefijo es 1
-     */
-    int mCantHijosHojaAtomica;
-
-    /*
-     * auxiliar al momento de comprimir
-     * guarda el nombre del Bill Plan
-     * que esta definido pasando por este Nodo
-     * En caso de existir dos o más BP
-     * diferentes que se definen pasando
-     * por este Nodo, el valor de
-     * la variable es NULL
-     */
-    char *mBPQueDefine;
 };
+/*
+template <class T>
+class cmp {
+public:
+    cmp(){};
+
+    bool operator() (const T& t1, const T& t2) const {
+        return t1.compare(t2) < 0;
+    }
+};*/
+// -------------------- VARIABLES GLOBALES -------------------- //
 
 Nodo raiz;
+set<string/*, cmp<string>*/> billPlans;
+const string *invalido;
 
-void comprimir( Nodo *nodo )
+// ------------------------- METODOS -------------------------- //
+#ifdef INVARIANTE
+void invariante( Nodo* nodo )
 {
-    while( nodo != &raiz && nodo->mBPQueDefine )
-    {
-        nodo->mBP = new char[ strlen(nodo->mBPQueDefine) + 1 ];
-        strcpy(nodo->mBP, nodo->mBPQueDefine );
-        nodo->mBPQueDefine = nodo->mBP;
+    if( !nodo )
+        return;
 
-        forn( i, MAXHIJOSNODO )
+    if( nodo->mKeyChar < 'a' || 'z' < nodo->mKeyChar )
+        throw "Hay un keyChar invalido";
+
+    bool esHoja = nodo->mBP != NULL;
+    if( esHoja && !nodo->mBP )
+        throw "esHoja y no tiene mBP";
+
+    if( esHoja && !nodo->mBPQueDefine )
+        throw "esHoja y no tiene mBPQueDefine";
+
+    if( nodo->mBPQueDefine )
+    {
+        bool defineMB = !(nodo->mBP) || ( nodo->mBP && nodo->mBPQueDefine );
+        if( nodo->mBP )
+            defineMB = defineMB && nodo->mBP == nodo->mBPQueDefine;
+
+        for( int i = 0; i < MAXHIJOSNODO && defineMB; i++ )
         {
             if( nodo->mHijos[i] )
             {
-                nodo->mHijos[i]->destruir();
-                nodo->mHijos[i] = NULL;
+                if( !nodo->mHijos[i]->mBPQueDefine )
+                    throw "El mBPQueDefine esta andando mal, su hijo tiene mBPQueDefine NULL";
+
+                defineMB = defineMB && nodo->mHijos[i]->mBPQueDefine == nodo->mBPQueDefine;
+                if( nodo->mHijos[i]->mBP )
+                    defineMB = defineMB && nodo->mHijos[i]->mBP == nodo->mBPQueDefine;
             }
         }
 
-        nodo->mCantHijosHojaAtomica = 0;
-        nodo->mEsHoja = true;
-
-        nodo->mPadre->mCantHijosHojaAtomica++;
-        nodo = nodo->mPadre;
+        if( !defineMB )
+            throw "El mBPQueDefine esta andando mal";
     }
+
+    bool padreHijo = false;
+    forn( i, MAXHIJOSNODO )
+        padreHijo = padreHijo || nodo == nodo->mPadre->mHijos[i];
+    if( !padreHijo )
+        throw "La relacion padre hijo esta andando mal";
+
+    forn( i, MAXHIJOSNODO )
+        invariante( nodo->mHijos[i] );
+}
+#endif
+
+inline bool esHoja( Nodo *nodo )
+{
+    if( !nodo )
+        return false;
+
+    bool esHoja = true;
+    for( int i = 0; i < MAXHIJOSNODO && esHoja; i++ )
+        esHoja = esHoja && nodo->mHijos[i] == NULL;
+
+    return esHoja;
 }
 
-void completar( Nodo* inicial, char* billPlan )
+void completar( Nodo* inicial, const string* billPlan )
 {
-	int top = 0;
+    Nodo *actual = inicial;
+    int top = 0;
 	Nodo *pila[ MAXHIJOSNODO*MAXLONGPREFIJO ];
-	pila[ top ] = inicial;
+	pila[ top ] = actual;
 	while( top >= 0 )
 	{
-        Nodo *actual = pila[ top-- ];
-        if( actual->mBPQueDefine && strcmp(actual->mBPQueDefine, billPlan) == 0 && !actual->mEsHoja )
-            comprimir( actual );
-        else
+        actual = pila[ top-- ];
+	    if( !actual->mBP )
         {
-            int longPref = 0;
-            if( actual->mPrefijo )
-                longPref = strlen(actual->mPrefijo);
-		    if( !actual->mBP || longPref > 1 ) {
-			    if( longPref > 1 ) {
-				    // parto el Nodo
-				    Nodo *nuevo = new Nodo( NULL, actual, actual->mPrefijo + 1 );
-                    nuevo->mCantHijosHojaAtomica = actual->mCantHijosHojaAtomica;
-                    nuevo->mEsHoja = actual->mEsHoja;
-                    nuevo->mBP = actual->mBP;
-                    nuevo->mBPQueDefine = actual->mBP;
-
-                    for( int i = 0; i < MAXHIJOSNODO; i++ ) {
-					    nuevo->mHijos[i] = actual->mHijos[i];
-					    actual->mHijos[i] = NULL;
-				    }
-
-                    actual->mBP = NULL;
-                    actual->mEsHoja = false;
-				    actual->mPrefijo[1] = '\0';
-				    actual->mHijos[ ord( *nuevo->mPrefijo ) ] = nuevo;
-                    actual->mCantHijosHojaAtomica = nuevo->mEsHoja && nuevo->mPrefijo[1] == 0;
+		    forn( i, MAXHIJOSNODO )
+            {
+			    if( actual->mHijos[i] )
+				    pila[ ++top ] = actual->mHijos[i];
+			    else
+                {
+				    Nodo *nuevo = new Nodo( i + '0', actual );
+                    nuevo->mBP = billPlan;
+                    actual->mHijos[i] = nuevo;
 			    }
-
-			    for( int i = 0; i < MAXHIJOSNODO; i++ ) {
-				    if( actual->mHijos[i] )
-					    pila[ ++top ] = actual->mHijos[i];
-				    else
-                    {
-					    Nodo *nuevo = new Nodo( billPlan, actual );
-					    nuevo->mPrefijo = new char[ 2 ];
-					    sprintf( nuevo->mPrefijo, "%d", i );
-					    for( int j = 0; j < MAXHIJOSNODO; j++ )
-						    nuevo->mHijos[j] = NULL;
-
-                        actual->mHijos[i] = nuevo;
-                        actual->mEsHoja = false;
-                        actual->mCantHijosHojaAtomica++;
-				    }
-			    }
-
-                if( actual->mBPQueDefine && actual->mBPQueDefine != billPlan )
-                    actual->mBPQueDefine = NULL;
 		    }
-        }
+	    }
 	}
 }
 
-void agregar( char *key, char *billPlan )
+void agregar( char *key, const string *billPlan )
 {
+    if( !*key )
+    {
+        completar( &raiz, billPlan );
+        return;
+    }
+
     Nodo *previo = &raiz;
-	char *p;
     Nodo *actual = previo->mHijos[ ord(*key) ];
 
-    while( actual && *key )
+    // Avanzo la key todo lo que puedo en el trie,
+    // posiblemente hasta una hoja
+    while( actual && *key && !actual->mBP )
     {
-		for( p = actual->mPrefijo; *key == *p && *key; key++,p++ );
-
-		// Si el prefijo que quiero agregar tiene
-		// como prefijo a otro que ya agregue
-		if( actual->mBP && !*p )
-			return;
-
-		// Si tienen prefijo en comun pero ninguno de
-		// los dos es prefijo del otro parto el Nodo
-		if( *p )
+        if( *(++key) )
         {
-			Nodo *nuevo = new Nodo( NULL, actual, p );
-            nuevo->mCantHijosHojaAtomica = actual->mCantHijosHojaAtomica;
-            nuevo->mEsHoja = actual->mEsHoja;
-            nuevo->mBP = actual->mBP;
-            nuevo->mBPQueDefine = actual->mBP;
-			for( int i = 0; i < MAXHIJOSNODO; i++ )
-            {
-				nuevo->mHijos[i] = actual->mHijos[i];
-				actual->mHijos[i] = NULL;
-			}
-
-			actual->mBP = NULL;
-            actual->mCantHijosHojaAtomica = actual->mEsHoja && nuevo->mPrefijo[1] == 0;
-            actual->mEsHoja = false;
-			actual->mHijos[ ord(*p) ] = nuevo;
-			*p = '\0';
-		}
-
-        if( actual->mBPQueDefine && strcmp(actual->mBPQueDefine, billPlan) != 0 )
-            actual->mBPQueDefine = NULL;
-
-        previo = actual;
-		if( *key )
-			actual = previo->mHijos[ ord(*key) ];
+            previo = actual;
+		    actual = actual->mHijos[ ord(*key) ];
+        }
 	}
 
-	/*
-	 * Si viene un numero que es prefijo de los demas
-	 * tengo que completar el arbol en todos los lugares
-	 * donde se pueden agregar hojas
-	 */
-    if( !*key )
-        completar( previo, billPlan );
-	else
-    {
-		if( !actual )
-        {
-            if( previo->mBPQueDefine && strcmp(previo->mBPQueDefine, billPlan) == 0 && previo->mCantHijosHojaAtomica == 9 && key[1] == 0 )
-                comprimir( previo );
-            else
-            {
-			    Nodo *nuevo = new Nodo( billPlan, previo, key );
-			    for( int i = 0; i < MAXHIJOSNODO; i++ )
-				    nuevo->mHijos[i] = NULL;
+    /*
+     * Si la clave que estoy agregando contiene
+     * otra clave ya agregada anteriormente,
+     * no tengo que agregar nada
+     */
+    if( actual && actual->mBP )
+        return;
 
-                previo->mEsHoja = false;
-                previo->mCantHijosHojaAtomica += key[1] == 0;
-                previo->mHijos[ ord(*key) ] = nuevo;
-            }
-		}
+	/*
+	 * Si la clave que estoy agregando es contenida
+	 * por otra clave ya agregada anteriormente,
+	 * tengo que completar el arbol hacia abajo
+     * definiendo el bill plan de parametro
+	 */
+    if( actual && !*key )
+    {
+        completar( actual, billPlan );
+        return;
+    }
+
+    /*
+     * Si no pasa ninguna de los casos anteriores
+     * quiere decir que tengo que simplemente
+     * definirle una nueva rama/hoja al arbol
+     */
+    if( !actual )
+    {
+        while( *key )
+        {
+	        Nodo *nuevo = new Nodo( *key, previo );
+	        for( int i = 0; i < MAXHIJOSNODO; i++ )
+		        nuevo->mHijos[i] = NULL;
+
+            previo->mHijos[ ord(*key) ] = nuevo;
+            previo = nuevo;
+            key++;
+        }
+
+        previo->mBP = billPlan;
 	}
 }
 
 long long int card;
 void cardinal( Nodo* t )
 {
-	if(t && ( !t->mBP || strcmp(t->mBP, "invalid") != 0 ) ){
+	if(t && ( !t->mBP || t->mBP != invalido ) )
+    {
 		if( t->mBP )
     	    card++;
 		else {
@@ -318,23 +277,23 @@ void cardinal( Nodo* t )
 	}
 }
 
-void printAux( Nodo* t, char* p, ostream& salida )
+void printAux( Nodo* t, char* p, int pLen, ostream& salida )
 {
-	int i;
-	char conc[MAXLONGPREFIJO + 1];
-
-	if(t && ( !t->mBP || strcmp(t->mBP, "invalid") != 0 ) ) {
+	if(t && ( !t->mBP || t->mBP != invalido ) )
+    {
 		if( t->mBP )
-    	    salida << p << t->mPrefijo << " " << t->mBP << endl;
+    	    salida << p << " " << t->mBP->c_str() << endl;
 		else
         {
-			for( i = 0; i < MAXHIJOSNODO; i++ )
+			forn( i, MAXHIJOSNODO )
             {
                 if( t->mHijos[i] )
                 {
+                	char conc[MAXLONGPREFIJO + 1];
 			        strcpy( conc, p );
-			        strcat( conc, t->mPrefijo );
-				    printAux( t->mHijos[i], conc, salida );
+                    conc[ pLen ] = i + '0';
+                    conc[ pLen + 1 ] = '\0';
+				    printAux( t->mHijos[i], conc, pLen + 1, salida );
                 }
 			}
 		}
@@ -342,7 +301,7 @@ void printAux( Nodo* t, char* p, ostream& salida )
 }
 
 inline void print( Nodo* t, ostream& salida ) {
-    printAux( &raiz, "", salida );
+    printAux( &raiz, "", 0, salida );
 }
 
 #ifdef FILEINPUT
@@ -364,8 +323,8 @@ void crearPrefijos( char* pi, char* pj )
 void generarTest( char* nombreArchivo )
 {
     ofstream salida( nombreArchivo, ios_base::out );
-    srand(time(NULL));
-    int cantTests = rand() % 5 + 1;
+    srand( time(NULL) );
+    int cantTests = 20;
     while( cantTests-- > 0 )
     {
         int n = rand() % 100;
@@ -384,74 +343,6 @@ void generarTest( char* nombreArchivo )
     salida.close();
 }
 #endif
-/*
-
-int longPi;
-int longOriginalPi;
-int longPj;
-
-inline void simplificar( char* pi, char* pj )
-{
-    for( int i = longPi - 1; i > 0 && pi[i] == '0'; i-- )
-    {
-        bool sePuedeSacar = false;
-        for( int j = 0; !sePuedeSacar && j < longPi; j++ )
-            sePuedeSacar = sePuedeSacar || pi[j] <= pj[j];
-
-        if( sePuedeSacar )
-        {
-            pi[i] = '\0';
-            longPi--;
-        }
-    }
-}
-
-void siguiente( char* pi, char* pj )
-{
-    // sumo uno
-    pi[longPi - 1]++;
-    int i;
-    for( i = longPi - 1; pi[i] > '9' && i > 0; i-- )
-    {
-        pi[i] = '0';
-        pi[i - 1]++;
-    }
-
-    if( i <= longOriginalPi - longPj - 1 || pi[longPi - longPj] > pj[0] )
-    {
-        pi[0] = '\0';
-        return;
-    }
-
-    bool menor = pi[longOriginalPi - longPj] < pj[0];
-    int j;
-    for( j = longOriginalPi - longPj + 1; !menor && j < longPi; j++ )
-        menor = pi[j] < pj[j - longOriginalPi + longPj];
-
-    if( !menor )
-    {
-        if( pi[longPi-1] > pj[longPj-1] )
-            pi[0] = '\0';
-        else
-        {
-            while( pi[longPi-1] >= pj[longPj-1] && longPi < longPj )
-            {
-                pi[longPi] = '0';
-                pi[longPi + 1] = '\0';
-                longPi++;
-            }
-        }
-    }
-    else
-    {
-        for( i = longPi - 1; i >= j && pi[i] == '0'; i-- )
-        {
-            pi[i] = '\0';
-            longPi--;
-        }
-    }
-}
-*/
 
 void llitoChar( char* c, long long int p, int digitosPi )
 {
@@ -464,84 +355,68 @@ void llitoChar( char* c, long long int p, int digitosPi )
         i--;
     }
 }
-/*
 
-void invariante( Nodo* nodo )
+void comprimir( Nodo *nodo )
 {
-    if( !nodo )
-        return;
-
-    if( !*nodo->mPrefijo )
-        throw "Hay un prefijo vacio";
-
-    bool esHoja = true;
-    for( int i = 0; i < MAXHIJOSNODO && esHoja; i++ )
-        esHoja = esHoja && nodo->mHijos[i] == NULL;
-
-    if( esHoja != nodo->mEsHoja )
-        throw "El nodo es una hoja y mEsHoja es false";
-
-    if( nodo->mBP && !nodo->mBPQueDefine )
-        throw "nodo->mBP && !nodo->mBPQueDefine  == true";
-
-    if( nodo->mBPQueDefine )
+    if( nodo && !nodo->mBP )
     {
-        bool defineMB = !(nodo->mBP) || ( nodo->mBP && nodo->mBPQueDefine );
-        if( nodo->mBP )
-            defineMB = defineMB && strcmp( nodo->mBP, nodo->mBPQueDefine ) == 0;
-        for( int i = 0; i < MAXHIJOSNODO && defineMB; i++ )
-        {
-            if( nodo->mHijos[i] )
-            {
-                if( !nodo->mHijos[i]->mBPQueDefine )
-                    throw "El mBPQueDefine esta andando mal, su hijo tiene mBPQueDefine NULL";
+        const string *hojasMismoBP = NULL;
 
-                defineMB = defineMB && strcmp( nodo->mHijos[i]->mBPQueDefine, nodo->mBPQueDefine ) == 0;
-                if( nodo->mHijos[i]->mBP )
-                    defineMB = defineMB && strcmp( nodo->mHijos[i]->mBP, nodo->mBPQueDefine ) == 0;
-            }
+        // las hojas no se comprimen
+        if( nodo->mHijos[0] )
+        {
+            if( !nodo->mHijos[0]->mBP )
+               comprimir( nodo->mHijos[0] );
+            
+            hojasMismoBP = nodo->mHijos[0]->mBP;
         }
 
-        if( !defineMB )
-            throw "El mBPQueDefine esta andando mal";
+        for( int i = 1; i < MAXHIJOSNODO; i++ )
+        {
+            // las hojas no se comprimen
+            if( nodo->mHijos[i] && !nodo->mHijos[i]->mBP )
+                comprimir( nodo->mHijos[i] );
+
+            if( !nodo->mHijos[i] || nodo->mHijos[i]->mBP != hojasMismoBP )
+                hojasMismoBP = NULL;
+        }
+
+        if( !nodo->mBP && hojasMismoBP )
+        {
+            forn( i, MAXHIJOSNODO )
+            {
+                if( nodo->mHijos[i] )
+                {
+                    delete nodo->mHijos[i];
+                    nodo->mHijos[i] = NULL;
+                }
+            }
+
+            nodo->mBP = hojasMismoBP;
+        }
     }
-
-    if( !nodo->mPadre && nodo != &raiz )
-        throw "Hay un nodo con padre NULL que no es raiz";
-
-    int cantHijosHojaAtomica = 0;
-    forn( i, MAXHIJOSNODO )
-    {
-        if( nodo->mHijos[i] && nodo->mHijos[i]->mEsHoja && nodo->mHijos[i]->mPrefijo[1] == 0 )
-            cantHijosHojaAtomica++;
-    }
-    if( cantHijosHojaAtomica != nodo->mCantHijosHojaAtomica )
-        throw "El atributo mCantHijosHojaAtomica esta andando mal";
-
-    forn( i, MAXHIJOSNODO )
-        invariante( nodo->mHijos[i] );
 }
-*/
 
 int main() {
 #ifdef FILEINPUT
-//    generarTest("testGenerado");
-	ifstream entrada( "test", ios_base::in );
-	ofstream salida( "testOut", ios_base::out );
+    generarTest("testGenerado");
+	ifstream entrada( "testGenerado", ios_base::in );
+	ofstream salida( "testGeneradoOut", ios_base::out );
 #else
 	istream& entrada = cin;
 	ostream& salida = cout;
 #endif
 
-	int n, numTest = 0;
+    int n, numTest = 0;
     long long int pi, pj;
-	char p[MAXLONGPREFIJO + 1], bp[21];
+	char p[MAXLONGPREFIJO + 1], bpInput[21];
+    const string* bp;
 
-	while( entrada >> n )
+    while( entrada >> n )
     {
-        raiz.mPrefijo = new char[1];
-        *raiz.mPrefijo = '\0';
         card = 0;
+        billPlans.clear();
+        invalido = &*billPlans.insert( "invalid" ).first;
 
         if ( numTest++ > 0 )
             salida << endl;
@@ -553,25 +428,14 @@ int main() {
             entrada.ignore(); /* Guion y espacio */
 			entrada.ignore();
 			entrada >> pj;
-			entrada >> bp;
-/*
+			entrada >> bpInput;
 
-            // completo el prefijo pj
-            longOriginalPi = strlen(pi);
-            longPi = longOriginalPi;
-            longPj = strlen(pj);
+            bp = &*billPlans.insert( bpInput ).first;
 
-            simplificar( pi, pj );
-            while( *pi )
-            {
-                agregar( pi, bp );
-                siguiente( pi, pj );
-            }
-*/
             int di = strlen(p);
             pi = atoll(p);
 
-            pj = pi - primerosNDigitos( digitos(pj), pi ) + pj;
+            pj = pi - pi % ( pow10(digitos(pj)) ) + pj;
             long long int dif = pj - pi + 1;
 		    int i = 0;
 		    while( dif > 0 )
@@ -591,16 +455,21 @@ int main() {
                 int dpi = digitos(pi);
 			    int cerosNuevo = di - dpi - i;
 		        llitoChar( p + cerosNuevo, pi, dpi );
-			    agregar( p, bp );
-/*
+		        agregar( p, bp ); 
+
+#ifdef INVARIANTE
                 forn( j, MAXHIJOSNODO )
                     invariante(raiz.mHijos[j]);
-*/
-			    dif -= pow10(i);
+#endif
+    		    dif -= pow10(i);
 			    pi++;
 		    }
 
 		}
+
+        // comprimo el arbol
+        forn( i, MAXHIJOSNODO )
+            comprimir( raiz.mHijos[i] );
 
         cardinal( &raiz );
 		salida << card << endl;
