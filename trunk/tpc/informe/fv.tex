@@ -1,0 +1,37 @@
+Dado un arreglo de números no decrecientes $A$, y un conjunto de consultas de
+índices $i$ y $j$ $(1 \le i \le j \le n)$, el problema es encontrar, para cada
+consulta, el valor más frecuente en $A$ entre los índices $i$ y $j$.
+
+Resolvemos el problema mediante {\sl Range Minimum Query} (RMQ), pero debemos
+antes preprocesar los datos de entrada. Dado que RMQ nos indica el valor máximo
+o mínimo en un arreglo, pero necesitamos conocer el que más veces aparece,
+generamos un arreglo a partir del primero que .
+
+
+\subsection*{Detalles de implementación}
+
+Si existen $k$ elementos distintos en $A$, el arreglo {\tt enteros} tiene largo
+$k$, y en cada posición se almacena la cantidad de apariciones del k-ésimo
+elemento distinto en $A$. Así, si el k-ésimo elemento distinto aparece $n$
+veces, se almacena: {\tt enteros[i]}$\gets n$.
+
+El vector {\tt rangos} contiene tuplas que denotan los rangos de elementos iguales en $A$.
+
+El diccionario (sobre {\tt map}) {\tt mapIndices} indica, dada una posición de
+$A$, la posición correspondiente en {\tt enteros}. {\tt mapIndices[j]}$=k
+\Leftrightarrow A[j]$ contiene al k-ésimo elemento distinto.
+
+FIXME: Explicar aquí que computamos la tabla RMQ (preprocesado: sparse table) con "enteros".
+
+Dado un query (índices $i,j$) vemos en qué rangos caen,
+(vector de rangos). Si caen en un mismo rango, contiene a un único elemento,
+por lo que el valor más frecuente es ese y la cantidad de veces que aparece es
+$j-i$. Sino, los dos rangos cortados se calculan a
+mano ($O(1)$ con aritmética sencilla), y los del medio, mediante RMQ.
+Vector rangos es para un elemento en "enteros", de donde hasta donde estaba
+en el original (i y j). Quedan k+2 rangos, con k los rangos en el medio de a y
+b. Sacamos el maximo enrte los tres (la cantidad de veces) que es lo que nos
+piden.
+
+\subsection*{Análisis de complejidad}
+
