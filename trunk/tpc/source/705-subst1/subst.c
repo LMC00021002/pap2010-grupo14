@@ -1,27 +1,23 @@
-#include<iostream>
-#include<string>
-#include<cstdio>
-#include<cstring>
-#include<algorithm>
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
 
-using namespace std;
-
-#define forn(N,X) for(int X=0; X<(int)(N); ++X)
-#define forinvn(N,X) for(int X=(int)(N)-1; X>=0; --X)
-#define fromto(N,M,X) for (int X=N; X<M; X++)
-#define inf 0x3f3f3f3f
+#define forn(N,X) for(X=0; X<(int)(N); ++X)
+#define fromto(N,M,X) for (X=N; X<M; X++)
 
 #define MAXN 65536
 #define MAXLG 17
 
-struct entry {
+typedef struct {
 	int nr[2], p;
-} L[MAXN];
-char A[MAXN];
-int P[MAXLG][MAXN],R[MAXN],H[MAXN], N, i, stp, cnt,final,k,h;
+} entry;
 
-bool cmp(const struct entry &a, const struct entry &b) {
-	return a.nr[0] == b.nr[0] ? (a.nr[1] < b.nr[1] ? 1 : 0) : (a.nr[0] < b.nr[0] ? 1 : 0);
+entry L[MAXN];
+char A[MAXN];
+int P[MAXLG][MAXN], R[MAXN], H[MAXN], N, i, stp, cnt, final, k, h;
+
+int menor(entry *a, entry *b) {
+	return ((*a).nr[0] == (*b).nr[0] && (*a).nr[1] < (*b).nr[1]) || ((*a).nr[0] < (*b).nr[0]);
 }
 
 int lcp(int x, int y) {
@@ -39,10 +35,10 @@ int lcp(int x, int y) {
 }
 
 int main(void) {
-	int cases;
-	cin >> cases;
+	int i,cases;
+	scanf("%i", &cases);
 	for (; cases > 0; cases--) {
-		cin >> A;
+		scanf("%s", A);
 		N = strlen(A);
 		forn (N, i)
 			P[0][i] = A[i] - 'a';
@@ -52,7 +48,7 @@ int main(void) {
 				L[i].nr[1] = i + cnt < N ? P[stp - 1][i + cnt] : -1;
 				L[i].p = i;
 			}
-			sort(L, L + N, cmp);
+			qsort(L, sizeof(entry)*N, sizeof(entry), menor);
 
 			forn(N,i) {
 				if (i > 0 && L[i].nr[0] == L[i - 1].nr[0] && L[i].nr[1] == L[i - 1].nr[1])
@@ -75,7 +71,7 @@ int main(void) {
 				H[k] = h;
 				if (h > 0) h--;
 			}
-			final += N - i - H[i];
+			final += N - i - H[k];
 		}
 /*
 1. for(i=1;i<=n;i++) rank[sa[i]] = i;
@@ -95,9 +91,9 @@ int main(void) {
 
 /*
 fromto(1,N,i)
-	final += N - i - H[i];//lcp(P[stp-1][t],P[stp-1][t+1]);
+	final += N - i - H[i]; // lcp(P[stp-1][t], P[stp-1][t+1]);
 */
-		cout << final << endl;
+		printf("%d\n", final);
 	}
 	return 0;
 }
