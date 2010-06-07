@@ -1,29 +1,29 @@
-Un string $s$ ($|s|=n$) ocurre con desplazamiento $p$ en un texto $t$ ($|t|=m$)
-si los $n$ caracteres que siguen en $t$ desde la posición $p$ son iguales a los
-de $s$. El problema consiste en encontrar todas los desplazamientos en que
-ocurre un string $s$ en un texto $t$ (con $m$ en principio de tamaño ilimitado).
+Un string $s$ ocurre con desplazamiento $p$ en un texto $t$ si los caracteres
+de $s$ ocurren en $t$ desde $t[p]$. El problema consiste en encontrar todas
+los desplazamientos en que ocurre un string $s$ en un texto $t$ ($|s|=n,
+|t|=m$, $m$ en principio de tamaño ilimitado).
 
-Lo resolvemos aplicando el algoritmo de Knuth-Morris-Pratt, que resuelve
-precisamente este problema, por lo que su sola implementación redunda en
-soluciones válidas, y no se hace necesario preprocesar los datos de entrada o de
-salida para adaptarlos a los del problema en cuestión.
+Aplicando el algoritmo de Knuth-Morris-Pratt, que resuelve precisamente
+este problema, por lo que su implementación computa soluciones válidas,
+y no se hace necesario preprocesar los datos de entrada o de salida para
+adaptarlos a los del problema.
 
 \subsection*{Detalles de implementación}
 
-El enunciado sugiere buscar el string a medida que se lee el texto. Para
-facilitar la primera implementación leimos tanto $s$ como $t$ completamente
-antes de ejecutar KMP (mediante dos {\tt scanf}). Guardando $t$ en un arreglo de
-1MB el algoritmo fue aceptado en SPOJ.
+El enunciado sugiere buscar $s$ a medida que se lee $t$. Para facilitar la
+primera implementación leimos completamente $s$ y $t$ antes de ejecutar KMP
+(con dos {\tt scanf}). Guardando $t$ en un arreglo de 1MB el algoritmo fue
+aceptado en SPOJ.
 
-Mejoramos luego la implementación leyendo $t$ de a 256 bytes. La solución
-también fue aceptada por SPOJ, el uso de memoria fue menor y el tiempo de
-cómputo fue casi igual.
+Mejoramos luego la implementación leyendo $t$ de a 256 bytes, de modo que
+el tamaño de $t$ no sea una limitante de nuestro algoritmo. La solución
+también fue aceptada por SPOJ, el uso de memoria resultó ser menor y el
+tiempo de cómputo casi no varió.
 
 \subsection*{Análisis de complejidad}
 
-El algoritmo se compone de dos partes. Primero calcula la tabla de prefijos del
-string a buscar, lo que toma tiempo lineal sobre el tamaño de la entrada
-($O(m)$). Luego hace la búsqueda propiamente dicha, y toma tiempo lineal sobre
-el tamaño del texto ($O(m)$).
+El algoritmo se compone de dos partes. Primero calcula la tabla de prefijos $s$,
+lo que toma tiempo lineal sobre el tamaño de la entrada ($O(m)$). Luego hace la
+búsqueda propiamente dicha, y toma tiempo lineal sobre el tamaño del texto ($O(m)$).
 
 La complejidad del algoritmo resulta por tanto de $O(n+m)$.
