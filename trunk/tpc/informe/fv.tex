@@ -1,7 +1,16 @@
-Dado un arreglo $A$ de números no decrecientes, y un conjunto de pares $(i,j)$
-(con $|A|=n$, $1 \le i \le j \le n$), el problema consiste en encontrar la
-cantidad de veces que aparece el valor más frecuente en $A$ entre los índices de
-cada consulta.
+\subsection*{Solución}
+
+Dada una secuencia $A$ de números no decrecientes, y un conjunto de pares $(i,j)$
+(con $|A|=n$, $1 \le i \le j \le n$), el problema consiste en encontrar la cantidad
+de veces que aparece el valor más frecuente en $A$ entre el intervalo $(i,j)$
+de índices de cada consulta.
+
+Para solucionar el problema decidimos usar el algoritmo {\sl Range Minimum Query}
+(RMQ), pero una aplicación directa de este algoritmo para este problema no es posible,
+pues RMQ encuentra un mínimo de una secuencia de números en un rango acotado dado, y nosotros
+necesitamos un máximo, pero además este máximo no es un entero de la secuencia,
+sino la cantidad de ocurrencias de un número. Como vemos, por lo tanto, una aplicación
+directa del algoritmo no es posible, pues no resolvería el problema.
 
 Procesamos los datos de entrada del problema de modo de poder obtener la
 respuesta ejecutando {\sl Range Minimum Query}. RMQ indica el valor máximo o
