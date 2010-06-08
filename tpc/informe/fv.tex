@@ -5,48 +5,49 @@ cada consulta.
 
 Procesamos los datos de entrada del problema de modo de poder obtener la
 respuesta ejecutando {\sl Range Minimum Query}. RMQ indica el valor máximo o
-mínimo entre dos índices de un arreglo, pero necesitamos conocer la frecuencia
-con que aparece el más frecuente en ese rango. Para encontrarla, generamos un
-arreglo tal que buscar el máximo entre los $i$ y $j$ de cada consulta mediante
-RMQ sea la respuesta al problema.
-
-[Explicamos el preprocesamiento aquí o en "Detalles"?]
+mínimo entre dos índices de un arreglo, pero lo que necesitamos es conocer la
+frecuencia con que aparece el más frecuente en ese rango. Para encontrarla,
+generamos un arreglo tal que buscar el máximo entre los $i$ y $j$ de cada
+consulta mediante RMQ sea la respuesta al problema.
 
 \subsection*{Detalles de implementación}
 
-Definimos las siguientes estructuras:
+Definimos para preprocesar los datos de la entrada las siguientes estructuras:
 
 \begin{itemize}
   \item[\tt enteros] tiene largo $k$, siendo $k$ el número de elementos
-  distintos en $A$, y en cada posición $i$ se almacena la cantidad de apariciones
+  distintos en $A$. En cada posición $i$ se almacena la cantidad de apariciones
   del iésimo elemento (distinto) de $A$.
 
   \item[\tt rangos] es un vector que contiene pares cuyos elementos denotan
-  los índices de los subarreglos maximales con elementos iguales en $A$.
+  los índices de los subarreglos maximales de elementos iguales en $A$.
 
   \item[\tt mapIndices] es un diccionario sobre {\tt map}, que, dada una
-  posición de $A$, indica la posición correspondiente en {\tt enteros}.
-  {\tt mapIndices[$j$]}$=k \Leftrightarrow A[j]$ contiene al k-ésimo elemento
+  posición de $A$, indica la posición correspondiente en {\tt enteros}. Esto es:
+  {\tt mapIndices[$j$]}$=i \Leftrightarrow A[j]$ contiene al iésimo elemento
   distinto.
+
+  \item[\tt tabla] es la tabla RMQ (implementada sobre vectores de vectores).
+  La obtenemos a partir del arreglo {\tt enteros} mediante el algoritmo {\sl
+  Sparse Table}. Este algoritmo mantiene un arreglo $M[0,N-1][0,\log N]$,
+  siendo $M[i][j]$ el índice del valor mínimo en el subarreglo que empieza en
+  $i$ de largo $2j$. [Seguir explicando.] \cite{topcoder}
 \end{itemize}
 
-[FIXME: Explicar aquí que computamos la tabla RMQ (preprocesado: sparse table)
-con "enteros".]
-
-Dada una consulta $(i,j)$, computamos a qué pertenece cae cada índice (vector
-{\tt rangos}). Si un mismo rango contiene a ambos, entonces el rango ``encierra''
+Dada una consulta $(i,j)$, computamos en qué rango cae cada índice (vector
+{\tt rangos}). Si un mismo rango contiene a ambos, entonces la consulta ``encierra''
 a un conjunto de elementos iguales, por lo que el valor más frecuente es ese y
 su cantidad de apariciones es $j-i$. Si $i$ y $j$ pertenencen a rangos distintos
-(los llamamos $S$ y $T$), debemos encontrar la frecuencia del valor más
+(llamamos a esos rangos $S$ y $T$), debemos encontrar la frecuencia del valor más
 frecuente en $S,T$, y en los rangos $R_i$ que queden contenidos completamente
-entre $S$ y $T$. Dicha frecuencia se computa en $O(1)$ en $S$ y $T$ [explicar
-aritmética], y se la obtiene en los intervalos $R_i$ ejecutando RMQ. La
-respuesta al problema es el máximo entre estos tres valores [demostrar mejor].
-
-[Otros comentarios: Vector rangos es para un elemento en "enteros", de donde
-hasta donde estaba en el original (i y j). Quedan k+2 rangos, con k los rangos
-en el medio de S y T.]
+entre $S$ y $T$ (posiblemente ninguno). Dicha frecuencia se computa para $S$ y
+$T$ en $O(1)$ [explicar aritmética], y el máximo entre todos los intervalos $R_i$
+se obtiene ejecutando RMQ sobre el arreglo {\tt enteros}. La respuesta al
+problema es entonces el máximo entre los tres valores así obtenidos.
 
 \subsection*{Análisis de complejidad}
 
 [Completar.]
+
+\bibliographystyle{acm}
+\bibliography{citas}
