@@ -84,25 +84,24 @@ y viceversa.
 \subsection*{Análisis de complejidad}
 
 Sea $k$ el largo de las ramas del árbol y $t$ el número de caracteres del
-alfabeto del árbol. Detallamos el orden de complejidad del algoritmo para cada fase.
+alfabeto de las claves del árbol. Detallamos el orden de complejidad del
+algoritmo para cada fase.
 
 En la primera fase el algoritmo determinante es el de agregar código. En cada
-inserción se debe calcular la cantidad de ceros con que empieza el
-código, operación cuyo orden es de $O(k)$.
+inserción se debe calcular el próximo prefijo, operación cuyo orden es de $O(k)$.
 
 La inserción normal en el trie tiene costo $O(k)$, que es la máxima cantidad
-de nodos que va a atravesar. Por cada inserción se calcula la cantidad de
-ceros prefijo, así que el orden resulta de $O(k^2)$.
+de nodos que va a atravesar.
 
 Si se deben completar los niveles subsiguientes (el nodo que se intentaba
 definir es prefijo de otro existente) se debe definir cada una de las ramas
 de los hijos y explorarlas cuanto haga falta. El orden para el peor caso es
-de $O(kt^k)$, que está dado por la profundidad de cada rama, la cantidad
-de hijos que puede tener un nodo, y la cantidad de ceros prefijos.
+de $O(t^k)$, que está dado por la profundidad de cada rama, la cantidad
+de hijos que puede tener un nodo.
 
 Si la inserción se ve cortada (no se llega a consumir la cadena a insertar
 porque se encuentra un código definido con anterioridad), el orden se puede
-acotar por $O(k^2)$, al igual que el primero.
+acotar por $O(k)$, al igual que el primero.
 
 En la segunda fase se realiza la compresión de claves. El peor caso ocurre
 cuando el diccionario está definido en todas las hojas de máxima profundidad
@@ -112,6 +111,14 @@ El orden (similarmente al caso de completar) es de $O(t^k)$.
 En la tercera fase (recorrer todas las claves para imprimirlas) se debe
 recorrer todos los nodos del árbol, por lo que su orden resulta también de
 $O(t^k)$.
+
+En el peor caso, dados A y B, tengo que agregar B - A claves al diccionario.
+Por lo tanto, para un A y B, en peor caso se ejecuta el ciclo $(B-A)*t^k$.
+
+Por lo tanto, la complejidad total resultante es $O(n*(max(b-a))*t^k + 2t^k)$, siendo
+$n$ el número de líneas, $b$ y $a$ los $B$ y $A$ de cada línea correspondientemente,
+$k$ el largo de las ramas del árbol y $t$ el número de caracteres del
+alfabeto de las claves del árbol.
 
 \subsection*{Pseudocódigos}
 
