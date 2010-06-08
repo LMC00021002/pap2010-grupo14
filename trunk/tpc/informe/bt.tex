@@ -1,8 +1,8 @@
 El problema consiste en el procesamiento de una tabla de planes de facturación
-para prefijos de números telefónicos. Para modelarlo utilizamos un trie
-que toma como clave el número de prefijo, y como significado el nombre del
-plan. Cada nodo tiene punteros a diez hijos, un puntero a string (significado)
-y una clave.
+para prefijos de números telefónicos. Para modelarlo utilizamos diccionario
+implementado sobre trie que toma como clave el número de prefijo, y como
+significado el nombre del plan. Cada nodo tiene punteros a diez hijos, un
+puntero a string (significado) y una clave.
 
 El algoritmo consta de 3 fases: en la primera se agregan los prefijos al
 diccionario, en la segunda se comprimen los nodos que tienen a todos sus hijos
@@ -21,12 +21,14 @@ Las inserciones se pueden dividir en tres casos:
   \item Descendiendo por una rama se intenta definir un significado en un nodo
   que tiene hijos. En este caso el algoritmo debe completar todos los nodos que
   corresponda, tratando de expandirse a través de todos los hijos que no
-  estén completos.
+  estén completos. Intuitivamente, se tiene un prefijo abajo en la tabla de facturación
+  antigua, que es a su vez prefijo de uno ubicado con anterioridad en la misma tabla.
 
   \item Al descender a través de una rama correspondiente el algoritmo encuentra
   una hoja. Esto significa que ya existe un plan cuyo código es prefijo del
-  que se intenta insertar. Los códigos necesarios para agregar el nuevo ya están
-  ocupados, y se cancela la operación por falta de lugar.
+  que se intenta insertar, por lo tanto se cancela la operación. Esto equivale a
+  que al leer la tabla antigua de arriba a abajo, leemos primero el que se leyó
+  anteriormente, por lo que el que esté más abajo no será tomado en cuenta.
 \end{enumerate}
 
 \subsubsection*{Compresión}
@@ -35,16 +37,23 @@ En la segunda fase se comprime el árbol. Para poder comprimir un nodo, todos
 sus hijos deben pertenecer al mismo plan de facturación. Lo chequeamos en
 forma recursiva, procesando primero todos los hijos de un nodo, y luego a
 él mismo. Se recorre el árbol via DFS, que retornará a un nodo el nombre
-del plan que comparten sus hijos si existe uno único. Dado que no existe
-ventaja en realizar la compresión a medida que se realizan las inserciones
-(porque si el nodo era candidato a comprimirse estaba ya completo, y no
-iba a tener nuevas inserciones), se comprime luego de todas las inserciones.
+del plan que comparten sus hijos si existe uno único. Se comprime luego de
+todas las inserciones, que no difiere en resultado si realizamos la compresión
+a medida que se realizan las inserciones (porque si el nodo era candidato a
+comprimirse estaba ya completo, y no iba a tener nuevas inserciones).
+Esto hace posible cumplir con la consigna del enunciado que pide que el resultado
+impreso contenga la menor cantidad de líneas posible.
 
 \subsubsection*{Impresión por pantalla}
 
 En la tercera y última fase se realiza la impresión de los códigos procesados,
-lo que se reduce a recorrer e imprimir todas las claves definidas en el
-diccionario.
+lo que se reduce a recorrer el diccionario e imprimir todas las claves definidas
+con su significado.
+Para imprimir antes de los códigos el número de líneas de la nueva tabla,
+mantenemos un contador de claves definidas y que no sean inválidas.
+Cuando se inserta una nueva clave se la incrementa, siempre y cuando su significado
+no sea ``invalid'', y al comprimir un nodo se la decrementa en nueve
+(pues en ese proceso se eliminan diez hojas y se agrega una).
 
 \subsection*{Detalles de implementación}
 
@@ -52,12 +61,13 @@ Dado un plan de facturación, para determinar el próximo código a insertar se
 itera en el intervalo que define. Ya que puede no ser necesario agregar todos
 los valores, se chequea si el siguiente código termina con `0', y tratamos
 de reducir cortando el último caracter siempre que el código resultante no
-contenga a otro código distinto (que tiene a este como prefijo). Repetimos el
+contenga a un código distinto (que tiene a este como prefijo). Repetimos el
 procedimiento mientras se pueda, logrando insertar al nivel más alto posible en
 el árbol.
 
 Guardamos en un {\tt set} todos los planes de facturación a procesar, lo que
-simplifica la comparación entre planes, reducida a comparar punteros.
+simplifica la comparación y asignación de significados del diccionario,
+pues se reduce a comparar y asignar punteros.
 
 Durante la mayor parte del algoritmo tratamos a los códigos como números
 enteros. Dado un plan $a-b$, $k=|b|$, definir el tamaño original del
@@ -70,11 +80,6 @@ Fue necesario utilizar {\tt long long int} para almacenar prefijos,
 pues pueden tener una longitud máxima de 11 caracteres, números que no
 entran en 32 bits. Debimos definir el pasaje de {\tt long long int} a {\tt char}
 y viceversa.
-
-Para conocer el número de líneas de la nueva tabla mantenemos un contador
-de claves definidas y que no sean inválidas. Cuando se agrega una nueva
-clave se la incrementa, y al comprimir un nodo se la decrementa en nueve
-(pues en ese proceso se eliminan diez hojas y se agrega una).
 
 \subsection*{Análisis de complejidad}
 
@@ -136,14 +141,21 @@ print(raiz)
 \vspace{0.4cm}
 pj $\leftarrow$ último prefijo a agregar calculado a partir de A y B
 
-candidato $\leftarrow$ A
+próximo $\leftarrow$ A
+dif $\leftarrow pj - próximo + 1$
 
-\For{candidato $<$ pj}{
-	próximo $\leftarrow$ candidato con los ceros a derecha simplificados de forma conveniente
+\While{$dif > 0$}{
+	\If{último dígito de próximo es cero y puedo restarle 10^{cantidad de ceros a derecha eliminados} a dif sin que quede negativo}{
+		próximo $\leftarrow$ $[próximo / 10]$
+	}
+	\Else{\If{no puedo restarle 10^{cantidad de ceros a derecha eliminados} a dif sin que quede negativo}{
+		próximo $\leftarrow$ $próximo \times 10$
+	}}
+
+    cerosNuevo $\leftarrow$ cantidad de ceros a izquierda del prefijo A - digitos(próximo) - cantidad de ceros a derecha eliminados
 	
-	agregar(próximo, BP)
-	
-	candidato $\leftarrow$ siguiente prefijo a agregar calculado a partir de A
+	p $\leftarrow$ próximo con cerosNuevo ceros agregados a izquierda
+	agregar(p, BP)
 }
 \end{algorithm}
 
