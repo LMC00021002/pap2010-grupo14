@@ -61,42 +61,55 @@ problema el máximo de los tres valores obtenidos.
 
 \subsection*{Detalles de implementación}
 
-Definimos para preprocesar los datos de la entrada las siguientes estructuras:
+Definimos para preprocesar y transformar los datos de la entrada las siguientes estructuras:
 
 \begin{itemize}
   \item[\tt enteros] tiene largo $k$, siendo $k$ el número de elementos
-  distintos en $A$. En cada posición $i$ se almacena la cantidad de apariciones
-  del iésimo elemento (distinto) de $A$.
+  distintos en $s$. En cada posición $i$ se almacena la cantidad de apariciones
+  del iésimo elemento (distinto) de $s$. Es el $s_t$ del modelo.
 
   \item[\tt rangos] es un vector que contiene pares cuyos elementos denotan
-  los índices de los subarreglos maximales de elementos iguales en $A$.
+  los índices de los subarreglos maximales de elementos iguales en $s$. Cumple
+  la función de mapRangos del modelo.
 
-  \item[\tt mapIndices] es un diccionario sobre {\tt map}, que, dada una
-  posición de $A$, indica la posición correspondiente en {\tt enteros}. Esto es:
-  {\tt mapIndices[$j$]}$=i \Leftrightarrow A[j]$ contiene al iésimo elemento
-  distinto.
+  \item[\tt mapIndices] es un vector que, dada una posición de $s$, indica la posición
+  correspondiente en {\tt enteros}. Esto es: {\tt mapIndices[$j$]}$=i \Leftrightarrow s[j]$
+  contiene al iésimo elemento distinto. Cumple la función de mapIndice del modelo.
 
   \item[\tt tabla] es la tabla RMQ (implementada sobre vectores de vectores).
   La obtenemos a partir del arreglo {\tt enteros} mediante el algoritmo {\sl
-  Sparse Table}. Este algoritmo mantiene un arreglo $M[0,N-1][0,\log N]$,
-  siendo $M[i][j]$ el índice del valor mínimo en el subarreglo que empieza en
-  $i$ de largo $2j$. [Seguir explicando.] \cite{topcoder}
-\end{itemize}
+  Sparse Table}. Este algoritmo realiza un preprocesamiento en una matriz
+  $M[0,n-1][0,\log n]$, siendo $M[i][j]$ el valor máximo en el subarreglo
+  que empieza en $i$ de largo $2^j$ y $n$ el del enunciado. Para obtener el $RMQ_s(i, j)$ a partir
+  de esta tabla, siendo $k = [log_2(j - i + 1)]$ se hace:
+  \[ RMQ_s(i, j) = \left\{ \begin{array}{ll}
+                 $M[i][k] & \mbox{si $M[i][k] > M[j-2^k+1][k]$};\\
+                 $M[j-2^k+1][k] \} & \mbox{en otro caso}.\end{array} \right. \]
 
-Dada una consulta $(i,j)$, computamos en qué rango cae cada índice (vector
-{\tt rangos}). Si un mismo rango contiene a ambos, entonces la consulta ``encierra''
-a un conjunto de elementos iguales, por lo que el valor más frecuente es ese y
-su cantidad de apariciones es $j-i$. Si $i$ y $j$ pertenencen a rangos distintos
-(llamamos a esos rangos $S$ y $T$), debemos encontrar la frecuencia del valor más
-frecuente en $S,T$, y en los rangos $R_i$ que queden contenidos completamente
-entre $S$ y $T$ (posiblemente ninguno). Dicha frecuencia se computa para $S$ y
-$T$ en $O(1)$ [explicar aritmética], y el máximo entre todos los intervalos $R_i$
-se obtiene ejecutando RMQ sobre el arreglo {\tt enteros}. La respuesta al
-problema es entonces el máximo entre los tres valores así obtenidos.
+  Para mayor información, visitar \cite{topcoder}.
+\end{itemize}
 
 \subsection*{Análisis de complejidad}
 
-[Completar.]
+Podemos calcular los vectores $enteros$, $rangos$ y $mapIndices$ en $O(n)$, siendo n el tamaño del
+vector original del input, si realizamos una sola pasada por ese vector que viene ya ordenado,
+identificando las crecientes.
+
+El RMQ tiene un costo de preprocesamiento de orden $O(nlog(n))$ lo cual es simple de verificar, pues
+debemos llenar una tabla de dimensiones $N \times log(N)$ de izquierda a derecha y de arriba a abajo.
+
+Por lo tanto la primera parte que incluye la transformación del vector original y el preprocesamiento de RMQ
+tiene en su conjunto una complejidad de $O(n + nlog(n))$.
+
+El costo de consulta de RMQ es de orden $O(1)$ según lo explicado en la sección de detalles de implementación.
+Para verificar complejidad de RMQ y más información, visitar \cite{topcoder}. Calcular la cantidad de ocurrencias
+de los elementos de los bordes del intervalo es una resta de enteros, por lo que tiene orden $O(1)$ también. Por
+lo tanto, una vez hecha la primera parte de todo el algoritmo, las consultas del |FV| tienen un orden $O(1)$.
+
+La segunda parte consiste en realizar $q$ consultas, siendo q el del enunciado, por lo que el orden resulta ser
+$O(q)$.
+
+Por lo tanto, el costo del algoritmo completo para solucionar el problema dado un input dado es $O(n + nlog(n) + q)$.
 
 \bibliographystyle{acm}
 \bibliography{citas}
