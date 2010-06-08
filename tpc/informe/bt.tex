@@ -8,8 +8,6 @@ Por otro lado tenemos un conjunto que contiene todos los {\sl bill plans}
 que van apareciendo, lo que simplifica la comparación entre {\sl billing
 plans} debido a que nos permite realizar comparaciones a nivel de punteros.
 
-\subsection*{Detalles de implementación}
-
 El algoritmo consta de 3 fases: en la primera se van agregando los prefijos
 al diccionario, en la segunda se comprimen aquellos nodos que tienen a todos sus
 hijos con igual {\sl billing plan}, y en la tercer etapa se imprimen los prefijos
@@ -70,14 +68,15 @@ cada momento que no sean inválidas. Cada vez que se agrega una clave se
 la incrementa, mientras que cuando se comprime se la decrementa en nueve
 (pues se borran diez hojas y se inserta una).
 
+\subsection*{Detalles de implementación}
+
 Por último, necesitamos utilizar {\tt long long int} para almacenar los
 prefijos, pues pueden tener una longitud máxima de 11 caracteres, números
 que no entran en 32 bits. Debimos también definir el pasaje de {\tt long
 long int} a {\tt char} y viceversa, dado que {\tt atoi} convierte de {\tt
-char} a {\tt int}. Lo mismo ocurrió con {\tt sprintf} (de arreglo a número)
-y {\tt pow10} (por alguna razón {\tt pow} no funcionaba correctamente).
+char} a {\tt int}. Lo mismo ocurrió con {\tt sprintf} (de arreglo a número).
 
-% c\begin{algorithm}[H]
+% \begin{algorithm}[H]
 % \linesnumbered
 % \caption{artic\_point\_DFS($v,G$)}
 % \Input{vértice $v$, grafo $G(V,E)$}
