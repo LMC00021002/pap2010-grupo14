@@ -5,59 +5,59 @@ Dada una secuencia $A$ de números no decrecientes, y un conjunto de pares $(i,j
 cantidad de veces que aparece el valor más frecuente en $A$ entre el intervalo
 $(i,j)$ de índices de cada consulta.
 
-Para solucionar el problema decidimos usar el algoritmo {\sl Range Minimum Query}
-(RMQ) visto en clase, pero una aplicación directa de este algoritmo para este problema
+Para solucionar el problema decidimos usar el algoritmo {\sl Range Minimum consulta}
+(RMQ) visto en clase, pero una aplicación directa de dicho algoritmo para este problema
 no es posible, pues RMQ encuentra un mínimo de una secuencia de números en un rango
 acotado dado, y nosotros necesitamos un máximo, pero además este máximo no es
 un entero de la secuencia, sino la cantidad de ocurrencias de un número.
-Como vemos, por lo tanto, aplicar RMQ al input no resolvería el problema.
+Como vemos, aplicar RMQ al input no resolvería el problema.
 
-Adaptar el {\sl Range Minimum Query} a un {\sl Range Maximum Query} es simple
+Adaptar el {\sl Range Minimum consulta} a un {\sl Range Maximum consulta} es simple
 y es un detalle de implementación que será explicado luego. Por ahora asumamos
-que podemos calcular el {\sl Range Maximum Query}.
+que podemos calcular el {\sl Range Maximum consulta}.
 
 Para adaptar la secuencia que nos provee el input la recorremos de forma
 lineal compactando los enteros que son iguales y consecutivos por un entero
-estrictamente mayor a $0$ que representa la cantidad de repeticiones de ese
-entero en la secuencia original (se asegura que todos los enteros repetidos
-aparecen de forma consecutiva ya que la secuencia viene ordenada).
+estrictamente mayor a $0$, que representa la cantidad de repeticiones de ese
+entero en la secuencia original (sabemos que todos los enteros repetidos
+aparecen de forma consecutiva porque la secuencia viene ordenada).
 
-Notar que la secuencia $s_t$ que resulta de transformar la secuencia $s$ tiene
-una longitud $1 \le L_{s_t} \le L_s$. Por lo tanto, los índices del intervalo $(i,j)$
-de la query del input pueden ser de valor mayor a $L_{s_t}$, por lo que necesitamos
+Notar que para la secuencia $s_t$ que resulta de transformar la secuencia $s$ vale
+que $1 \le |s_t| \le |s|$. Por lo tanto, los índices del intervalo $(i,j)$
+de la consulta del input pueden ser de valor mayor a $|s_t|$, por lo que necesitamos
 una forma de mapear estos índices por índices de nuestra secuencia. Para esto
-definimos un mapeo que dado un índice $i$, $mapIndice(i) = k$ es un índice de $s_t$
-con $k <= L_{s_t}$, donde $s_{t_k}$ es la cantidad de veces que ocurre el elemento
-$s_i$ en la secuencia $s$.
+definimos $mapIndice$, que dado un índice de $A$, indica la posición correspondiente
+en $s_t$ (llamémosla $k$), donde $s_{t_k}$ es la cantidad de veces que ocurre el
+elemento $s_i$ en la secuencia $s$.
 
 Dada esta transformación, es tentador utilizar RMQ directamente sobre $s_t$, pero
-esto no resuelve el problema, pues, por ejemplo, para el input del enunciado
-$s = [-1, -1, 1, 1, 1, 1, 3, 10, 10, 10]$, $s_t = [2, 4, 1, 3]$, y supongamos
-que nos dan la query $q = (2, 3)$, entonces $mapIndice(2) = 1$ y $mapIndice(3) = 2$,
-por lo tanto $RMQ_{s_t}(1,2) = 4$, que sería lo que devolvemos si no hacemos nada más,
-pero este resultado es incorrecto, pues debíamos devolver $1$. Esto se debe a que
-los intervalos de antes que tenían una longitud y que permite hacer querys con indices
-que caen entremedio se fusionaron en un solo entero.
+esto no resuelve el problema, pues una consulta podría ``partir'' intervalos.
+Por ejemplo, para el input del enunciado
+($s = [-1, -1, 1, 1, 1, 1, 3, 10, 10, 10]$, $s_t = [2, 4, 1, 3]$) y la consulta
+$q=(2,3)$, $mapIndice(2) = 1$ y $mapIndice(3) = 2$, por lo tanto $RMQ_{s_t}(1,2)
+=4$. Pero este resultado es incorrecto, pues debíamos devolver $1$, teniendo en
+cuenta que no se seleccionan los intervalos completos.
 
-Por lo tanto necesitamos una forma de solucionar esto último, y lo hacemos definiendo
-otra función auxiliar $mapRangos(i) = <k_1, k_2>$, donde $1 \le k_1 \le k_2 \le L_s$
-y $k_1$ es el índice donde comienza a ocurrir el elemento $s_i$ y $k_2$ es el índice
-de la última ocurrencia del mismo elemento en la secuencia original $s$.
+Para solucionar esto, definimos la función auxiliar $mapRangos(i) = <k_1,k_2>$,
+donde $1 \le k_1 \le k_2 \le L_s$ y $k_1$ es el índice de la primera aparición
+del elemento $s_i$ en $s$, y $k_2$ es el índice de la última aparición de $s_i$ en $s$.
 
-Con todo esto hecho, tenemos todas las herramientas necesarias para el cálculo de
-la solución. Dado un $s_t$ transformado de $s$ y una query $q = (i, j)$, tenemos una
-secuencia de rangos $<k_{1_1}, k_{1_2}>, <k_{2_1}, k_{2_2}>, ..., <k_{m_1}, k_{m_2}>$
-siendo $m = L_{s_t}$, y sabemos que $mapRangos(i) = <k_{p_1}, k_{p_2}>$ con
+Ahora tenemos todas las estructuras necesarias para calcular la solución. Dado
+un $s_t$ transformado de $s$ y una consulta $q = (i, j)$, tenemos una
+secuencia de rangos $<k_{1_1}, k_{1_2}>, <k_{2_1}, k_{2_2}>, \ldots, <k_{m_1}, k_{m_2}>$
+siendo $m = |s_t|$, y sabemos que $mapRangos(i) = <k_{p_1}, k_{p_2}>$ con
 $p = mapIndice(i)$ y $mapRangos(j) = <k_{r_1}, k_{r_2}>$ con $r = mapIndice(j)$, $p \le r$.
-Por lo tanto la función que calcula el resultado será:
+La función que calcula el resultado será:
 
 \[ FV(s, i, j) = \left\{ \begin{array}{ll}
                  j - i + 1 & \mbox{si $p = r$};\\
                  max\{ k_{p_2} - i + 1, j - k_{r_1} + 1, RMQ_{s_t}(p_2 + 1, r_1 - 1) \} & \mbox{si $p < r$}.\end{array} \right. \]
      
-Intuitivamente esta función trata los intervalos cortados (en los que caen i y j) de forma
-manual y corre RMQ para todos los intervalos de entremedio, que sabemos que son abarcados
-completamente por la query.
+Intuitivamente esta función corre RMQ para todos los intervalos completos
+que hay entre $i$ y $j$, y computa en forma particular el máximo de los
+intervalos que quedan ``cortados'' por los índices, devolviendo como solución al
+problema el máximo de los tres valores obtenidos.
+
 
 \subsection*{Detalles de implementación}
 
