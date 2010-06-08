@@ -115,10 +115,9 @@ $O(t^k)$.
 En el peor caso, dados A y B, tengo que agregar B - A claves al diccionario.
 Por lo tanto, para un A y B, en peor caso se ejecuta el ciclo $(B-A)*t^k$.
 
-Por lo tanto, la complejidad total resultante es $O(n*(max(b-a))*t^k + 2t^k)$, siendo
+Por lo tanto, la complejidad total resultante es $O(n*(max\{b-a\})*t^k + 2t^k)$, siendo
 $n$ el número de líneas, $b$ y $a$ los $B$ y $A$ de cada línea correspondientemente,
-$k$ el largo de las ramas del árbol y $t$ el número de caracteres del
-alfabeto de las claves del árbol.
+y $k$ y $t$ los ya definidos.
 
 \subsection*{Pseudocódigos}
 
