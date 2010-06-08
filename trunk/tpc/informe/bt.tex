@@ -1,45 +1,60 @@
-El problema se define como el procesamiento de una tabla de planes para
-prefijos de números telefónicos. Para modelarlo utilizamos un trie que
-toma como clave el número de prefijo y como significado el nombre del
-plan. Cada nodo tiene punteros a diez hijos, una clave, y un puntero a string
-(significado).
+El problema consiste en el procesamiento de una tabla de planes de facturación
+para prefijos de números telefónicos. Para modelarlo utilizamos un trie
+que toma como clave el número de prefijo, y como significado el nombre del
+plan. Cada nodo tiene punteros a diez hijos, un puntero a string (significado)
+y una clave.
 
-Por otro lado tenemos un conjunto que contiene todos los {\sl bill plans}
-que van apareciendo, lo que simplifica la comparación entre {\sl billing
-plans} debido a que nos permite realizar comparaciones a nivel de punteros.
+El algoritmo consta de 3 fases: en la primera se agregan los prefijos al
+diccionario, en la segunda se comprimen los nodos que tienen a todos sus hijos
+con igual plan de facturación, y en la tercera se imprimen los prefijos
+resultantes del proceso.
 
-El algoritmo consta de 3 fases: en la primera se van agregando los prefijos
-al diccionario, en la segunda se comprimen aquellos nodos que tienen a todos sus
-hijos con igual {\sl billing plan}, y en la tercer etapa se imprimen los prefijos
-resultantes del proceso.\\
+\subsubsection*{Inserción}
 
 Las inserciones se pueden dividir en tres casos:
 
 \begin{enumerate}
-  \item Al descender a través de la rama del árbol correspondiente se
-  encuentra con una hoja, lo que significa que ya existe un plan que tiene
-  un código que es prefijo del que se intenta insertar. Los códigos que se
-  necesitan ya están ocupados, y no se agrega el plan.
+  \item Al descender a través de una rama correspondiente el algoritmo encuentra
+  una hoja. Esto significa que ya existe un plan cuyo código es prefijo del
+  que se intenta insertar. Los códigos necesarios para agregar el nuevo ya están
+  ocupados, y se cancela la operación por falta de lugar.
 
-  \item Descendiendo se intenta definir un significado en un nodo que
-  tiene hijos. En este caso el algoritmo debe completar todos los nodos que
+  \item Descendiendo por una rama se intenta definir un significado en un nodo
+  que tiene hijos. En este caso el algoritmo debe completar todos los nodos que
   corresponda, tratando de expandirse a través de todos los hijos que no
-  estén completos. Puede llegar a tener que completar la rama del hijo que
-  contenía un plan definido con anterioridad.
+  estén completos.
 
   \item Al insertar se llega a una primer hoja, sin que tenga hijos el nodo
-  donde se define el significado. En este único caso se realiza la inserción
-  normal en el diccionario.
+  donde se define el significado. En este caso se realiza la inserción ``normal''
+  en el trie.
 \end{enumerate}
 
-Para determinar cual es el próximo código a insertar dado un {\sl billing
-plan} se realiza una iteración dentro del intervalo de los códigos definidos
-para el plan. Pero para que no atraviese por n valores, todos sufijos de un
-mismo prefijo, se chequea si el siguiente código termina con '0', y tratamos
-de reducir cortando el último caracter, siempre que el código resultante
-no contenga ya algún otro código que tenga a este como prefijo. Repetimos
-el procedimiento mientras se pueda, y la inserción se realiza al nivel más
-alto posible del árbol.
+\subsubsection*{Compresión}
+
+En la segunda fase se comprime el árbol. Para poder comprimir un nodo, todos
+sus hijos deben pertenecer al mismo plan de facturación. Lo chequeamos en
+forma recursiva, procesando primero todos los hijos de un nodo, y luego a
+él mismo. Se recorre el árbol via DFS, que retornará a un nodo el nombre
+del plan que comparten sus hijos si existe uno único. Dado que no existe
+ventaja en realizar la compresión a medida que se realizan las inserciones
+(porque si el nodo era candidato a comprimirse estaba ya completo, y no
+iba a tener nuevas inserciones), se comprime luego de todas las inserciones.
+
+\subsubsection*{Impresión por pantalla}
+
+En la tercera y última fase se realiza la impresión de los códigos procesados,
+lo que se reduce a recorrer e imprimir todas las claves definidas en el
+diccionario.
+
+\subsection*{Detalles de implementación}
+
+Dado un plan de facturación, para determinar el próximo código a insertar
+se realiza una iteración dentro del intervalo de códigos definido para el
+plan. Ya que tal vez no es necesario agregar todos los valores, se chequea
+si el siguiente código termina con `0', y tratamos de reducir cortando el
+último caracter siempre que el código resultante no contenga ya otro
+código que tenga a este como prefijo. Repetimos el procedimiento mientras
+se pueda, logrando ejecutar la inserción al nivel más alto posible en el árbol.
 
 En general durante el algoritmo tratamos los códigos como números
 enteros. Para avanzar de un código a otro se computa una suma. La ventaja es
@@ -48,33 +63,24 @@ computa como una suma entre los dígitos de $b$ y $a$ con los últimos $k$
 dígitos en 0, donde $k$ es la cantidad de cifras de $b$. Surgió con esto
 el problema de trabajar con códigos que comiencen con ceros, debemos llevar
 la cuenta de cuántos ceros tiene al inicio cada código, para ubicarlos
-como prefijos al imprimir el árbol.\\
+como prefijos al imprimir el árbol.
 
-En la segunda fase se comprime el árbol. Para saber que un nodo se puede
-comprimir, todos sus hijos deben pertenecer al mismo {\sl billing plan}. Este
-proceso se puede realizar de manera recursiva: en cada paso primero se
-procesan todos los hijos de un nodo, y luego él mismo. La recorrida a
-través del árbol se realiza mediante un DFS, que retornará a un nodo el
-nombre del plan que comparten sus hijos si es que existe alguno. No ofrece
-ventaja realizar la compresión a medida que se realizan las inserciones,
-porque si el nodo era candidato a comprimirse ya estaba completo, y no se
-iban a realizar allí nuevas inserciones.\\
+Por otro lado tenemos un conjunto que contiene todos los planes de
+facturación que van apareciendo, lo que simplifica la comparación entre
+planes de facturación, debido a que nos permite realizar comparaciones a
+nivel de punteros.
 
-En la tercera y última fase se realiza la impresión de los códigos nuevos
-obtenidos, lo que se reduce a recorrer todas las claves definidas en el
-diccionario e imprimirlas. Para lograr imprimir el número de líneas de
-la nueva tabla mantenemos una variable que cuenta las claves definidas en
-cada momento que no sean inválidas. Cada vez que se agrega una clave se
-la incrementa, mientras que cuando se comprime se la decrementa en nueve
-(pues se borran diez hojas y se inserta una).
+Nos fue necesario utilizar {\tt long long int} para almacenar prefijos,
+pues pueden tener una longitud máxima de 11 caracteres, números que no
+entran en 32 bits. Debimos también definir el pasaje de {\tt long long int}
+a {\tt char} y viceversa, dado que {\tt atoi} convierte de {\tt char} a {\tt
+int}. Lo mismo ocurrió con {\tt sprintf} (de arreglo a número).
 
-\subsection*{Detalles de implementación}
-
-Por último, necesitamos utilizar {\tt long long int} para almacenar los
-prefijos, pues pueden tener una longitud máxima de 11 caracteres, números
-que no entran en 32 bits. Debimos también definir el pasaje de {\tt long
-long int} a {\tt char} y viceversa, dado que {\tt atoi} convierte de {\tt
-char} a {\tt int}. Lo mismo ocurrió con {\tt sprintf} (de arreglo a número).
+Para conocer (e imprimir) el número de líneas de la nueva tabla mantenemos
+una variable que cuenta las claves definidas en cada momento que no sean
+inválidas. Cada vez que se agrega una clave se la incrementa, mientras que
+cuando se comprime se la decrementa en nueve (pues se borran diez hojas y
+se inserta una).
 
 % \begin{algorithm}[H]
 % \linesnumbered
