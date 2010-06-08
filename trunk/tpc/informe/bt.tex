@@ -77,33 +77,34 @@ long int} a {\tt char} y viceversa, dado que {\tt atoi} convierte de {\tt
 char} a {\tt int}. Lo mismo ocurrió con {\tt sprintf} (de arreglo a número)
 y {\tt pow10} (por alguna razón {\tt pow} no funcionaba correctamente).
 
-\begin{algorithm}[H]
-\linesnumbered
-\caption{artic\_point\_DFS($v,G$)}
-\Input{vértice $v$, grafo $G(V,E)$}
+% c\begin{algorithm}[H]
+% \linesnumbered
+% \caption{artic\_point\_DFS($v,G$)}
+% \Input{vértice $v$, grafo $G(V,E)$}
 
-\vspace{0.4cm}
-\For{$x$ tal que $\{v,x\} \in E$}{
-        \If{$x.dfs\_num = -1$}{
-                $v.num\_children \gets v.num\_children+1$\;
-                $stack.push(\{v,x\})$\;
-                $artic\_point\_DFS(x,G)$
-        } \lElse{\If{$x.dfs\_num < v.dfs\_num - 1$}{
-                $stack.push(\{v,x\})$\;
-        }}
-}
-\end{algorithm}
+% \vspace{0.4cm}
+% \For{$x$ tal que $\{v,x\} \in E$}{
+%         \If{$x.dfs\_num = -1$}{
+%                 $v.num\_children \gets v.num\_children+1$\;
+%                 $stack.push(\{v,x\})$\;
+%                 $artic\_point\_DFS(x,G)$
+%         } \lElse{\If{$x.dfs\_num < v.dfs\_num - 1$}{
+%                 $stack.push(\{v,x\})$\;
+%         }}
+% }
+% \end{algorithm}
 
 \subsection*{Análisis de complejidad}
 
-Sea k el largo de las ramas del árbol y t el número de caracteres del alfabeto del árbol.
+Sea $k$ el largo de las ramas del árbol y $t$ el número de caracteres del alfabeto del árbol.
 
-El orden de complejidad del algoritmo se puede determinar por cada una de las operaciones que realizamos
-en cada fase. 
+El orden de complejidad del algoritmo se puede determinar por cada una de las
+operaciones que realizamos en cada fase. 
 
-En la primera fase el algoritmo determinante es el de agregar un código. 
-En la fase de inserción el debemos calcular la cantidad de ceros que tiene el código. 
-El orden de éste es O(k). Luego este algoritmo va a ser utilizado durante toda la primera fase.
+En la primera fase el algoritmo determinante es el de agregar un código. En la
+fase de inserción el debemos calcular la cantidad de ceros que tiene el
+código. El orden de éste es $O(k)$. Luego este algoritmo va a ser utilizado
+durante toda la primera fase.
 
 El caso en el que la inserción deviene en ingresar un único código el
 orden del algoritmo es $O(k^2)$, que es la profundidad del árbol, que es la
@@ -127,5 +128,5 @@ con un mismo plan. En ese caso tiene que realizar un chequeo sobre cada uno
 de los nodos del árbol. El orden al igual que el de completar es de $O(t^k)$.
 
 Por último queda la tercera fase que es la de recorrer todas las claves para
-poder imprimirlas. Este tiene que pasar por todos los nodos del árbol por lo que
-el orden del mismo es $O(t^k)$.
+poder imprimirlas. Este tiene que pasar por todos los nodos del árbol, por lo
+que su orden es $O(t^k)$.
