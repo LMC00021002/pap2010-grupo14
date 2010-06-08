@@ -22,21 +22,21 @@ ordenada). Obtenemos así una secuencia derivada $s_t$, que cumple
 $1 \le |s_t| \le |s|$.
 
 Los índices del intervalo $(i,j)$ de las consultas del input pueden ser
-mayores que $|s_t|$, por lo que necesitamos mapear estos índices a índices de
+mayores que $|s_t|$, por lo que necesitamos mapearlos a índices válidos de
 nuestra secuencia. Para esto definimos $mapIndice$, que dado un índice de $A$,
-indica la posición correspondiente en $s_t$ (llamémosla $k$), donde $s_{t_k}$
+indica la posición correspondiente en $s_t$ (llamémosla $k$). $s_{t_k}$
 es la cantidad de veces que ocurre el elemento $s_i$ en la secuencia $s$.
 
-Dada esta transformación, es tentador utilizar RMQ directamente sobre $s_t$, pero
-esto no resuelve el problema, pues una consulta podría ``partir'' intervalos.
-Por ejemplo, para el input del enunciado
-($s = [-1, -1, 1, 1, 1, 1, 3, 10, 10, 10]$, $s_t = [2, 4, 1, 3]$) y la consulta
-$q=(2,3)$, $mapIndice(2) = 1$ y $mapIndice(3) = 2$, por lo tanto $RMQ_{s_t}(1,2)
-=4$. Pero este resultado es incorrecto, pues debíamos devolver $1$, teniendo en
-cuenta que no se seleccionan los intervalos completos.
+Dada esta transformación, es tentador utilizar RMQ directamente sobre $s_t$,
+pero esto no resuelve el problema, pues una consulta podría ``partir''
+intervalos. Por ejemplo, para el input del enunciado ($s = [-1, -1, 1,
+1, 1, 1, 3, 10, 10, 10]$, $s_t = [2, 4, 1, 3]$) y la consulta $q=(2,3)$,
+$mapIndice(2)$ vale $1$ y $mapIndice(3)$ vale $2$, por lo tanto $RMQ_{s_t}(1,2)
+=4$. Pero este resultado es incorrecto, pues debíamos devolver $1$, pues
+no se seleccionan los intervalos completos.
 
 Para solucionar esto, definimos la función auxiliar $mapRangos(i) = <k_1,k_2>$,
-donde $1 \le k_1 \le k_2 \le L_s$ y $k_1$ es el índice de la primera aparición
+donde $1 \le k_1 \le k_2 \le L_s$, $k_1$ es el índice de la primera aparición
 del elemento $s_i$ en $s$, y $k_2$ es el índice de la última aparición de $s_i$ en $s$.
 
 Ahora tenemos todas las estructuras necesarias para calcular la solución. Dado
@@ -50,7 +50,7 @@ La función que calcula el resultado será:
                  j - i + 1 & \mbox{si $p = r$};\\
                  max\{ k_{p_2} - i + 1, j - k_{r_1} + 1, RMQ_{s_t}(p_2 + 1, r_1 - 1) \} & \mbox{si $p < r$}.\end{array} \right. \]
      
-Intuitivamente esta función corre RMQ para todos los intervalos completos
+Intuitivamente esta función ejecuta RMQ para todos los intervalos completos
 que hay entre $i$ y $j$, y computa en forma particular el máximo de los
 intervalos que quedan ``cortados'' por los índices, devolviendo como solución al
 problema el máximo de los tres valores obtenidos.
@@ -88,17 +88,16 @@ Definimos para preprocesar y transformar los datos de la entrada las siguientes 
 
 \subsection*{Análisis de complejidad}
 
-Podemos calcular los vectores $enteros$, $rangos$ y $mapIndices$ en $O(n)$, siendo n el tamaño del
-vector original del input, si realizamos una sola pasada por ese vector que viene ya ordenado,
-identificando las crecientes.
+Siendo $n=|s|$, podemos calcular los vectores $enteros$, $rangos$ y
+$mapIndices$ en $O(n)$, si realizamos una sola pasada por ese vector que
+viene ya ordenado, identificando las crecientes.
 
 El RMQ tiene un costo de preprocesamiento de orden $O(n\log n)$ lo cual es
 simple de verificar, pues debemos llenar una tabla de dimensiones $N \times
 \log N$ de izquierda a derecha y de arriba hacia abajo.
 
 Por lo tanto la primera parte que incluye la transformación del vector
-original y el preprocesamiento de RMQ tiene en su conjunto una complejidad
-de $O(n + n\log n)$.
+original y el preprocesamiento de RMQ tiene una complejidad de $O(n + n\log n)$.
 
 El costo de consulta de RMQ es de orden $O(1)$ según lo explicado en la
 sección de detalles de implementación. Para verificar complejidad de RMQ y
@@ -107,8 +106,7 @@ de los elementos de los bordes del intervalo es una resta de enteros, que se
 ejecuta también en $O(1)$. Por lo tanto, una vez computada la primer parte del
 algoritmo, las consultas del $FV$ tienen un orden de $O(1)$.
 
-La segunda parte consiste en realizar $q$ consultas, siendo $q$ el del enunciado,
-por lo que el orden resulta ser $O(q)$.
+La segunda parte consiste en realizar $q$ consultas, cuyo orden es de $O(q)$.
 
 Por lo tanto, el costo del algoritmo completo para solucionar el problema, con un
 input compuesto por un arreglo de tamaño $n$ y $q$ consultas, es de
