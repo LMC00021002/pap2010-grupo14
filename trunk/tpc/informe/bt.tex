@@ -14,19 +14,19 @@ resultantes del proceso.
 Las inserciones se pueden dividir en tres casos:
 
 \begin{enumerate}
-  \item Al descender a través de una rama correspondiente el algoritmo encuentra
-  una hoja. Esto significa que ya existe un plan cuyo código es prefijo del
-  que se intenta insertar. Los códigos necesarios para agregar el nuevo ya están
-  ocupados, y se cancela la operación por falta de lugar.
+  \item Al insertar se llega a una primer hoja, sin que tenga hijos el nodo
+  donde se define el significado. En este caso se realiza la inserción ``normal''
+  en el trie.
 
   \item Descendiendo por una rama se intenta definir un significado en un nodo
   que tiene hijos. En este caso el algoritmo debe completar todos los nodos que
   corresponda, tratando de expandirse a través de todos los hijos que no
   estén completos.
 
-  \item Al insertar se llega a una primer hoja, sin que tenga hijos el nodo
-  donde se define el significado. En este caso se realiza la inserción ``normal''
-  en el trie.
+  \item Al descender a través de una rama correspondiente el algoritmo encuentra
+  una hoja. Esto significa que ya existe un plan cuyo código es prefijo del
+  que se intenta insertar. Los códigos necesarios para agregar el nuevo ya están
+  ocupados, y se cancela la operación por falta de lugar.
 \end{enumerate}
 
 \subsubsection*{Compresión}
@@ -78,37 +78,32 @@ clave se la incrementa, y al comprimir un nodo se la decrementa en nueve
 
 \subsection*{Análisis de complejidad}
 
-Sea $k$ el largo de las ramas del árbol y $t$ el número de caracteres del alfabeto del árbol.
+Sea $k$ el largo de las ramas del árbol y $t$ el número de caracteres del
+alfabeto del árbol. Detallamos el orden de complejidad del algoritmo para cada fase.
 
-El orden de complejidad del algoritmo se puede determinar por cada una de las
-operaciones que realizamos en cada fase. 
+En la primera fase el algoritmo determinante es el de agregar código. En cada
+inserción se debe calcular la cantidad de ceros con que empieza el
+código, operación cuyo orden es de $O(k)$.
 
-En la primera fase el algoritmo determinante es el de agregar un código. En la
-fase de inserción el debemos calcular la cantidad de ceros que tiene el
-código. El orden de éste es $O(k)$. Luego este algoritmo va a ser utilizado
-durante toda la primera fase.
+La inserción normal en el trie tiene costo $O(k)$, que es la máxima cantidad
+de nodos que va a atravesar. Por cada inserción se calcula la cantidad de
+ceros prefijo, así que el orden resulta de $O(k^2)$.
 
-El caso en el que la inserción deviene en ingresar un único código el
-orden del algoritmo es $O(k^2)$, que es la profundidad del árbol, que es la
-máxima cantidad de nodos que va a atravesar por el orden de cantidad de ceros.
+Si se deben completar los niveles subsiguientes (el nodo que se intentaba
+definir es prefijo de otro existente) se debe definir cada una de las ramas
+de los hijos y explorarlas cuanto haga falta. El orden para el peor caso es
+de $O(kt^k)$, que está dado por la profundidad de cada rama, la cantidad
+de hijos que puede tener un nodo, y la cantidad de ceros prefijos.
 
-En cambio cuando agregar un código se convierte en completar los niveles
-subsiguientes porque el nodo que se intentaba definir es prefijo de uno ya
-existente, entonces se debe definir cada una de las ramas de los hijos y
-explorarlas hacia abajo cuanto haga falta. El orden para el peor caso que se
-obtiene del algoritmo es $O(k*t^k)$, que está dado por la profundidad de cada
-rama y la cantidad de hijos que puede tener un nodo y la cantidad de ceros.
+Si la inserción se ve cortada (no se llega a consumir la cadena a insertar
+porque se encuentra un código definido con anterioridad), el orden se puede
+acotar por $O(k^2)$, al igual que el primero.
 
-Por último queda el caso donde la inserción se ve cortada porque no
-se llega a consumir toda la cadena a insertar y se encuentra un código
-definido antes. El orden para este caso se puede acotar por $O(k^2)$, al igual
-que el primero.
+En la segunda fase se realiza la compresión de claves. El peor caso ocurre
+cuando el diccionario está definido en todas las hojas de máxima profundidad
+con un mismo plan. En ese caso se realiza un chequeo sobre cada nodo del árbol.
+El orden (similarmente al caso de completar) es de $O(t^k)$.
 
-En la segunda fase se realiza la compresión de las claves. El peor caso es
-donde el diccionario está definido en todas las hojas de máxima profundidad
-con un mismo plan. En ese caso tiene que realizar un chequeo sobre cada uno
-de los nodos del árbol. El orden al igual que el de completar es de $O(t^k)$.
-
-Por último queda la tercera fase que es la de recorrer todas las claves para
-poder imprimirlas. Este tiene que pasar por todos los nodos del árbol, por lo
-que su orden es $O(t^k)$.
+En la tercera fase (recorrer todas las claves para imprimirlas) se debe
+recorrer todos los nodos del árbol, por lo que su orden resulta también de
+$O(t^k)$.
