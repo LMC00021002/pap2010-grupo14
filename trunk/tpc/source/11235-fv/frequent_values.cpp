@@ -14,12 +14,12 @@ typedef unsigned int uint;
 
 vector< vector< int > > tabla;
 vector< int > enteros;
-vector< int > mapRangos;
+vector< int > mapIndices;
 vector< pii > rangos;
 
 inline int max( int a, int b ) { return a > b ? a : b; }
 inline int log2( int a ){ int potencia = 0; while( 1 << ++potencia <= a ){} return potencia - 1; }
-inline pii& rangoEnQueCae( int a ) { return rangos[ mapRangos[ a ] ]; }
+inline pii& rangoEnQueCae( int a ) { return rangos[ mapIndices[ a ] ]; }
 
 void convertirARMQ( const vector< int >& arreglo )
 {
@@ -27,7 +27,7 @@ void convertirARMQ( const vector< int >& arreglo )
     int k = 0;
     int ultimoDiferente = 0;
     enteros.push_back(1);
-    mapRangos.resize( n, 0 );
+    mapIndices.resize( n, 0 );
 
     rangos.push_back( pii( 0, 0 ) );
     for( int i = 1; i < n; i++ )
@@ -42,7 +42,7 @@ void convertirARMQ( const vector< int >& arreglo )
         }
 
         enteros[ k ]++;
-        mapRangos[ i ] = k;
+        mapIndices[ i ] = k;
     }
 
     rangos[ k ].second = n - 1;
@@ -67,8 +67,8 @@ int calcularMaximo( int i, int j )
     if ( i > j )
         return 1;
 
-    i = mapRangos[ i ];
-    j = mapRangos[ j ];
+    i = mapIndices[ i ];
+    j = mapIndices[ j ];
 
     int k = log2( j - i + 1 );
     return max( tabla[ i ][ k ], tabla[ j - (1<<k) + 1 ][ k ] );
@@ -139,7 +139,7 @@ int main()
         
         tabla.clear();
         enteros.clear();
-        mapRangos.clear();
+        mapIndices.clear();
         rangos.clear();
 
         entrada >> q;
