@@ -6,12 +6,12 @@ Explicar casos. Porque esos casos resuelven el problema (Agregar, completar, etc
 \subsection*{Solución}
 
 El problema se define como el procesamiento de una tabla de planes de para los
-prefijos de números telefónicos. Para modelar esto utilizamos un trie que toma como clave 
-el número de prefijo y como significado el nombre del plan. 
-La estructura del trie es basica: cada nodo tiene punteros a diez hijos, un char (Clave) y un
-puntero a string (Significado).
-Por otro lado tenemos un conjunto que contiene todos los bill plans que van apareciendo
-de manera que nos simplifica la comparación entre los billing plans, debido a que 
+prefijos de números telefónicos. Para modelar esto utilizamos un trie que
+toma como clave el número de prefijo y como significado el nombre del plan.
+La estructura del trie es basica: cada nodo tiene punteros a diez hijos,
+un char (Clave) y un puntero a string (Significado). Por otro lado tenemos
+un conjunto que contiene todos los bill plans que van apareciendo de manera
+que nos simplifica la comparación entre los billing plans, debido a que
 nos permite realizar una comparación a nivel de punteros.
 
 \subsection*{Detalles de implementación}
@@ -80,20 +80,27 @@ En la primera fase el algoritmo determinante es el de agregar un código.
 En la fase de inserción el debemos calcular la cantidad de ceros que tiene el código. 
 El orden de éste es O(k). Luego este algoritmo va a ser utilizado durante toda la primera fase.
 
-El caso en el que la inserción deviene en ingresar un único código el orden del algoritmo es O(k^2), 
-que es la profundidad del árbol, que es la máxima cantidad de nodos que va a atravesar por el orden de cantidad de ceros.
+El caso en el que la inserción deviene en ingresar un único código el
+orden del algoritmo es $O(k^2)$, que es la profundidad del árbol, que es la
+máxima cantidad de nodos que va a atravesar por el orden de cantidad de ceros.
 
-En cambio cuando agregar un código se convierte en completar los niveles subsiguientes porque
-el nodo que se intentaba definir es prefijo de uno ya existente, entonces se debe definir cada una de las ramas
-de los hijos y explorarlas hacia abajo cuanto haga falta. El orden para el peor caso que se obtiene del algoritmo es 
-O(k*t^k), que está dado por la profundidad de cada rama y la cantidad de hijos que puede tener un nodo y la cantidad de ceros.
+En cambio cuando agregar un código se convierte en completar los niveles
+subsiguientes porque el nodo que se intentaba definir es prefijo de uno ya
+existente, entonces se debe definir cada una de las ramas de los hijos y
+explorarlas hacia abajo cuanto haga falta. El orden para el peor caso que se
+obtiene del algoritmo es $O(k*t^k)$, que está dado por la profundidad de cada
+rama y la cantidad de hijos que puede tener un nodo y la cantidad de ceros.
 
-Por último queda el caso donde la inserción se ve cortada porque no se llega a consumir toda la cadena a insertar 
-y se encuentra un código definido antes. El orden para este caso se puede acotar por O(k^2), al igual que el primero.
+Por último queda el caso donde la inserción se ve cortada porque no
+se llega a consumir toda la cadena a insertar y se encuentra un código
+definido antes. El orden para este caso se puede acotar por $O(k^2)$, al igual
+que el primero.
 
-En la segunda fase se realiza la compresión de las claves. El peor caso es donde el diccionario está definido en todas las hojas
-de máxima profundidad con un mismo plan. En ese caso tiene que realizar un chequeo sobre cada uno de los nodos del árbol.
-El orden al igual que el de completar es de O(t^k).
+En la segunda fase se realiza la compresión de las claves. El peor caso es
+donde el diccionario está definido en todas las hojas de máxima profundidad
+con un mismo plan. En ese caso tiene que realizar un chequeo sobre cada uno
+de los nodos del árbol. El orden al igual que el de completar es de $O(t^k)$.
 
-Por último queda la tercera fase que es la de recorrer todas las claves para poder imprimirlas.
-Este tiene que pasar por todos los nodos del árbol por lo que el orden del mismo es O(t^k).
+Por último queda la tercera fase que es la de recorrer todas las claves para
+poder imprimirlas. Este tiene que pasar por todos los nodos del árbol por lo que
+el orden del mismo es $O(t^k)$.
