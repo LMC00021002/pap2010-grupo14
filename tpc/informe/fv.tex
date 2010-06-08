@@ -50,9 +50,14 @@ secuencia de rangos $<k_{1_1}, k_{1_2}>, <k_{2_1}, k_{2_2}>, ..., <k_{m_1}, k_{m
 siendo $m = L_{s_t}$, y sabemos que $mapRangos(i) = <k_{p_1}, k_{p_2}>$ con
 $p = mapIndice(i)$ y $mapRangos(j) = <k_{r_1}, k_{r_2}>$ con $r = mapIndice(j)$, $p \le r$.
 Por lo tanto la función que calcula el resultado será:
+
 \[ FV(s, i, j) = \left\{ \begin{array}{ll}
-                 $j - i + 1$ & \mbox{si $p = r$}\\
-                 $max( k_{p_2} - i + 1, j - k_{r_1} + 1, RMQ_{s_t}(p + 1, r - 1) )$ & \mbox{si $p < r$}.\end{array} \right \] 
+                 j - i + 1 & \mbox{si $p = r$};\\
+                 max\{ k_{p_2} - i + 1, j - k_{r_1} + 1, RMQ_{s_t}(p_2 + 1, r_1 - 1) \} & \mbox{si $p < r$}.\end{array} \right. \]
+     
+Intuitivamente esta función trata los intervalos cortados (en los que caen i y j) de forma
+manual y corre RMQ para todos los intervalos de entremedio, que sabemos que son abarcados
+completamente por la query.
 
 \subsection*{Detalles de implementación}
 
