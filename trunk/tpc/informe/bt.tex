@@ -66,57 +66,34 @@ nueve, ya que se borran diez hojas pero se inserta una.
 
 Por último necesitamos utilizar long long int para poder guardar los prefijos que tenían una longitud máxima de 11 caracteres.
 Debido a esto tuvimos que definir pasaje de long long int a char y viceversa,dado que atoi pasa a int. 
-Lo mismo ocurrión con sprintf (de arreglo a un numero) y pow10 que por alguna razón no funcionaba correctamente. 
+Lo mismo ocurrió con sprintf (de arreglo a un numero) y pow10 que por alguna razón no funcionaba correctamente. 
+
+\subsection*{Análisis de complejidad}
+
+Sea k el largo de las ramas del árbol y t el número de caracteres del alfabeto del árbol.
 
 
+El orden de complejidad del algoritmo se puede determinar por cada una de las operaciones que realizamos
+en cada fase. 
 
-Guardamos en un {\tt set} ($billPlans$) todos los bill plans, y cuando queremos
-dar significados solamente asignamos y comparamos punteros. {\tt invalid} se lo
-agrega siempre a $billPlans$.
+En la primera fase el algoritmo determinante es el de agregar un código. 
+En la fase de inserción el debemos calcular la cantidad de ceros que tiene el código. 
+El orden de éste es O(k). Luego este algoritmo va a ser utilizado durante toda la primera fase.
 
-Magias:
+El caso en el que la inserción deviene en ingresar un único código el orden del algoritmo es O(k^2), 
+que es la profundidad del árbol, que es la máxima cantidad de nodos que va a atravesar por el orden de cantidad de ceros.
 
-Agregar: Si quiero agregar una clave que tiene como prefijo una ya existente,
-no se la agrega (ya está usado: ya está más arriba en la tabla). Llega
-a una hoja.
+En cambio cuando agregar un código se convierte en completar los niveles subsiguientes porque
+el nodo que se intentaba definir es prefijo de uno ya existente, entonces se debe definir cada una de las ramas
+de los hijos y explorarlas hacia abajo cuanto haga falta. El orden para el peor caso que se obtiene del algoritmo es 
+O(k*t^k), que está dado por la profundidad de cada rama y la cantidad de hijos que puede tener un nodo y la cantidad de ceros.
 
-Completar: No llegamos a ninguna hoja pero la clave se consumió (es más
-chica que la rama que ya existe). Se agregan un montón de hijos, se extiende
-en ramas y en hojas. Si estaba el 1234 y llega el 123, se completa 121, 122,
-123, 1231, 1232, 1233, 1234...
+Por último queda el caso donde la inserción se ve cortada porque no se llega a consumir toda la cadena a insertar 
+y se encuentra un código definido antes. El orden para este caso se puede acotar por O(k^2), al igual que el primero.
 
-Si no ocurre ninguno de los casos anteriores, hay que agregar una nueva rama u
-hoja al árbol. No existen ramas que compartan prefijo. 
+En la segunda fase se realiza la compresión de las claves. El peor caso es donde el diccionario está definido en todas las hojas
+de máxima profundidad con un mismo plan. En ese caso tiene que realizar un chequeo sobre cada uno de los nodos del árbol.
+El orden al igual que el de completar es de O(t^k).
 
-Cual conviene agregar después: Dados dos numeros $a-b$ (prefijos). $|b| \le |a|
-\land$ 12345-567 == 12345-12567. Pasamos a la segunda opción. Para ello, si
-$|b|=k$, para los últimos k digitos de $a$ se ponen en cero, y se le suma $b$.
-
-b-a = |intervalo|. Pero no hacemos un for bruto, empezamos a intentar avanzar de
-a paquetes. Si se puede restar 10, podemos agrear ese dígito completo. "Se puede
-reducir un dígito?" Cuando no se puede seguir restando, se agrega un cero. Se
-puede restar 10? No. Y 1? Si. Hasta b.
-
-Molestan los ceros adelante porque trabajamos con enteros. Recibimos en char,
-despues pasamos a int para esos computos, pero sabemos entonces cuantos ceros
-habia adelante, para agregar al prefijo resultado.
-
-Comprimir: Se agrega todo y después se comprime. Si una rama esta completa de cualquier
-manera no se puede agregar nada, se comprima o no. Asi que comprimimos al final, pues
-el resultado no cambia. Se hace un DFS en el árbol, y en la vuelta se verifica
-que si todas las hojas tienen el mismo bill plan podemos borrar todas las hojasa y
-poner el mismo billing plan en ese nodo. Se la define en el padre, digamos. Minimiza
-la cantidad de lineas del resultado. mismobillplan (mbp) tiene algo si tienen el mismo
-bill plan, sino, se mantiene vacio.
-
-Cardinal: antes de imrpimir el resultado hay que saber cuantas lineas e van a imprimir.
-cardinal es var global que se incrementa segun se agreguen lineas. siempre que billplan
-no sea invalido, pues esos no se imprimen. Al comprimir, se decrementa el cardinal, y al final se
-incrementa uno. Se simplifican 9 nodos, no 10.
-
-
-Otras cosas: La estructura del trie es basica: cada nodo tiene punteros a diez hijos, un char (Clave) y un
-puntero a string mbp (Significado). Los prefijos son de largo 1 a 11, no entra en intord pasa de char a int. cant de digitos de un long long int.
-
-
-The kind of magic fue cambiar de streaming a stdio, que bajo de 80 a 45 mseg en tiempo de computo. no poner.
+Por último queda la tercera fase que es la de recorrer todas las claves para poder imprimirlas.
+Este tiene que pasar por todos los nodos del árbol por lo que el orden del mismo es O(t^k).
