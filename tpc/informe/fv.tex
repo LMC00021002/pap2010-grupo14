@@ -83,8 +83,8 @@ Definimos para preprocesar y transformar los datos de la entrada las siguientes 
   que empieza en $i$ de largo $2^j$ y $n$ el del enunciado. Para obtener el $RMQ_s(i, j)$ a partir
   de esta tabla, siendo $k = [log_2(j - i + 1)]$ se hace:
   \[ RMQ_s(i, j) = \left\{ \begin{array}{ll}
-                 $M[i][k] & \mbox{si $M[i][k] > M[j-2^k+1][k]$};\\
-                 $M[j-2^k+1][k] \} & \mbox{en otro caso}.\end{array} \right. \]
+                 M[i][k] & \mbox{si $M[i][k] > M[j-2^k+1][k]$}\\
+                 M[j-2^k+1][k] & \mbox{en otro caso}\end{array} \right. \]
 
   Para mayor información, visitar \cite{topcoder}.
 \end{itemize}
