@@ -1,19 +1,18 @@
 \subsection*{Solución}
-El problema nos pide buscar todas las ocurrencias de un patrón en un string dado,
-siendo este patrón otro string. Nos piden además devolver la posición en la que
-ocurre el patrón dentro del texto.
+
+El problema consiste en buscar todas las ocurrencias de un patrón en un string
+dado, siendo este patrón otro string. Nos piden devolver la posición de cada
+ocurrencia del patrón en el texto.
 
 Un string $s$ ocurre con desplazamiento $p$ en un texto $t$ si los caracteres
-de $s$ ocurren en $t$ desde el $p-ésimo$ caracter del texto t. Este desplazamiento
-es, por ende, la posición en la que ocurre el patrón dado en el texto. Por lo tanto
-debemos encontrar todas los desplazamientos en que ocurre un string $s$ en un texto
-$t$ ($|s|=n, |t|=m$, con $m$ y $n$ en principio de valor ilimitado).
+de $s$ ocurren en $t$ desde el $p$-ésimo caracter de $t$. Este desplazamiento
+es, por ende, la posición en la que ocurre el patrón dado en el texto.
 
-Para este problema optamos por utilizar el algoritmo recomendado por el
+Optamos por utilizar el algoritmo sugerido por el
 enunciado: Knuth-Morris-Pratt (KMP), que resuelve precisamente
 este problema, por lo que su implementación computa soluciones válidas,
 y no se hace necesario preprocesar los datos de entrada o de salida para
-adaptar el problema.
+adaptar a este problema.
 
 \subsection*{Detalles de implementación}
 
@@ -29,8 +28,8 @@ tiempo de cómputo casi no varió.
 
 \subsection*{Análisis de complejidad}
 
-El algoritmo fue visto en clase. Se compone de dos partes: primero calcula la tabla de prefijos
-$s$, lo que toma tiempo lineal sobre el tamaño de la entrada ($O(n)$), luego hace la
-búsqueda propiamente dicha, lo que toma tiempo lineal sobre el tamaño del texto ($O(m)$).
-
-Por lo tanto la complejidad del algoritmo resulta ser $O(n + m)$.
+Este algoritmo fue visto en clase. Se compone de dos partes: primero calcula
+la tabla de prefijos de $s$, lo que toma tiempo lineal sobre el tamaño de la
+entrada: $O(|s|)$. Luego hace la búsqueda propiamente dicha, lo que toma
+tiempo lineal sobre el tamaño del texto $t$: $O(|t|)$. Por lo tanto la
+complejidad del algoritmo resulta de $O(|s| + |t|)$.
