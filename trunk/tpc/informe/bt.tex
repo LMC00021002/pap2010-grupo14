@@ -77,6 +77,22 @@ long int} a {\tt char} y viceversa, dado que {\tt atoi} convierte de {\tt
 char} a {\tt int}. Lo mismo ocurrió con {\tt sprintf} (de arreglo a número)
 y {\tt pow10} (por alguna razón {\tt pow} no funcionaba correctamente).
 
+\begin{algorithm}[H]
+\linesnumbered
+\caption{artic\_point\_DFS($v,G$)}
+\Input{vértice $v$, grafo $G(V,E)$}
+
+\vspace{0.4cm}
+\For{$x$ tal que $\{v,x\} \in E$}{
+        \If{$x.dfs\_num = -1$}{
+                $v.num\_children \gets v.num\_children+1$\;
+                $stack.push(\{v,x\})$\;
+                $artic\_point\_DFS(x,G)$
+        } \lElse{\If{$x.dfs\_num < v.dfs\_num - 1$}{
+                $stack.push(\{v,x\})$\;
+        }}
+}
+\end{algorithm}
 
 \subsection*{Análisis de complejidad}
 
