@@ -48,56 +48,33 @@ diccionario.
 
 \subsection*{Detalles de implementación}
 
-Dado un plan de facturación, para determinar el próximo código a insertar
-se realiza una iteración dentro del intervalo de códigos definido para el
-plan. Ya que tal vez no es necesario agregar todos los valores, se chequea
-si el siguiente código termina con `0', y tratamos de reducir cortando el
-último caracter siempre que el código resultante no contenga ya otro
-código que tenga a este como prefijo. Repetimos el procedimiento mientras
-se pueda, logrando ejecutar la inserción al nivel más alto posible en el árbol.
+Dado un plan de facturación, para determinar el próximo código a insertar se
+itera en el intervalo que define. Ya que puede no ser necesario agregar todos
+los valores, se chequea si el siguiente código termina con `0', y tratamos
+de reducir cortando el último caracter siempre que el código resultante no
+contenga a otro código distinto (que tiene a este como prefijo). Repetimos el
+procedimiento mientras se pueda, logrando insertar al nivel más alto posible en
+el árbol.
 
-En general durante el algoritmo tratamos los códigos como números
-enteros. Para avanzar de un código a otro se computa una suma. La ventaja es
-que, dados $(a,b)$, definir el tamaño original del intervalo de un plan se
-computa como una suma entre los dígitos de $b$ y $a$ con los últimos $k$
-dígitos en 0, donde $k$ es la cantidad de cifras de $b$. Surgió con esto
-el problema de trabajar con códigos que comiencen con ceros, debemos llevar
-la cuenta de cuántos ceros tiene al inicio cada código, para ubicarlos
-como prefijos al imprimir el árbol.
+Guardamos en un {\tt set} todos los planes de facturación a procesar, lo que
+simplifica la comparación entre planes, reducida a comparar punteros.
 
-Por otro lado tenemos un conjunto que contiene todos los planes de
-facturación que van apareciendo, lo que simplifica la comparación entre
-planes de facturación, debido a que nos permite realizar comparaciones a
-nivel de punteros.
+Durante la mayor parte del algoritmo tratamos a los códigos como números
+enteros. Dado un plan $a-b$, $k=|b|$, definir el tamaño original del
+intervalo se computa poniendo en cero los últimos $k$ dígitos de $a$,
+y haciendo $a+b$. Pero un código podría tener ceros como prefijo, para
+tenerlos en cuenta se lo lee primero como string, se cuenta la cantidad de
+ceros al inicio, y se los agrega como prefijo al momento de imprimir el árbol.
 
-Nos fue necesario utilizar {\tt long long int} para almacenar prefijos,
+Fue necesario utilizar {\tt long long int} para almacenar prefijos,
 pues pueden tener una longitud máxima de 11 caracteres, números que no
-entran en 32 bits. Debimos también definir el pasaje de {\tt long long int}
-a {\tt char} y viceversa, dado que {\tt atoi} convierte de {\tt char} a {\tt
-int}. Lo mismo ocurrió con {\tt sprintf} (de arreglo a número).
+entran en 32 bits. Debimos definir el pasaje de {\tt long long int} a {\tt char}
+y viceversa.
 
-Para conocer (e imprimir) el número de líneas de la nueva tabla mantenemos
-una variable que cuenta las claves definidas en cada momento que no sean
-inválidas. Cada vez que se agrega una clave se la incrementa, mientras que
-cuando se comprime se la decrementa en nueve (pues se borran diez hojas y
-se inserta una).
-
-% \begin{algorithm}[H]
-% \linesnumbered
-% \caption{artic\_point\_DFS($v,G$)}
-% \Input{vértice $v$, grafo $G(V,E)$}
-
-% \vspace{0.4cm}
-% \For{$x$ tal que $\{v,x\} \in E$}{
-%         \If{$x.dfs\_num = -1$}{
-%                 $v.num\_children \gets v.num\_children+1$\;
-%                 $stack.push(\{v,x\})$\;
-%                 $artic\_point\_DFS(x,G)$
-%         } \lElse{\If{$x.dfs\_num < v.dfs\_num - 1$}{
-%                 $stack.push(\{v,x\})$\;
-%         }}
-% }
-% \end{algorithm}
+Para conocer el número de líneas de la nueva tabla mantenemos un contador
+de claves definidas y que no sean inválidas. Cuando se agrega una nueva
+clave se la incrementa, y al comprimir un nodo se la decrementa en nueve
+(pues en ese proceso se eliminan diez hojas y se agrega una).
 
 \subsection*{Análisis de complejidad}
 
