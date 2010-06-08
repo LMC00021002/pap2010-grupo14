@@ -70,18 +70,18 @@ Definimos para preprocesar y transformar los datos de la entrada las siguientes 
 
   \item[\tt rangos] es un vector que contiene pares cuyos elementos denotan
   los índices de los subarreglos maximales de elementos iguales en $s$. Cumple
-  la función de mapRangos del modelo.
+  la función de $mapRangos$ del modelo.
 
   \item[\tt mapIndices] es un vector que, dada una posición de $s$, indica la posición
   correspondiente en {\tt enteros}. Esto es: {\tt mapIndices[$j$]}$=i \Leftrightarrow s[j]$
-  contiene al iésimo elemento distinto. Cumple la función de mapIndice del modelo.
+  contiene al iésimo elemento distinto. Cumple la función de $mapIndice$ del modelo.
 
   \item[\tt tabla] es la tabla RMQ (implementada sobre vectores de vectores).
   La obtenemos a partir del arreglo {\tt enteros} mediante el algoritmo {\sl
   Sparse Table}. Este algoritmo realiza un preprocesamiento en una matriz
   $M[0,n-1][0,\log n]$, siendo $M[i][j]$ el valor máximo en el subarreglo
   que empieza en $i$ de largo $2^j$ y $n$ el del enunciado. Para obtener el $RMQ_s(i, j)$ a partir
-  de esta tabla, siendo $k = [log_2(j - i + 1)]$ se hace:
+  de esta tabla, siendo $k = [\log_2(j - i + 1)]$ se hace:
   \[ RMQ_s(i, j) = \left\{ \begin{array}{ll}
                  M[i][k] & \mbox{si $M[i][k] > M[j-2^k+1][k]$}\\
                  M[j-2^k+1][k] & \mbox{en otro caso}\end{array} \right. \]
@@ -95,21 +95,27 @@ Podemos calcular los vectores $enteros$, $rangos$ y $mapIndices$ en $O(n)$, sien
 vector original del input, si realizamos una sola pasada por ese vector que viene ya ordenado,
 identificando las crecientes.
 
-El RMQ tiene un costo de preprocesamiento de orden $O(nlog(n))$ lo cual es simple de verificar, pues
-debemos llenar una tabla de dimensiones $N \times log(N)$ de izquierda a derecha y de arriba a abajo.
+El RMQ tiene un costo de preprocesamiento de orden $O(n\log n)$ lo cual es
+simple de verificar, pues debemos llenar una tabla de dimensiones $N \times
+\log N$ de izquierda a derecha y de arriba hacia abajo.
 
-Por lo tanto la primera parte que incluye la transformación del vector original y el preprocesamiento de RMQ
-tiene en su conjunto una complejidad de $O(n + nlog(n))$.
+Por lo tanto la primera parte que incluye la transformación del vector
+original y el preprocesamiento de RMQ tiene en su conjunto una complejidad
+de $O(n + n\log n)$.
 
-El costo de consulta de RMQ es de orden $O(1)$ según lo explicado en la sección de detalles de implementación.
-Para verificar complejidad de RMQ y más información, visitar \cite{topcoder}. Calcular la cantidad de ocurrencias
-de los elementos de los bordes del intervalo es una resta de enteros, por lo que tiene orden $O(1)$ también. Por
-lo tanto, una vez hecha la primera parte de todo el algoritmo, las consultas del |FV| tienen un orden $O(1)$.
+El costo de consulta de RMQ es de orden $O(1)$ según lo explicado en la
+sección de detalles de implementación. Para verificar complejidad de RMQ y
+más información, visitar \cite{topcoder}. Calcular la cantidad de ocurrencias
+de los elementos de los bordes del intervalo es una resta de enteros, que se
+ejecuta también en $O(1)$. Por lo tanto, una vez computada la primer parte del
+algoritmo, las consultas del $|FV|$ tienen un orden de $O(1)$.
 
-La segunda parte consiste en realizar $q$ consultas, siendo q el del enunciado, por lo que el orden resulta ser
-$O(q)$.
+La segunda parte consiste en realizar $q$ consultas, siendo $q$ el del enunciado,
+por lo que el orden resulta ser $O(q)$.
 
-Por lo tanto, el costo del algoritmo completo para solucionar el problema dado un input dado es $O(n + nlog(n) + q)$.
+Por lo tanto, el costo del algoritmo completo para solucionar el problema, con un
+input compuesto por un arreglo de tamaño $n$ y $q$ consultas, es de
+$O(n + n\log n + q)$.
 
 \bibliographystyle{acm}
 \bibliography{citas}
