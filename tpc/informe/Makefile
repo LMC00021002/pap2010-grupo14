@@ -4,7 +4,7 @@ doc:
 	if [ -x /usr/bin/evince ]; then evince doc.pdf; else open doc.pdf; fi &
 
 clean:
-	rm -f *.aux *.log *.out *.pdf *.gnuplot *.blg
+	rm -f *.aux *.log *.out *.pdf *.gnuplot *.blg *.bbl
 
 build:
 	pdflatex doc
