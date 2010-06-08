@@ -124,10 +124,8 @@ A modo de aclaración, agregamos los pseudocódigos de los principales métodos 
 \vspace{0.4cm}
 
 \While{existan A, B, BP que no fueron leídos de la entrada}{
-
-	A,B,BP $\leftarrow$ leerlo de entrada
-
-	agregar\_plan(A,B,BP)
+	$A,B,BP \gets$ leerlo de entrada\;
+	$agregar\_plan(A,B,BP)$
 }
 comprimir(raiz)
 
@@ -139,23 +137,19 @@ print(raiz)
 \caption{agregar\_plan($A,B,BP$)}
 \Input{prefijo entero $A$, B últimos números del último prefijo a agregar, nombre del plan de facturación BP}
 \vspace{0.4cm}
-pj $\leftarrow$ último prefijo a agregar calculado a partir de A y B
-
-próximo $\leftarrow$ A
-dif $\leftarrow pj - próximo + 1$
-
+$pj \gets$ último prefijo a agregar calculado a partir de A y B\;
+$proximo \gets A$\;
+$dif \gets pj - proximo + 1$\;
 \While{$dif > 0$}{
-	\If{último dígito de próximo es cero y puedo restarle 10^{cantidad de ceros a derecha eliminados} a dif sin que quede negativo}{
-		próximo $\leftarrow$ $[próximo / 10]$
-	}
-	\Else{\If{no puedo restarle 10^{cantidad de ceros a derecha eliminados} a dif sin que quede negativo}{
-		próximo $\leftarrow$ $próximo \times 10$
+	\If{último dígito de $proximo$ es cero y puedo restarle $10^{cant\_ceros\_eliminados}$ a $dif$ sin que quede negativo}{
+		$proximo \gets proximo / 10$
+	}\Else{
+	\If{no puedo restarle $10^{cant\_ceros\_eliminados}$ a $dif$ sin que quede negativo}{
+		$proximo \gets proximo \times 10$
 	}}
-
-    cerosNuevo $\leftarrow$ cantidad de ceros a izquierda del prefijo A - digitos(próximo) - cantidad de ceros a derecha eliminados
-	
-	p $\leftarrow$ próximo con cerosNuevo ceros agregados a izquierda
-	agregar(p, BP)
+	$cerosNuevo \gets$ cantidad de ceros a izquierda del prefijo A - digitos(proximo) - $cant\_ceros\_eliminados$\;
+	$p \leftarrow$ próximo con cerosNuevo ceros agregados a izquierda\;
+	$agregar(p,BP)$
 }
 \end{algorithm}
 
