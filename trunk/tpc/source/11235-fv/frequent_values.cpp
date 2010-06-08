@@ -1,17 +1,8 @@
-//#define FILEINPUT
-#ifdef FILEINPUT
-#include <fstream>
-#include <time.h>
-#else
 #include <iostream>
-#endif
-
 #include <vector>
 using namespace std;
 
 typedef pair< int, int > pii;
-typedef unsigned int uint;
-
 vector< vector< int > > tabla;
 vector< int > enteros;
 vector< int > mapIndices;
@@ -85,54 +76,12 @@ int calcularFV( int i, int j )
     int maximoParcial = calcularMaximo( a.second + 1, b.first - 1 );
     return max( maximoParcial, max( a.second - i + 1, j - b.first + 1) );
 }
-#ifdef FILEINPUT
-void generarTest( const char* nombreArchivo )
-{
-    srand ( time(NULL) );
-
-    int NMAX = 50;
-    int MAXINCREMENTO = 2;
-    int PROBABILIDADIGUALES = 65;
-
-    ofstream salida( nombreArchivo, ios_base::out );
-    int n = rand() % NMAX + 1;
-    int q = n*(n+1)/2;
-
-    salida << n << " " << q << endl;
-    
-    int num = -NMAX*MAXINCREMENTO/10;
-    salida << num;
-
-    for( int i = 1; i < n; i++ )
-    {
-        if( (rand() % 100) > PROBABILIDADIGUALES )
-            num += rand() % MAXINCREMENTO + 1;
-        
-        salida << " " << num;
-    }
-
-    salida << endl;
-    for( int i = 1; i <= n; i++ )
-        for( int j = i; j <= n; j++ )
-            salida << i << " " << j << endl;
-    salida << "0";
-    salida.close();
-}
-#endif
 
 int main()
 {
-#ifdef FILEINPUT
-    generarTest("test");
-    ifstream entrada( "test", ios_base::in );
-    ofstream salida( "testOut", ios_base::out );
-#else
-    istream& entrada = cin;
-    ostream& salida = cout;
-#endif
     int n, q;
 
-    while( entrada >> n )
+    while( scanf("%d", &n) == 1 )
     {
         if( n == 0 )
             break;
@@ -142,12 +91,10 @@ int main()
         mapIndices.clear();
         rangos.clear();
 
-        entrada >> q;
+        scanf("%d", &q);
         vector< int > arregloEntrada( n );
         for( int i = 0; i < n; i++ )
-        {
-            entrada >> arregloEntrada[ i ];
-        }
+            scanf("%d", &arregloEntrada[ i ]);
 
         convertirARMQ( arregloEntrada );
         procesarTabla();
@@ -155,14 +102,11 @@ int main()
         for( int i = 0; i < q; i++ )
         {
             int desde, hasta;
-            entrada >> desde >> hasta;
+            scanf("%d %d", &desde, &hasta);
 
-            salida << calcularFV(--desde, --hasta) << endl;
+            printf("%d\n", calcularFV(--desde, --hasta));
         }
     }
-#ifdef FILEINPUT
-    entrada.close();
-    salida.close();
-#endif
+
     return 0;
 }
