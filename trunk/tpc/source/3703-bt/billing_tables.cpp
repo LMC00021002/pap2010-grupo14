@@ -1,27 +1,17 @@
-//#define _CRT_SECURE_NO_WARNINGS
-//#define FILEINPUT
-//#define INVARIANTE
-#ifdef FILEINPUT
-#include <time.h>
-#include <fstream>
-#endif
-
-#include <iostream>
 #include <stdio.h>
-#include <string.h>
+#include <string>
 #include <set>
-#define forn(i, n) for(int i = 0; i < (int)(n); ++i)
 
 using namespace std;
 
 #define MAXHIJOSNODO 10
 #define MAXLONGPREFIJO 11
+#define forn(i, n) for(int i = 0; i < (int)(n); ++i)
+
+// ------------- METODOS BASICOS NECESARIOS ---------------- //
 
 inline int ord( char c ) {
-    if( 'a' < c && c < 'z' )
-	    return c - 'a';
-    else
-        return c - '0';
+    return c - '0';
 }
 
 inline long long int pow10( int i )
@@ -54,11 +44,25 @@ inline long long atoll( char* n )
     return number;
 }
 
+void llitoChar( char* c, long long int p, int digitosPi )
+{
+    c[digitosPi] = 0;
+    int i = digitosPi - 1;
+    while( p > 0 )
+    {
+        c[i] = p % 10 + '0';
+        p /= 10;
+        i--;
+    }
+}
+
+// ------------------- ESTRUCTURA DEL TRIE -------------------- //
+
 class Nodo
 {
 public:
     Nodo( char keyChar = '$', Nodo *padre = NULL ) :
-      mBP( NULL ), mKeyChar( keyChar ), mPadre( padre ) {
+      mBP( NULL ), mKeyChar( keyChar ) {
 	    forn( i, MAXHIJOSNODO )
 		    mHijos[i] = NULL;
     }
@@ -73,7 +77,6 @@ public:
 	    }
 
         mBP = NULL;
-        mPadre = NULL;
     }
 
     ~Nodo(){ destruir(); }
@@ -90,87 +93,42 @@ public:
 
     // punteros a hijos
 	Nodo *mHijos[ MAXHIJOSNODO ];
-
-    // puntero al padre
-    Nodo *mPadre;
 };
-/*
-template <class T>
-class cmp {
-public:
-    cmp(){};
 
-    bool operator() (const T& t1, const T& t2) const {
-        return t1.compare(t2) < 0;
-    }
-};*/
 // -------------------- VARIABLES GLOBALES -------------------- //
 
 Nodo raiz;
-set<string/*, cmp<string>*/> billPlans;
+set<string> billPlans;
 const string *invalido;
+long long int cardinal;
 
-// ------------------------- METODOS -------------------------- //
-#ifdef INVARIANTE
-void invariante( Nodo* nodo )
+// --------------------- METODOS DEL TRIE --------------------- //
+
+void printAux( Nodo* t, char* p, int pLen )
 {
-    if( !nodo )
-        return;
-
-    if( nodo->mKeyChar < 'a' || 'z' < nodo->mKeyChar )
-        throw "Hay un keyChar invalido";
-
-    bool esHoja = nodo->mBP != NULL;
-    if( esHoja && !nodo->mBP )
-        throw "esHoja y no tiene mBP";
-
-    if( esHoja && !nodo->mBPQueDefine )
-        throw "esHoja y no tiene mBPQueDefine";
-
-    if( nodo->mBPQueDefine )
+	if(t && ( !t->mBP || t->mBP != invalido ) )
     {
-        bool defineMB = !(nodo->mBP) || ( nodo->mBP && nodo->mBPQueDefine );
-        if( nodo->mBP )
-            defineMB = defineMB && nodo->mBP == nodo->mBPQueDefine;
-
-        for( int i = 0; i < MAXHIJOSNODO && defineMB; i++ )
+		if( t->mBP )
+    	    printf( "%s %s\n", p, t->mBP->c_str() );
+		else
         {
-            if( nodo->mHijos[i] )
+			forn( i, MAXHIJOSNODO )
             {
-                if( !nodo->mHijos[i]->mBPQueDefine )
-                    throw "El mBPQueDefine esta andando mal, su hijo tiene mBPQueDefine NULL";
-
-                defineMB = defineMB && nodo->mHijos[i]->mBPQueDefine == nodo->mBPQueDefine;
-                if( nodo->mHijos[i]->mBP )
-                    defineMB = defineMB && nodo->mHijos[i]->mBP == nodo->mBPQueDefine;
-            }
-        }
-
-        if( !defineMB )
-            throw "El mBPQueDefine esta andando mal";
-    }
-
-    bool padreHijo = false;
-    forn( i, MAXHIJOSNODO )
-        padreHijo = padreHijo || nodo == nodo->mPadre->mHijos[i];
-    if( !padreHijo )
-        throw "La relacion padre hijo esta andando mal";
-
-    forn( i, MAXHIJOSNODO )
-        invariante( nodo->mHijos[i] );
+                if( t->mHijos[i] )
+                {
+                	char conc[MAXLONGPREFIJO + 1];
+			        strcpy( conc, p );
+                    conc[ pLen ] = i + '0';
+                    conc[ pLen + 1 ] = '\0';
+				    printAux( t->mHijos[i], conc, pLen + 1 );
+                }
+			}
+		}
+	}
 }
-#endif
 
-inline bool esHoja( Nodo *nodo )
-{
-    if( !nodo )
-        return false;
-
-    bool esHoja = true;
-    for( int i = 0; i < MAXHIJOSNODO && esHoja; i++ )
-        esHoja = esHoja && nodo->mHijos[i] == NULL;
-
-    return esHoja;
+inline void print( Nodo* t ) {
+    printAux( &raiz, "", 0 );
 }
 
 void completar( Nodo* inicial, const string* billPlan )
@@ -193,6 +151,8 @@ void completar( Nodo* inicial, const string* billPlan )
 				    Nodo *nuevo = new Nodo( i + '0', actual );
                     nuevo->mBP = billPlan;
                     actual->mHijos[i] = nuevo;
+                    if( billPlan != invalido )
+                        cardinal++;
 			    }
 		    }
 	    }
@@ -260,100 +220,9 @@ void agregar( char *key, const string *billPlan )
         }
 
         previo->mBP = billPlan;
+        if( billPlan != invalido )
+            cardinal++;
 	}
-}
-
-long long int card;
-void cardinal( Nodo* t )
-{
-	if(t && ( !t->mBP || t->mBP != invalido ) )
-    {
-		if( t->mBP )
-    	    card++;
-		else {
-			forn( i, MAXHIJOSNODO )
-			    cardinal( t->mHijos[i] );
-		}
-	}
-}
-
-void printAux( Nodo* t, char* p, int pLen, ostream& salida )
-{
-	if(t && ( !t->mBP || t->mBP != invalido ) )
-    {
-		if( t->mBP )
-    	    salida << p << " " << t->mBP->c_str() << endl;
-		else
-        {
-			forn( i, MAXHIJOSNODO )
-            {
-                if( t->mHijos[i] )
-                {
-                	char conc[MAXLONGPREFIJO + 1];
-			        strcpy( conc, p );
-                    conc[ pLen ] = i + '0';
-                    conc[ pLen + 1 ] = '\0';
-				    printAux( t->mHijos[i], conc, pLen + 1, salida );
-                }
-			}
-		}
-	}
-}
-
-inline void print( Nodo* t, ostream& salida ) {
-    printAux( &raiz, "", 0, salida );
-}
-
-#ifdef FILEINPUT
-void crearPrefijos( char* pi, char* pj )
-{
-    for( int i = 0; i < MAXLONGPREFIJO; i++ )
-        pi[i] = rand() % 10 + '0';
-    pi[11] = '\0';
-
-    int offset = rand() % MAXLONGPREFIJO;
-    for( int i = offset; i < MAXLONGPREFIJO; i++ ) {
-        pj[i - offset] = pi[i] + rand() % 3;
-        if( pj[i - offset] > '9' )
-            pj[i - offset] = '9';
-    }
-    pj[MAXLONGPREFIJO - offset] = '\0';
-}
-
-void generarTest( char* nombreArchivo )
-{
-    ofstream salida( nombreArchivo, ios_base::out );
-    srand( time(NULL) );
-    int cantTests = 20;
-    while( cantTests-- > 0 )
-    {
-        int n = rand() % 100;
-
-        salida << n << endl;
-
-        while( n-- > 0 ) {
-            char pi[12], pj[12];
-            crearPrefijos( pi, pj );
-            salida << pi << " - " << pj << " ";
-            (rand() % 100 > 30) ? salida << (char)(rand() % 26 + 'a') : salida << "invalid";
-            salida << endl;
-        }
-        salida << endl;
-    }
-    salida.close();
-}
-#endif
-
-void llitoChar( char* c, long long int p, int digitosPi )
-{
-    c[digitosPi] = 0;
-    int i = digitosPi - 1;
-    while( p > 0 )
-    {
-        c[i] = p % 10 + '0';
-        p /= 10;
-        i--;
-    }
 }
 
 void comprimir( Nodo *nodo )
@@ -389,46 +258,36 @@ void comprimir( Nodo *nodo )
                 {
                     delete nodo->mHijos[i];
                     nodo->mHijos[i] = NULL;
+                    if( hojasMismoBP != invalido )
+                        cardinal--;
                 }
             }
 
             nodo->mBP = hojasMismoBP;
+            if( hojasMismoBP != invalido )
+                cardinal++;
         }
     }
 }
 
 int main() {
-#ifdef FILEINPUT
-    generarTest("testGenerado");
-	ifstream entrada( "testGenerado", ios_base::in );
-	ofstream salida( "testGeneradoOut", ios_base::out );
-#else
-	istream& entrada = cin;
-	ostream& salida = cout;
-#endif
 
     int n, numTest = 0;
     long long int pi, pj;
 	char p[MAXLONGPREFIJO + 1], bpInput[21];
     const string* bp;
 
-    while( entrada >> n )
+    while( scanf("%d", &n ) == 1 )
     {
-        card = 0;
-        billPlans.clear();
+        cardinal = 0;
         invalido = &*billPlans.insert( "invalid" ).first;
 
         if ( numTest++ > 0 )
-            salida << endl;
+            printf("\n");
 
 		while( n-- > 0 )
         {
-			entrada.ignore(); // ignoramos el '\n'
-			entrada >> p;
-            entrada.ignore(); /* Guion y espacio */
-			entrada.ignore();
-			entrada >> pj;
-			entrada >> bpInput;
+            scanf("%s - %lld %s", p, &pj, bpInput );
 
             bp = &*billPlans.insert( bpInput ).first;
 
@@ -457,10 +316,6 @@ int main() {
 		        llitoChar( p + cerosNuevo, pi, dpi );
 		        agregar( p, bp ); 
 
-#ifdef INVARIANTE
-                forn( j, MAXHIJOSNODO )
-                    invariante(raiz.mHijos[j]);
-#endif
     		    dif -= pow10(i);
 			    pi++;
 		    }
@@ -471,18 +326,14 @@ int main() {
         forn( i, MAXHIJOSNODO )
             comprimir( raiz.mHijos[i] );
 
-        cardinal( &raiz );
-		salida << card << endl;
+		printf("%d\n", cardinal);
 
 		/* Imprime árbol por stdout */
-		print( &raiz, salida );
+		print( &raiz );
 
 		raiz.destruir();
+        billPlans.clear();
     }
 
-#ifdef FILEINPUT
-	entrada.close();
-	salida.close();
-#endif
 	return 0;
 }
