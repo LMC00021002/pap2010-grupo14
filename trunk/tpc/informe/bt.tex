@@ -78,81 +78,6 @@ clave se la incrementa, y al comprimir un nodo se la decrementa en nueve
 
 \subsection*{Análisis de complejidad}
 
-\begin{algorithm}[H]
-\linesnumbered
-\caption{agregar\_plan($A,B,BP$)}
-\Input{prefijo entero $A$, B últimos números del último prefijo a agregar, nombre del plan de facturación BP}
-\vspace{0.4cm}
-pj $\leftarrow$ último prefijo a agregar calculado a partir de A y B
-
-candidato $\leftarrow$ A
-
-\For{candidato $<$ pj}{
-	próximo $\leftarrow$ candidato con los ceros a derecha simplificados de forma conveniente
-	
-	agregar(próximo, BP)
-	
-	candidato $\leftarrow$ siguiente prefijo a agregar calculado a partir de A
-}
-\end{algorithm}
-
-\begin{algorithm}[H]
-\linesnumbered
-\caption{agregar($p,BP$)}
-\Input{prefijo $p$ a agregar, nombre del plan de facturación BP}
-\vspace{0.4cm}
-actual $\leftarrow$ raíz
-\While{pueda bajar en el árbol}{
-	actual $\leftarrow$ actual.hijo[primer caracter de p] si existe
-	p $\leftarrow$ p sin el primer caracter
-}
-\If{no llegué a una hoja ya agregada}{
-	\If{p es vacío}{
-		completar(actual, BP)
-	}
-	\lElse{
-		agregar la rama correspondiente a p a partir de actual
-		
-		$cardinal++$
-	}
-}
- \end{algorithm}
-
-\begin{algorithm}[H]
-\linesnumbered
-\caption{comprimir($nodo$)}
-\Input{nodo del árbol}
-\vspace{0.4cm}
-\For{$0 < i < 9$}{
-	comprimir($nodo.hijo[i]$)
-}
-\If{todos los hijos de nodo tienen significado y es el mismo}{
-
-	hojasMismoBp $\leftarrow$ significado
-	
-	borrar hijos de nodo
-
-	actualizar cardinal
-}
- \end{algorithm}
-
-\begin{algorithm}[H]
-\linesnumbered
-\caption{billing\_tables(entrada)}
-\Input{archivo de entrada}
-\vspace{0.4cm}
-
-\While{existan A, B, BP que no fueron leídos de la entrada}{
-
-	A,B,BP $\leftarrow$ leerlo de entrada
-
-	agregar\_plan(A,B,BP)
-}
-comprimir(raiz)
-
-print(raiz)
-\end{algorithm}
-
 Sea $k$ el largo de las ramas del árbol y $t$ el número de caracteres del
 alfabeto del árbol. Detallamos el orden de complejidad del algoritmo para cada fase.
 
@@ -182,3 +107,92 @@ El orden (similarmente al caso de completar) es de $O(t^k)$.
 En la tercera fase (recorrer todas las claves para imprimirlas) se debe
 recorrer todos los nodos del árbol, por lo que su orden resulta también de
 $O(t^k)$.
+
+\subsection*{Pseudocódigos}
+
+A modo de aclaración, agregamos los pseudocódigos de los principales métodos del algoritmo:
+
+\begin{algorithm}[H]
+\linesnumbered
+\caption{billing\_tables(entrada)}
+\Input{archivo de entrada}
+\vspace{0.4cm}
+
+\While{existan A, B, BP que no fueron leídos de la entrada}{
+
+	A,B,BP $\leftarrow$ leerlo de entrada
+
+	agregar\_plan(A,B,BP)
+}
+comprimir(raiz)
+
+print(raiz)
+\end{algorithm}
+
+\begin{algorithm}[H]
+\linesnumbered
+\caption{agregar\_plan($A,B,BP$)}
+\Input{prefijo entero $A$, B últimos números del último prefijo a agregar, nombre del plan de facturación BP}
+\vspace{0.4cm}
+pj $\leftarrow$ último prefijo a agregar calculado a partir de A y B
+
+candidato $\leftarrow$ A
+
+\For{candidato $<$ pj}{
+	próximo $\leftarrow$ candidato con los ceros a derecha simplificados de forma conveniente
+	
+	agregar(próximo, BP)
+	
+	candidato $\leftarrow$ siguiente prefijo a agregar calculado a partir de A
+}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\linesnumbered
+\caption{agregar($p,BP$)}
+\Input{prefijo $p$ a agregar, nombre del plan de facturación BP}
+\vspace{0.4cm}
+actual $\leftarrow$ raíz
+
+\While{pueda bajar en el árbol}{
+	actual $\leftarrow$ actual.hijo[primer caracter de p] si existe
+	
+	p $\leftarrow$ p sin el primer caracter
+}
+\If{no llegué a una hoja ya agregada}{
+	\If{p es vacío}{
+		completar(actual, BP)
+	}
+	\lElse{
+		agregar la rama correspondiente a p a partir de actual
+		
+		$cardinal++$
+	}
+}
+ \end{algorithm}
+
+\begin{algorithm}[H]
+\linesnumbered
+\caption{completar(nodo)}
+\Input{nodo del árbol}
+\vspace{0.4cm}
+recorrer el árbol que tiene como raíz a nodo en orden DFS, agregando hojas donde no las haya y actualizando el cardinal cada vez que lo hacemos
+\end{algorithm}
+
+\begin{algorithm}[H]
+\linesnumbered
+\caption{comprimir($nodo$)}
+\Input{nodo del árbol}
+\vspace{0.4cm}
+\For{$0 < i < 9$}{
+	comprimir($nodo.hijo[i]$)
+}
+\If{todos los hijos de nodo tienen significado y es el mismo}{
+
+	hojasMismoBp $\leftarrow$ significado
+	
+	borrar hijos de nodo
+
+	actualizar cardinal
+}
+\end{algorithm}
