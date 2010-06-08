@@ -1,12 +1,19 @@
-Un string $s$ ocurre con desplazamiento $p$ en un texto $t$ si los caracteres
-de $s$ ocurren en $t$ desde $t[p]$. El problema consiste en encontrar todas
-los desplazamientos en que ocurre un string $s$ en un texto $t$ ($|s|=n,
-|t|=m$, $m$ en principio de tamaño ilimitado).
+\subsection*{Solución}
+El problema nos pide buscar todas las ocurrencias de un patrón en un string dado,
+siendo este patrón otro string. Nos piden además devolver la posición en la que
+ocurre el patrón dentro del texto.
 
-Aplicando el algoritmo de Knuth-Morris-Pratt, que resuelve precisamente
+Un string $s$ ocurre con desplazamiento $p$ en un texto $t$ si los caracteres
+de $s$ ocurren en $t$ desde el $p-ésimo$ caracter del texto t. Este desplazamiento
+es, por ende, la posición en la que ocurre el patrón dado en el texto. Por lo tanto
+debemos encontrar todas los desplazamientos en que ocurre un string $s$ en un texto
+$t$ ($|s|=n, |t|=m$, con $m$ y $n$ en principio de valor ilimitado).
+
+Para este problema optamos por utilizar el algoritmo recomendado por el
+enunciado: Knuth-Morris-Pratt (KMP), que resuelve precisamente
 este problema, por lo que su implementación computa soluciones válidas,
 y no se hace necesario preprocesar los datos de entrada o de salida para
-adaptarlos a los del problema.
+adaptar el problema.
 
 \subsection*{Detalles de implementación}
 
@@ -22,8 +29,8 @@ tiempo de cómputo casi no varió.
 
 \subsection*{Análisis de complejidad}
 
-El algoritmo se compone de dos partes. Primero calcula la tabla de prefijos $s$,
-lo que toma tiempo lineal sobre el tamaño de la entrada ($O(m)$). Luego hace la
-búsqueda propiamente dicha, y toma tiempo lineal sobre el tamaño del texto ($O(m)$).
+El algoritmo fue visto en clase. Se compone de dos partes: primero calcula la tabla de prefijos
+$s$, lo que toma tiempo lineal sobre el tamaño de la entrada ($O(n)$), luego hace la
+búsqueda propiamente dicha, lo que toma tiempo lineal sobre el tamaño del texto ($O(m)$).
 
-La complejidad del algoritmo resulta por tanto de $O(n+m)$.
+Por lo tanto la complejidad del algoritmo resulta ser $O(n + m)$.
