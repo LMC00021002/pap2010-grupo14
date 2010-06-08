@@ -1,77 +1,86 @@
-Modelo: Tenemos un trie, le agregamos como clave el número prefijo. Como significado
-el bill plan.
+El problema se define como el procesamiento de una tabla de planes para
+prefijos de números telefónicos. Para modelarlo utilizamos un trie que
+toma como clave el número de prefijo y como significado el nombre del
+plan. Cada nodo tiene punteros a diez hijos, una clave, y un puntero a string
+(significado).
 
-Explicar casos. Porque esos casos resuelven el problema (Agregar, completar, etc).
-
-\subsection*{Solución}
-
-El problema se define como el procesamiento de una tabla de planes de para los
-prefijos de números telefónicos. Para modelar esto utilizamos un trie que
-toma como clave el número de prefijo y como significado el nombre del plan.
-La estructura del trie es basica: cada nodo tiene punteros a diez hijos,
-un char (Clave) y un puntero a string (Significado). Por otro lado tenemos
-un conjunto que contiene todos los bill plans que van apareciendo de manera
-que nos simplifica la comparación entre los billing plans, debido a que
-nos permite realizar una comparación a nivel de punteros.
+Por otro lado tenemos un conjunto que contiene todos los {\sl bill plans}
+que van apareciendo, lo que simplifica la comparación entre {\sl billing
+plans} debido a que nos permite realizar comparaciones a nivel de punteros.
 
 \subsection*{Detalles de implementación}
 
-El algoritmo consta de 3 fases, la primera es el momento en que se van agregando los prefijos
-al diccionario, la segunda donde se comprimen aquellos nodos que tienen a todos sus hijos
-con el mismo billing plan, y por último la etapa donde se imprimen los prefijos resultantes 
-del proceso.
+El algoritmo consta de 3 fases: en la primera se van agregando los prefijos
+al diccionario, en la segunda se comprimen aquellos nodos que tienen a todos sus
+hijos con igual {\sl billing plan}, y en la tercer etapa se imprimen los prefijos
+resultantes del proceso.\\
 
-En la primera etapa las inserciones pueden seguir 3 caminos posibles:
-El primero es que al descender a través de la rama del árbol correspondiente, 
-se encuentre con una hoja, con lo cual quiere decir que ya existe un plan que tiene definido
-un código que es prefijo del que estamos tratando de insertar. En ese caso el algoritmo 
-concluye en ese momento debido a que los códigos para este que está tratando de insertar ya están
-ocupados.
-El segundo camino es que en el momento del descenso intente definir un significado en un nodo que tiene
-hijos. En este caso el algoritmo debe completar todos los nodos que corresponda tratando de expandirse
-a través de todos los hijos que no estén completados. Esto quiere decir que también puede que tenga que completar 
-la rama del hijo que contenía otro plan definido anteriormente.
-El tercer camino posible es que al insertar llegue a una hoja sin que se haya cruzado con una hoja en el camino
-y sin que tenga hijos el nodo donde se define el significado. En este caso sólo se realiza la inserción 
-normal en el diccionario.
+Las inserciones se pueden dividir en tres casos:
 
-Para determinar dado un billing plan cual es el próximo código a insertar 
-se realiza una iteración dentro del intervalo de los códigos definidos para el plan.
-Pero para que no atraviese por todos los valores lo que hacemos es chequear si es que el siguiente
-código termina con 0 y tratamos de reducir cortando el último caracter siempre que el 
-código resultante no contenga ya algún otro código que tenga a este como prefijo. Repetimos el procedimiento
-mientras se pueda y se realiza la inserción al nivel más alto posible del árbol.
+\begin{enumerate}
+  \item Al descender a través de la rama del árbol correspondiente se
+  encuentra con una hoja, lo que significa que ya existe un plan que tiene
+  un código que es prefijo del que se intenta insertar. Los códigos que se
+  necesitan ya están ocupados, y no se agrega el plan.
 
-En general durante el algoritmo tratamos los códigos como números enteros, avanzar de un código a otro lo realizamos 
-como una suma. Esto trae la ventaja de que definir el tamaño original del intervalo de un plan dado (a,b) 
-se puede computar como una suma entre los dígitos de b y a con los últimos k dígitos en 0, donde k es la cantidad de cifras de b.
-Por otro lado surgió el problema de tener que trabajar con códigos que comienzan con dígitos en 0. 
-Esto hizo que debamos a cada paso mantener contados los dígitos en 0 para el código actual y poder ubicarlo como prefijo al imprimirlo por ejemplo.
+  \item Descendiendo se intenta definir un significado en un nodo que
+  tiene hijos. En este caso el algoritmo debe completar todos los nodos que
+  corresponda, tratando de expandirse a través de todos los hijos que no
+  estén completos. Puede llegar a tener que completar la rama del hijo que
+  contenía un plan definido con anterioridad.
 
+  \item Al insertar se llega a una primer hoja, sin que tenga hijos el nodo
+  donde se define el significado. En este único caso se realiza la inserción
+  normal en el diccionario.
+\end{enumerate}
 
-En la segunda fase realizamos la compresión del árbol. 
-Para saber que un nodo se debe comprimir debe cumplir que todos sus hijos pertenezcan al mismos billing plan.
-Entonces este proceso se puede realizar de manera recursiva con el fin de que en cada paso primero se hayan procesado
-todos los hijos de un nodo y recién luego el mismo, así se tiene la certeza de que todos sus hijos fueron procesados
-anteriormente. La recorrida a través del árbol se realiza mediante un DFS que retornará a un nodo el nombre del billing plan que 
-comparten sus hijos si es que tal existe. La compresión se realiza en este paso debido a que no ofrece
-ninguna ventaja realizarlo a medida que se realizan las inserciones porque si el nodo era candidato a comprimirse
-ya estaba completo y no se iban a realizar otras inserciones en éste.
+Para determinar cual es el próximo código a insertar dado un {\sl billing
+plan} se realiza una iteración dentro del intervalo de los códigos definidos
+para el plan. Pero para que no atraviese por n valores, todos sufijos de un
+mismo prefijo, se chequea si el siguiente código termina con '0', y tratamos
+de reducir cortando el último caracter, siempre que el código resultante
+no contenga ya algún otro código que tenga a este como prefijo. Repetimos
+el procedimiento mientras se pueda, y la inserción se realiza al nivel más
+alto posible del árbol.
 
-En la tercera y última fase se realiza la impresión de todos los códigos nuevos que se obtuvieron, que no es más que recorrer
-todas las claves definidas en el diccionario e imprimirlas. Pero para lograr imprimir el número de líneas de la nueva tabla
-mantenemos una variable que cuenta las claves definidas en cada momento del diccionario que no sean inválidas.
-De esta manera cada vez que se agrega una clave se la incrementa en uno, mientras que cada vez que se comprime se la decrementa en 
-nueve, ya que se borran diez hojas pero se inserta una.
+En general durante el algoritmo tratamos los códigos como números
+enteros. Para avanzar de un código a otro se computa una suma. La ventaja es
+que, dados $(a,b)$, definir el tamaño original del intervalo de un plan se
+computa como una suma entre los dígitos de $b$ y $a$ con los últimos $k$
+dígitos en 0, donde $k$ es la cantidad de cifras de $b$. Surgió con esto
+el problema de trabajar con códigos que comiencen con ceros, debemos llevar
+la cuenta de cuántos ceros tiene al inicio cada código, para ubicarlos
+como prefijos al imprimir el árbol.\\
 
-Por último necesitamos utilizar long long int para poder guardar los prefijos que tenían una longitud máxima de 11 caracteres.
-Debido a esto tuvimos que definir pasaje de long long int a char y viceversa,dado que atoi pasa a int. 
-Lo mismo ocurrió con sprintf (de arreglo a un numero) y pow10 que por alguna razón no funcionaba correctamente. 
+En la segunda fase se comprime el árbol. Para saber que un nodo se puede
+comprimir, todos sus hijos deben pertenecer al mismo {\sl billing plan}. Este
+proceso se puede realizar de manera recursiva: en cada paso primero se
+procesan todos los hijos de un nodo, y luego él mismo. La recorrida a
+través del árbol se realiza mediante un DFS, que retornará a un nodo el
+nombre del plan que comparten sus hijos si es que existe alguno. No ofrece
+ventaja realizar la compresión a medida que se realizan las inserciones,
+porque si el nodo era candidato a comprimirse ya estaba completo, y no se
+iban a realizar allí nuevas inserciones.\\
+
+En la tercera y última fase se realiza la impresión de los códigos nuevos
+obtenidos, lo que se reduce a recorrer todas las claves definidas en el
+diccionario e imprimirlas. Para lograr imprimir el número de líneas de
+la nueva tabla mantenemos una variable que cuenta las claves definidas en
+cada momento que no sean inválidas. Cada vez que se agrega una clave se
+la incrementa, mientras que cuando se comprime se la decrementa en nueve
+(pues se borran diez hojas y se inserta una).
+
+Por último, necesitamos utilizar {\tt long long int} para almacenar los
+prefijos, pues pueden tener una longitud máxima de 11 caracteres, números
+que no entran en 32 bits. Debimos también definir el pasaje de {\tt long
+long int} a {\tt char} y viceversa, dado que {\tt atoi} convierte de {\tt
+char} a {\tt int}. Lo mismo ocurrió con {\tt sprintf} (de arreglo a número)
+y {\tt pow10} (por alguna razón {\tt pow} no funcionaba correctamente).
+
 
 \subsection*{Análisis de complejidad}
 
 Sea k el largo de las ramas del árbol y t el número de caracteres del alfabeto del árbol.
-
 
 El orden de complejidad del algoritmo se puede determinar por cada una de las operaciones que realizamos
 en cada fase. 
