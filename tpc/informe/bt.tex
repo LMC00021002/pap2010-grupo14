@@ -8,6 +8,8 @@ Explicar casos. Porque esos casos resuelven el problema (Agregar, completar, etc
 El problema se define como el procesamiento de una tabla de planes de para los
 prefijos de números telefónicos. Para modelar esto utilizamos un trie que toma como clave 
 el número de prefijo y como significado el nombre del plan. 
+La estructura del trie es basica: cada nodo tiene punteros a diez hijos, un char (Clave) y un
+puntero a string (Significado).
 Por otro lado tenemos un conjunto que contiene todos los bill plans que van apareciendo
 de manera que nos simplifica la comparación entre los billing plans, debido a que 
 nos permite realizar una comparación a nivel de punteros.
@@ -35,7 +37,16 @@ normal en el diccionario.
 
 Para determinar dado un billing plan cual es el próximo código a insertar 
 se realiza una iteración dentro del intervalo de los códigos definidos para el plan.
-Pero para que no atraviese por todos los valores lo que hacemos es chequear si es que siguiente
+Pero para que no atraviese por todos los valores lo que hacemos es chequear si es que el siguiente
+código termina con 0 y tratamos de reducir cortando el último caracter siempre que el 
+código resultante no contenga ya algún otro código que tenga a este como prefijo. Repetimos el procedimiento
+mientras se pueda y se realiza la inserción al nivel más alto posible del árbol.
+
+En general durante el algoritmo tratamos los códigos como números enteros, avanzar de un código a otro lo realizamos 
+como una suma. Esto trae la ventaja de que definir el tamaño original del intervalo de un plan dado (a,b) 
+se puede computar como una suma entre los dígitos de b y a con los últimos k dígitos en 0, donde k es la cantidad de cifras de b.
+Por otro lado surgió el problema de tener que trabajar con códigos que comienzan con dígitos en 0. 
+Esto hizo que debamos a cada paso mantener contados los dígitos en 0 para el código actual y poder ubicarlo como prefijo al imprimirlo por ejemplo.
 
 
 En la segunda fase realizamos la compresión del árbol. 
@@ -47,7 +58,17 @@ comparten sus hijos si es que tal existe. La compresión se realiza en este paso
 ninguna ventaja realizarlo a medida que se realizan las inserciones porque si el nodo era candidato a comprimirse
 ya estaba completo y no se iban a realizar otras inserciones en éste.
 
-Para 
+En la tercera y última fase se realiza la impresión de todos los códigos nuevos que se obtuvieron, que no es más que recorrer
+todas las claves definidas en el diccionario e imprimirlas. Pero para lograr imprimir el número de líneas de la nueva tabla
+mantenemos una variable que cuenta las claves definidas en cada momento del diccionario que no sean inválidas.
+De esta manera cada vez que se agrega una clave se la incrementa en uno, mientras que cada vez que se comprime se la decrementa en 
+nueve, ya que se borran diez hojas pero se inserta una.
+
+Por último necesitamos utilizar long long int para poder guardar los prefijos que tenían una longitud máxima de 11 caracteres.
+Debido a esto tuvimos que definir pasaje de long long int a char y viceversa,dado que atoi pasa a int. 
+Lo mismo ocurrión con sprintf (de arreglo a un numero) y pow10 que por alguna razón no funcionaba correctamente. 
+
+
 
 Guardamos en un {\tt set} ($billPlans$) todos los bill plans, y cuando queremos
 dar significados solamente asignamos y comparamos punteros. {\tt invalid} se lo
@@ -95,11 +116,7 @@ incrementa uno. Se simplifican 9 nodos, no 10.
 
 
 Otras cosas: La estructura del trie es basica: cada nodo tiene punteros a diez hijos, un char (Clave) y un
-puntero a string mbp (Significado). Los prefijos son de largo 1 a 11, no entra en int
-asi que se usa long long int. tuvimos que definir pasaje de long long int a char y viceversa,
-atoi por ejemplo pasa a int. Lo mesmo con sprintf (de arreglo a un numero). pow10, por alguna raazon
-pow no andaba bien. ord pasa de char a int. cant de digitos de un long long int.
+puntero a string mbp (Significado). Los prefijos son de largo 1 a 11, no entra en intord pasa de char a int. cant de digitos de un long long int.
+
 
 The kind of magic fue cambiar de streaming a stdio, que bajo de 80 a 45 mseg en tiempo de computo. no poner.
-
-\subsection*{Análisis de complejidad}
