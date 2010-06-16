@@ -1,0 +1,36 @@
+El problema consiste en determinar la cantidad de substrings distintos dada
+una cadena de caracteres. El archivo de input del test contiene un conjunto de
+cadenas y hay que calcular los substrings distintos para cada una de ellas.
+
+Para esto calculamos el suffix array de la cadena y luego el LCP. De este modo
+al sumar cada una de las longitudes de los sufijos y al mismo tiempo restar el
+valor del LCP (que calcula la longitud del prefijo común y en su defecto los
+prefijos que comparten) estamos obteniendo la cantidad de substrings no
+repetidos que se obtienen al considerar todos los prefijos de los sufijos de
+la cadena. O sea todos los substrings de la cadena.
+
+Para poder realizar esto utilizamos una una versión sencilla del suffix array
+que sigue está basada en la implementación presentada en el paper de Kasai. La
+idea del algoritmo es que puede ordenar todos los sufijos comparando sólo 2
+caracteres por iteración. En cada iteración va a aprovechar la información
+obtenida en las iteraciones anteriores, de manera que pueda conocer en cada
+paso el doble de la información que en el anterior de manera que pueda
+ordenarlos en una $log n$ iteraciones. 
+%En cada una de las iteraciones se realiza un orde
+
+Para calcular el LCP utlizamos el algoritmo de Sadakane que calcula el LCP
+correspondiente al suffix array en tiempo lineal. El concepto principal del
+algoritmo se basa en aprovechar que si el sufijo $S{k}$ y el $S{j}$ tienen en
+común $t$ caracteres, los sufijos $S{k+1}$ y $S{j+1}$, tienen en comun al
+menos t-1 caracteres ya que estos también los comparten sus predecesores.
+
+Finalmente sólo queda recorrer el LCP y el suffix array para ir computando los
+substrings y restando aquellos que son prefijos de otros sufijos.
+
+\subsection*{Detalles de implementación}
+
+\subsection*{Análisis de complejidad}
+
+Ambos algoritmos los vimos en clase, el orden del suffix array es $n (log
+n)^2$ y n para el LCP. Luego la recorrida a través de los arrays tiene un
+orden de $O(n)$. El orden completo del algoritmo es $O(n\log n^2)$
