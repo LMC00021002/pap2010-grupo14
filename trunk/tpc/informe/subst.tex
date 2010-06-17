@@ -27,9 +27,9 @@ por lo que realiza un ordenamiento en $log(n)$ iteraciones.
 
 Para calcular el LCP utilizamos el algoritmo de Sadakane que calcula el LCP
 correspondiente al suffix array en tiempo lineal. El concepto principal del
-algoritmo se basa en aprovechar que si el sufijo $s_k1$ y el $s_k2$ tienen en
-común $p$ caracteres, los sufijos $s_{k1+1}$ y $s_{k2+1}$ tienen en comun al
-menos $p-1$ caracteres, ya que estos también los comparten sus predecesores.
+algoritmo se basa en aprovechar que si el sufijo $s_{k1}$ y el $s_{k2}$ tienen en
+común un prefijo $p$, los sufijos $s_{k1+1}$ y $s_{k2+1}$ tienen en común un prefijo
+$p'$ de longitud $|p'| \ge |p|-1$.
 
 Finalmente, para devolver la cantidad de substrings distintos calculamos la cantidad
 total de substrings de la cadena que es $\displaystyle\frac{|s|*(|s|+1)}{2}$ y le restamos la
@@ -42,5 +42,5 @@ repetidos.
 \subsection*{Análisis de complejidad}
 
 Ambos algoritmos los vimos en clase. El orden para calcular el suffix array es
-$O(n(logn)^2)$ y $O(n)$ para el LCP. La recorrida a través del LCP array tiene un
-orden de $O(n)$. Por lo tanto el orden total del algoritmo es $O(n(log n)^2)$.
+$O( n*log^2(n) )$ y $O(n)$ para el LCP. La recorrida a través del LCP array tiene un
+orden de $O(n)$. Por lo tanto el orden total del algoritmo es $O( n*log^2(n) )$.
