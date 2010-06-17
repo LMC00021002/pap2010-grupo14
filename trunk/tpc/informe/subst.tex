@@ -2,35 +2,45 @@ El problema consiste en determinar la cantidad de substrings distintos dada
 una cadena de caracteres. El archivo de input del test contiene un conjunto de
 cadenas y hay que calcular los substrings distintos para cada una de ellas.
 
-Para esto calculamos el suffix array de la cadena y luego el LCP. De este modo
-al sumar cada una de las longitudes de los sufijos y al mismo tiempo restar el
-valor del LCP (que calcula la longitud del prefijo común y en su defecto los
-prefijos que comparten) estamos obteniendo la cantidad de substrings no
-repetidos que se obtienen al considerar todos los prefijos de los sufijos de
-la cadena. O sea todos los substrings de la cadena.
+Sabemos que si tenemos una cadena $s$, podemos obtener un substring $s_{ij}$
+con $1 \le i \le j \le |s|$ conociendo el sufijo $s_i$ y tomando su prefijo
+$s_{i_j}$. Además, resulta fácil ver que si tenemos dos sufijos $s_{k1}$ y 
+$s_{k2}$ con $1 \le k1 \le k2 \le |s|$, si la primer letra del primer sufijo
+es distinta a la primer letra del segundo sufijo, entonces los prefijos de esos
+sufijos serán todos diferentes entre sí. En cambio si existe un prefijo en común
+$p$ de longitud $1 \le |p| \le k1 \le k2$ los sufijos tendrán $|p|$ prefijos
+en común, o sea que ambos presentan $|p|$ substrings en común. Por lo tanto, la
+cantidad de substrings distintos que ambos sufijos generan será $|s_{k1}| + |s_{k1}| - |p|$.
+Esta es la idea básica del algoritmo que resuelve el problema.
 
-Para poder realizar esto utilizamos una una versión sencilla del suffix array
-que sigue está basada en la implementación presentada en el paper de Kasai. La
-idea del algoritmo es que puede ordenar todos los sufijos comparando sólo 2
-caracteres por iteración. En cada iteración va a aprovechar la información
-obtenida en las iteraciones anteriores, de manera que pueda conocer en cada
-paso el doble de la información que en el anterior de manera que pueda
-ordenarlos en una $log n$ iteraciones. 
-%En cada una de las iteraciones se realiza un orde
+Conocemos una estructura que fue dada en clase y que ayuda mucho a resolver este
+problema: el suffix array. Calculamos el suffix array de la cadena y el LCP array.
+El objetivo principal es utilizar el LCP array para calcular la cantidad de substrings
+que comparten dos sufijos.
 
-Para calcular el LCP utlizamos el algoritmo de Sadakane que calcula el LCP
+Utilizamos una versión sencilla del suffix array que está basada en la
+implementación presentada en el paper de Kasai. La idea del algoritmo es que
+puede ordenar todos los sufijos comparando sólo 2 caracteres por iteración. En
+cada iteración aprovecha la información obtenida en las iteraciones anteriores,
+de forma que en cada paso conoce el doble de la información que en el anterior,
+por lo que realiza un ordenamiento en $log(n)$ iteraciones.
+
+Para calcular el LCP utilizamos el algoritmo de Sadakane que calcula el LCP
 correspondiente al suffix array en tiempo lineal. El concepto principal del
-algoritmo se basa en aprovechar que si el sufijo $S{k}$ y el $S{j}$ tienen en
-común $t$ caracteres, los sufijos $S{k+1}$ y $S{j+1}$, tienen en comun al
-menos t-1 caracteres ya que estos también los comparten sus predecesores.
+algoritmo se basa en aprovechar que si el sufijo $s_k1$ y el $s_k2$ tienen en
+común $p$ caracteres, los sufijos $s_{k1+1}$ y $s_{k2+1}$ tienen en comun al
+menos $p-1$ caracteres, ya que estos también los comparten sus predecesores.
 
-Finalmente sólo queda recorrer el LCP y el suffix array para ir computando los
-substrings y restando aquellos que son prefijos de otros sufijos.
+Finalmente, para devolver la cantidad de substrings distintos calculamos la cantidad
+total de substrings de la cadena que es $\displaystyle\frac{|s|*(|s|+1)}{2}$ y le restamos la
+sumatoria del arreglo de LCP, que se corresponde con la cantidad total de substrings
+repetidos.
 
 \subsection*{Detalles de implementación}
+%TODO: COMPLETAR CON LAS ESTRUCTURAS USADAS EN LA IMPLEMENTACION
 
 \subsection*{Análisis de complejidad}
 
-Ambos algoritmos los vimos en clase, el orden del suffix array es $n (log
-n)^2$ y n para el LCP. Luego la recorrida a través de los arrays tiene un
-orden de $O(n)$. El orden completo del algoritmo es $O(n\log n^2)$
+Ambos algoritmos los vimos en clase. El orden para calcular el suffix array es
+$O(n(logn)^2)$ y $O(n)$ para el LCP. La recorrida a través del LCP array tiene un
+orden de $O(n)$. Por lo tanto el orden total del algoritmo es $O(n(log n)^2)$.
