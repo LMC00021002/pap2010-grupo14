@@ -26,13 +26,12 @@ la información obtenida en los iteraciones anteriores, de forma que en
 cada paso conoce el doble de la información que en el anterior, logrando
 realizar el ordenamiento en $\log(n)$ iteraciones.
 
-% FIXME: Sadakane es el paper de la ACM?
 % FIXME: Explicar mejor?
 Para calcular el LCP utilizamos el algoritmo de Sadakane que calcula el LCP
 correspondiente a un suffix array dado en tiempo lineal sobre la cantidad de
-sufijos. Su concepto principal es aprovechar que si el sufijo $s_{k1}$ y el
-$s_{k2}$ tienen en común un prefijo $p$, los sufijos $s_{k1+1}$ y $s_{k2+1}$
-tienen en común un prefijo $p'$ de longitud $|p'| \ge |p|-1$.
+sufijos \cite{sadakane}. Su concepto principal es aprovechar que si el sufijo
+$s_{k1}$ y el $s_{k2}$ tienen en común un prefijo $p$, los sufijos $s_{k1+1}$ y
+$s_{k2+1}$ tienen en común un prefijo $p'$ de longitud $|p'| \ge |p|-1$.
 
 Finalmente, para devolver la cantidad de substrings distintos,
 calculamos la cantidad total de substrings de la cadena, que es
