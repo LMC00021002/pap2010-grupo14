@@ -1,0 +1,113 @@
+Dada una secuencia $s$ de números no decrecientes y un conjunto de pares
+$(i,j)$ llamados consultas (con $|A|=n$, $1 \le i \le j \le n$), el problema
+consiste en encontrar la cantidad de veces que aparece el valor más frecuente
+en $A$ en el intervalo $(i,j)$.
+
+Para solucionar el problema decidimos usar el algoritmo {\sl Range Minimum
+Query} (RMQ) visto en clase, pero una aplicación directa del algoritmo no es
+posible para este problema, pues RMQ encuentra un mínimo de una secuencia
+de números en un rango dado, y nosotros necesitamos un máximo, pero
+además no necesitamos conocer un entero de la secuencia, sino la cantidad
+de ocurrencias de un número dado.
+
+Adaptar el {\sl Range Minimum Query} a un {\sl Range Maximum Query} es un
+detalle de implementación que será explicado luego. Por ahora asumamos
+que podemos calcularlo.
+
+Recorremos $s$ para adaptarla en forma lineal, compactando los enteros que
+son iguales y consecutivos por un entero mayor que $0$, que representa la
+cantidad de repeticiones de ese entero en la secuencia original (todos los
+enteros repetidos aparecen de forma consecutiva porque la secuencia está
+ordenada). Obtenemos así una secuencia derivada $s_t$, que cumple
+$1 \le |s_t| \le |s|$.
+
+Los índices del intervalo $(i,j)$ de las consultas del input pueden ser
+mayores que $|s_t|$, por lo que necesitamos mapearlos a índices válidos de
+nuestra secuencia. Para esto definimos $mapIndice$, que dado un índice de $A$,
+indica la posición correspondiente en $s_t$ (llamémosla $k$). $s_{t_k}$
+es la cantidad de veces que ocurre el elemento $s_i$ en la secuencia $s$.
+
+Dada esta transformación, es tentador utilizar RMQ directamente sobre $s_t$,
+pero esto no resuelve el problema, pues una consulta podría ``partir''
+intervalos. Por ejemplo, para el input del enunciado ($s = [-1, -1, 1,
+1, 1, 1, 3, 10, 10, 10]$, $s_t = [2, 4, 1, 3]$) y la consulta $q=(2,3)$,
+$mapIndice(2)$ vale $1$ y $mapIndice(3)$ vale $2$, por lo tanto $RMQ_{s_t}(1,2)
+=4$. Pero este resultado es incorrecto, pues debíamos devolver $1$, pues
+no se seleccionan los intervalos completos.
+
+Para solucionar esto, definimos la función auxiliar $mapRangos(i) = <k_1,k_2>$,
+donde $1 \le k_1 \le k_2 \le L_s$, $k_1$ es el índice de la primera aparición
+del elemento $s_i$ en $s$, y $k_2$ es el índice de la última aparición de $s_i$ en $s$.
+
+Ahora tenemos todas las estructuras necesarias para calcular la solución. Dado
+un $s_t$ transformado de $s$ y una consulta $q = (i, j)$, tenemos una
+secuencia de rangos $<k_{1_1}, k_{1_2}>, <k_{2_1}, k_{2_2}>, \ldots, <k_{m_1}, k_{m_2}>$
+siendo $m = |s_t|$, y sabemos que $mapRangos(i) = <k_{p_1}, k_{p_2}>$ con
+$p = mapIndice(i)$ y $mapRangos(j) = <k_{r_1}, k_{r_2}>$ con $r = mapIndice(j)$, $p \le r$.
+La función que calcula el resultado será:
+
+\[ FV(s, i, j) = \left\{ \begin{array}{ll}
+                 j - i + 1 & \mbox{si $p = r$};\\
+                 max\{ k_{p_2} - i + 1, j - k_{r_1} + 1, RMQ_{s_t}(p_2 + 1, r_1 - 1) \} & \mbox{si $p < r$}.\end{array} \right. \]
+     
+Intuitivamente esta función ejecuta RMQ para todos los intervalos completos
+que hay entre $i$ y $j$, y computa en forma particular el máximo de los
+intervalos que quedan ``cortados'' por los índices, devolviendo como solución al
+problema el máximo de los tres valores obtenidos.
+
+
+\subsection*{Detalles de implementación}
+
+Definimos para preprocesar y transformar los datos de la entrada las siguientes estructuras:
+
+\begin{itemize}
+  \item[\tt enteros] tiene largo $k$, siendo $k$ el número de elementos
+  distintos en $s$. En cada posición $i$ se almacena la cantidad de apariciones
+  del iésimo elemento (distinto) de $s$. Es el $s_t$ del modelo.
+
+  \item[\tt rangos] es un vector que contiene pares cuyos elementos denotan
+  los índices de los subarreglos maximales de elementos iguales en $s$. Cumple
+  la función de $mapRangos$ del modelo.
+
+  \item[\tt mapIndices] es un vector que, dada una posición de $s$, indica la posición
+  correspondiente en {\tt enteros}. Esto es: {\tt mapIndices[$j$]}$=i \Leftrightarrow s[j]$
+  contiene al iésimo elemento distinto. Cumple la función de $mapIndice$ del modelo.
+
+  \item[\tt tabla] es la tabla RMQ (implementada sobre vectores de vectores).
+  La obtenemos a partir del arreglo {\tt enteros} mediante el algoritmo {\sl
+  Sparse Table}. Este algoritmo realiza un preprocesamiento en una matriz
+  $M[0,n-1][0,\log n]$, siendo $M[i][j]$ el valor máximo en el subarreglo
+  que empieza en $i$ de largo $2^j$ y $n$ el del enunciado. Para obtener el $RMQ_s(i, j)$ a partir
+  de esta tabla, siendo $k = [\log_2(j - i + 1)]$ se hace:
+  \[ RMQ_s(i, j) = \left\{ \begin{array}{ll}
+                 M[i][k] & \mbox{si $M[i][k] > M[j-2^k+1][k]$}\\
+                 M[j-2^k+1][k] & \mbox{en otro caso}\end{array} \right. \]
+
+  Para mayor información, visitar \cite{topcoder}.
+\end{itemize}
+
+\subsection*{Análisis de complejidad}
+
+Siendo $n=|s|$, podemos calcular los vectores $enteros$, $rangos$ y
+$mapIndices$ en $O(n)$, si realizamos una sola pasada por ese vector que
+viene ya ordenado, identificando las crecientes.
+
+El RMQ tiene un costo de preprocesamiento de orden $O(n\log n)$ lo cual es
+simple de verificar, pues debemos llenar una tabla de dimensiones $N \times
+\log N$ de izquierda a derecha y de arriba hacia abajo.
+
+Por lo tanto la primera parte que incluye la transformación del vector
+original y el preprocesamiento de RMQ tiene una complejidad de $O(n + n\log n)$.
+
+El costo de consulta de RMQ es de orden $O(1)$ según lo explicado en la
+sección de detalles de implementación. Para verificar complejidad de RMQ y
+más información, visitar \cite{topcoder}. Calcular la cantidad de ocurrencias
+de los elementos de los bordes del intervalo es una resta de enteros, que se
+ejecuta también en $O(1)$. Por lo tanto, una vez computada la primer parte del
+algoritmo, las consultas del $FV$ tienen un orden de $O(1)$.
+
+La segunda parte consiste en realizar $q$ consultas, cuyo orden es de $O(q)$.
+
+Por lo tanto, el costo del algoritmo completo para solucionar el problema, con un
+input compuesto por un arreglo de tamaño $n$ y $q$ consultas, es de
+$O(n + n\log n + q)$.
