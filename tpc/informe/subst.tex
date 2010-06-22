@@ -30,9 +30,27 @@ Finalmente, para devolver la cantidad de substrings distintos,
 calculamos la cantidad total de substrings de la cadena, que es
 $\displaystyle\frac{|s|(|s|+1)}{2}$, y le restamos la sumatoria del arreglo
 de LCP, que se corresponde con la cantidad total de substrings repetidos.
+Intuitivamente, esto es lo mismo que recorrer el suffix array en orden inverso
+(ya que el LCP array guarda los prefijos repetidos con el siguiente sufijo del
+arreglo), sumando la longitud del sufijo actual y restando los substrings
+repetidos que este sufijo produce con respecto a los anteriores iterados.
+Es decir, en la i-ésima iteración, se suma la longitud del i-ésimo elemento
+del suffix array y se resta su LCP que se corresponde con la cantidad de substrings
+repetidos con el inmediato anterior, y no hace falta restar los repetidos con los
+anteriores restantes pues ya fueron exluídos en las iteraciones previas.
 
 \subsection*{Detalles de implementación}
-% FIXME: COMPLETAR CON LAS ESTRUCTURAS USADAS EN LA IMPLEMENTACION
+La implementación del algoritmo de armado del suffix array con LCP fue sacada de:
+
+http://trucosos.alwaysdata.net/snippets/173/
+
+Fue testeada, verificada y se le agregó:
+\begin{itemize}
+\item El parseo de varios casos de test para un input dado.
+\item La devolución del resultado en long long int.
+\item El método sumatoria que se encarga de sumar los enteros de un arreglo y
+devolver un long long int.
+\end{itemize}
 
 \subsection*{Análisis de complejidad}
 
