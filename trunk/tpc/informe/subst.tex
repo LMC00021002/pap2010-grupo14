@@ -1,6 +1,6 @@
 El problema consiste en determinar la cantidad de substrings distintos que
 pueden formarse con una cadena de caracteres. El input contiene un conjunto de
-cadenas, y se debe calcular la cantidad de substrings distintos para cada una.
+cadenas, y se debe calcular para cada una la cantidad de substrings distintos.
 
 Si tenemos una cadena $s$, podemos obtener un substring $s_{ij}$ (con $1
 \le i \le j \le |s|$) conociendo el sufijo $s_i$, y tomando luego su prefijo
@@ -9,29 +9,22 @@ $s_{k2}$ ($1 \le k1 \le k2 \le |s|$), si la primer letra del primer sufijo es
 distinta a la primer letra del segundo sufijo, entonces los prefijos de esos
 sufijos serán todos diferentes entre sí. En cambio si existe un prefijo $p$
 en común, los sufijos tendrán $|p|$ prefijos en común, lo que significa
-que ambos comparten $|p|$ substrings. Por tanto, la cantidad de subcadenas
-distintas que ambos sufijos generan será igual a $|s_{k1}| + |s_{k1}| -
-|p|$. Esta es la idea del algoritmo que usamos para resolver este problema.
+que ambos comparten $|p|$ substrings iguales. Por tanto, la cantidad de
+subcadenas distintas que ambos sufijos generan será igual a $|s_{k1}| + |s_{k1}|
+-|p|$. Esta es la idea del algoritmo que usamos para resolver este problema.
 
-% FIXME: Explicaría más esto que sigue.
-La estructura de datos que facilita la implementación de la idea es {\sl suffix
-array}. Calculamos el {\sl suffix array} de la cadena, y luego el {\sl Longest
-Common Prefix} (LCP). El objetivo es utilizar el LCP array para calcular la
-cantidad de substrings que comparten dos sufijos.
+La estructura de datos que facilita la implementación de dicha idea es {\sl
+suffix array}. Calculamos el {\sl suffix array} de la cadena, y luego el {\sl
+Longest Common Prefix} (LCP {\sl array}), con el que calculamos la cantidad de
+substrings que comparte cada par de sufijos (lo que equivale al valor de $|p|$).
 
 Utilizamos una implementación de {\sl suffix array} basada en la presentada
-en \cite{kasai}. La idea del algoritmo es que puede ordenarse todos los
-sufijos comparando sólo 2 caracteres por vez. En cada iteración aprovecha
-la información obtenida en los iteraciones anteriores, de forma que en
-cada paso conoce el doble de la información que en el anterior, logrando
-realizar el ordenamiento en $\log(n)$ iteraciones.
-
-% FIXME: Explicar mejor?
-Para calcular el LCP utilizamos el algoritmo de Sadakane que calcula el LCP
-correspondiente a un suffix array dado en tiempo lineal sobre la cantidad de
-sufijos \cite{sadakane}. Su concepto principal es aprovechar que si el sufijo
-$s_{k1}$ y el $s_{k2}$ tienen en común un prefijo $p$, los sufijos $s_{k1+1}$ y
-$s_{k2+1}$ tienen en común un prefijo $p'$ de longitud $|p'| \ge |p|-1$.
+en el paper de Toru Kasai\cite{kasai}, que en cada iteración aprovecha la
+información obtenida en los iteraciones anteriores, de forma que en cada
+paso conoce el doble de la información que en el anterior, logrando realizar
+el ordenamiento en $\log(n)$ pasos. Para calcular el LCP utilizamos el
+algoritmo de Sadakane, que calcula el LCP de un suffix array dado en tiempo
+lineal sobre la cantidad de sufijos\cite{sadakane}.
 
 Finalmente, para devolver la cantidad de substrings distintos,
 calculamos la cantidad total de substrings de la cadena, que es
@@ -43,7 +36,6 @@ de LCP, que se corresponde con la cantidad total de substrings repetidos.
 
 \subsection*{Análisis de complejidad}
 
-Ambos algoritmos fueron vistos en clase. El orden para calcular el {\sl suffix
-array} es $O(n\log^2(n))$, y calcular su LCP toma tiempo $O(n)$. Recorrer el
-LCP array tiene un orden de $O(n)$, por lo que el orden total del algoritmo
-resulta $O(n\log^2(n))$.
+Ambos algoritmos fueron vistos en clase. El orden para calcular el {\sl
+suffix array} es $O(n\log^2(n))$, y calcular su LCP (igual que recorrerlo)
+toma tiempo $O(n)$. El orden total del algoritmo resulta $O(n\log^2(n))$.
