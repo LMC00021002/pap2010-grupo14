@@ -1,6 +1,6 @@
-#include <iostream>
-#include <vector>
+#include <stdio.h>
 #include <math.h>
+#include <vector>
 #include <list>
 
 #ifdef _DEBUG
@@ -26,9 +26,9 @@ public:
     Par( double _x, double _y ) : x( _x ), y( _y ) {};
     Par( const Par& p ) : x( p.x ), y( p.y ) {};
     Par operator-( const Par& p ) const { return Par( x - p.x, y - p.y ); }
-    bool operator<( const Par& p ) const { return y < p.x; }
-    bool operator==( const Par& p ) const { return x == p.x && y == p.y; }
-    bool operator!=( const Par& p ) const { return x != p.x || y != p.y; }
+    bool operator<( const Par& p ) const { return y + EPSILON < p.x; }
+    bool operator==( const Par& p ) const { return fabs(x - p.x) < EPSILON && fabs(y - p.y) < EPSILON; }
+    bool operator!=( const Par& p ) const { return fabs(x - p.x) > EPSILON || fabs(y - p.y) > EPSILON; }
 
     double x;
     double y;
@@ -145,7 +145,7 @@ bool interSemirrectaSeg( const Semirrecta& sr, const Segmento& s, Par& res )
 Par intervaloSombra( const Luz& l, const Columna& c )
 {
     Par v( c.x - l.x, c.y - l.y );
-    double hipot = _hypot( v.x, v.y );
+    double hipot = sqrt( v.x * v.x + v.y * v.y );   // hypot( v.x, v.y );
     double sinAlf = c.r / hipot;        // sin(alfa) = opuesto / hipotenusa
     double ady = sqrt( hipot * hipot - (double)(c.r * c.r) );   // adyacente = raiz( hipotenusa^2 - opuesto^2 )
     double cosAlf = ady / hipot;        // cos(alfa) = adyacente / hipotenusa
@@ -305,8 +305,6 @@ void complemento( list< Par >& conj, double minVal, double maxVal )
 
 double perimIluminado()
 {
-    int cantLuces = luces.size();
-    int cantColumnas = columnas.size();
     int minVal = 0, maxVal = (ancho << 1) + (alto << 1);
     list< Par > iluminado;
 
