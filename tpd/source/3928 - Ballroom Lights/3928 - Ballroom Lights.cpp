@@ -145,10 +145,11 @@ bool interSemirrectaSeg( const Semirrecta& sr, const Segmento& s, Par& res )
 Par intervaloSombra( const Luz& l, const Columna& c )
 {
     Par v( c.x - l.x, c.y - l.y );
-    double hipot = sqrt( v.x * v.x + v.y * v.y );   // hypot( v.x, v.y );
-    double sinAlf = c.r / hipot;        // sin(alfa) = opuesto / hipotenusa
-    double ady = sqrt( hipot * hipot - (double)(c.r * c.r) );   // adyacente = raiz( hipotenusa^2 - opuesto^2 )
-    double cosAlf = ady / hipot;        // cos(alfa) = adyacente / hipotenusa
+    double hipot = sqrt( v.x * v.x + v.y * v.y );					// hypot( v.x, v.y );
+    double sinAlf = c.r / hipot;									// sin(alfa) = opuesto / hipotenusa
+//    double ady = sqrt( hipot * hipot - (double)(c.r * c.r) );		// adyacente = raiz( hipotenusa^2 - opuesto^2 )
+//    double cosAlf = ady / hipot;									// cos(alfa) = adyacente / hipotenusa
+    double cosAlf = sqrt(1 - sinAlf * sinAlf);						// cos(alfa) = sqrt( 1 - sin^2(alfa) )
 
     /* las tangentes las calculamos rotando el vector multiplicandolo con la matriz de rotación
      *
@@ -306,6 +307,13 @@ void complemento( list< Par >& conj, double minVal, double maxVal )
 double perimIluminado()
 {
     int minVal = 0, maxVal = (ancho << 1) + (alto << 1);
+
+	if( cantLuces == 0 )
+		return minVal;
+
+	if( cantColumnas == 0 )
+		return maxVal;
+
     list< Par > iluminado;
 
     for( vector< Luz >::const_iterator l = luces.begin(); l < luces.end(); l++ ) {
@@ -389,7 +397,13 @@ bool testInterSemirrectas()
 
     paso = paso && !interSemirrectas( sr1, sr2, inter );
 
-    return paso;
+	// 10
+	sr1 = Semirrecta( Par( 0, EPSILON ), Par( 1, 0 ) );
+	sr2 = Semirrecta( Par( EPSILON, 1 ), Par( -EPSILON, -EPSILON ) );
+
+    paso = paso && !interSemirrectas( sr1, sr2, inter );
+
+	return paso;
 }
 
 bool testInterSemirrectaSeg()
@@ -453,7 +467,13 @@ bool testInterSemirrectaSeg()
 
     paso = paso && !interSemirrectaSeg( sr1, sr2, inter );
 
-    return paso;
+    // 10
+    sr1 = Semirrecta( Par( 0, 0 ), Par( 1, 0 ) );
+    sr2 = Segmento( Par( 0, 1 ), Par( -EPSILON, 0 ) );
+
+    paso = paso && !interSemirrectaSeg( sr1, sr2, inter );
+
+	return paso;
 }
 bool testIntervaloSombra()
 {
@@ -702,8 +722,8 @@ int main()
     assert( testUnir() );
     assert( testComplemento() );
 
-    ifstream entrada( "test.in", ios_base::in );
-    ofstream salida( "test.out", ios_base::out );
+    ifstream entrada( "test2.txt", ios_base::in );
+    ofstream salida( "test2.out", ios_base::out );
 #endif
 
     while( true ) {
@@ -717,7 +737,7 @@ int main()
         scanf( "%d %d %d %d", &cantLuces, &cantColumnas, &ancho, &alto );
 #endif
 
-        if( ! ( cantLuces > 0 && cantColumnas > 0 && ancho > 0 && alto > 0 ) )
+        if( cantLuces == 0 && cantColumnas == 0 && ancho == 0 && alto == 0 )
             break;
 
         pared.resize(4);
@@ -756,6 +776,7 @@ int main()
 
 #ifdef _DEBUG
     entrada.close();
+	salida.close();
 #endif
 
     return 0;
