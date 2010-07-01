@@ -3,13 +3,13 @@
 #define forn(i, n) for(i=0; i < (int)(n); ++i)
 #define MAX_RULE 94
 
-int M[MAX_RULE][MAX_RULE];
-int M2[MAX_RULE][MAX_RULE];
+int orig[MAX_RULE][MAX_RULE];
+int aux[MAX_RULE][MAX_RULE];
 
 void show_matrix(int (*a)[MAX_RULE]) {
 	int i, j;
 	forn(i, MAX_RULE) {
-		printf("%i\t", i);
+		printf("%c (%i)\t", i+33, i+33);
 		forn(j, MAX_RULE)
 			printf("%d ", a[i][j]);
 		printf("\n");
@@ -17,45 +17,69 @@ void show_matrix(int (*a)[MAX_RULE]) {
 	printf("\n");
 }
 
-void matrix_exp(int (*orig)[MAX_RULE], int exp) {
-	int i, j, k;
-	int b[MAX_RULE][MAX_RULE];
+int num_chars(const unsigned char *str, char c) {
+	int i=0, count=0;
+	for (; str[i] != 0; i++)
+		if (str[i] == c) count++;
+	return count;
+}
+
+void cp_matrix(int (*a)[MAX_RULE], int (*b)[MAX_RULE]) {
+	int i,j;
 	forn(i, MAX_RULE)
 		forn(j, MAX_RULE)
-			b[i][j] = orig[i][j];
-	while (--exp) {
-		forn(i, MAX_RULE)
-			forn(j, MAX_RULE)
-				M2[i][j] = 0;
-		forn(i, MAX_RULE)
-			forn(j, MAX_RULE)
-				forn(k, MAX_RULE)
-					M2[i][j] += b[i][k] * orig[k][j];
-		forn(i, MAX_RULE)
-			forn(j, MAX_RULE)
-				b[i][j] = M2[i][j];
+			a[i][j] = b[i][j];
+}
+
+void mult_matrix(int (*a)[MAX_RULE], int (*b)[MAX_RULE]) {
+	/* Sobreescribe a */
+	int i, j, k, res[MAX_RULE][MAX_RULE];
+	forn(i, MAX_RULE)
+		forn(j, MAX_RULE)
+			res[i][j] = 0;
+
+	forn(i, MAX_RULE)
+		forn(j, MAX_RULE)
+			forn(k, MAX_RULE)
+				res[i][j] += a[i][k] * b[k][j];
+
+	cp_matrix(a, res);
+}
+
+void matrix_exp(int exp) {
+	if (exp >= 2) {
+		mult_matrix(aux, aux); /* aux^2 */
+		matrix_exp(exp >> 1);  /* exp/2 */
+		if (exp & 1)
+			mult_matrix(aux, orig);
 	}
 }
 
 int main(int argc, char **argv) {
-	int i, rules, queries, its, res=0;
+	int i, j, rules, queries, its, res;
 	unsigned char rule[MAX_RULE], str[MAX_RULE], c;
-	int length;
-	scanf("%i", &length); /* #Cases */
-	while(length--) {
+	int num_cases;
+	scanf("%i", &num_cases);
+	while(num_cases--) {
+		forn(i, MAX_RULE)
+			forn(j, MAX_RULE)
+				orig[i][j] = 0; /* Reset orig */
+
 		scanf("%i", &rules);
 		while (rules--) {
 			scanf("%s", rule);
 			for(i=3; rule[i] != 0; i++)
-				M[rule[0]-33][rule[i]-33] += 1;
+				orig[rule[0]-33][rule[i]-33] += 1;
 		}
 
 		scanf("%i", &queries);
 		while (queries--) {
+			res = 0;
 			scanf("%s %c %i", str, &c, &its);
-			matrix_exp(M,its);
+			cp_matrix(aux, orig); /* Reset aux */
+			matrix_exp(its);      /* aux matrix exponenciada */
 			forn(i, MAX_RULE)
-				res += M2[i][c-33];
+				res += aux[i][c-33];
 			printf("%i\n", res);
 		}
 	}
