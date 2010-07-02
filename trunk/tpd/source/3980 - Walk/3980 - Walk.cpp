@@ -22,13 +22,6 @@ public:
 };
 
 //------------------------------------------------------------------------------------------------
-// VARIABLES GLOBALES
-
-int n;
-vector< Desnivel > poligonosAlice;
-vector< Desnivel > poligonosBob;
-
-//------------------------------------------------------------------------------------------------
 // METODOS
 
 inline double min( double a, double b ) { return a < b ? a : b; }
@@ -59,8 +52,9 @@ int main()
     scanf( "%d", &cantTests );
 #endif
     while( cantTests-- > 0 ) {
-        poligonosAlice.clear();
-        poligonosBob.clear();
+        vector< Desnivel > poligonosAlice;
+        vector< Desnivel > poligonosBob;
+        int n;
 #ifdef _DEBUG
         entrada >> n;
 #else
@@ -73,7 +67,7 @@ int main()
 #ifdef _DEBUG
             entrada >> altura >> cantVertices >> xInicial >> yInicial;
 #else
-            scanf( "%d %d %d %d", &altura, &cantVertices, &x1, &y1 );
+            scanf( "%d %d %d %d", &altura, &cantVertices, &xInicial, &yInicial );
 #endif
             x1 = xInicial;
             y1 = yInicial;
@@ -89,7 +83,7 @@ int main()
                 scanf( "%d %d", &x2, &y2 );
 #endif
                 // si cruza al eje x
-                if( ( y1 < 0 && y2 > 0 ) || ( y1 > 0 && y2 < 0 ) || ( y1 == 0 && y2 != 0 ) ) {
+                if( ( y1 < 0 && y2 >= 0 ) || ( y1 >= 0 && y2 < 0 ) ) {
                     double x = cruceEjeX( x1, y1, x2, y2 );
 
                     if ( x < POSALICE ) {
@@ -113,7 +107,7 @@ int main()
 
             // por ultimo, verificamos si cruza el eje X el segmento formado por el ultimo punto
             // y el primero. En caso de hacerlo, hay que agregar el cruce.
-            if( ( y1 < 0 && yInicial > 0 ) || ( y1 > 0 && yInicial < 0 ) || ( y1 == 0 && yInicial != 0 ) ) {
+            if( ( y1 < 0 && yInicial >= 0 ) || ( y1 >= 0 && yInicial < 0 ) ) {
                 double x = cruceEjeX( x1, y1, xInicial, yInicial );
 
                 if ( x < POSALICE ) {
@@ -134,10 +128,10 @@ int main()
             // si el poligono actual cruza al eje x en un punto de coordenada x menor a la
             // de alice, y si la cantidad de cruces a la izquierda de alice es impar
             // entonces el poligono contiene a alice
-            bool contieneAlice = xMasCercanoIzqAlice != POSALICE && cantCrucesIzq % 2 == 1;
+            bool contieneAlice = xMasCercanoIzqAlice != POSALICE && xMasCercanoDerAlice != POSALICE && cantCrucesIzq % 2 == 1;
 
             // analogo para bob pero con cantidad de cruces = cantCrucesIzq + cantCrucesMedio
-            bool contieneBob = xMasCercanoDerBob != POSBOB && (cantCrucesIzq + cantCrucesMedio) % 2 == 1;
+            bool contieneBob = xMasCercanoIzqBob != POSBOB && xMasCercanoDerBob != POSBOB && (cantCrucesIzq + cantCrucesMedio) % 2 == 1;
 
             if( ( contieneAlice || contieneBob ) && !( contieneAlice && contieneBob ) ) {
                 if( contieneAlice )
