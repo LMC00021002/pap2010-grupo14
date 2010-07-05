@@ -106,7 +106,7 @@ y con esto:
 el centro de la columna.
 \item el largo de la hipotenusa coincide con la norma del vector $v$, por lo tanto calculamos $|v|$.
 \item dado que son triángulos rectángulos, calculamos el seno de alfa como
-$\displaystyle\frac{c_r}{hip}$ por trigonometría.
+$\displaystyle\frac{c_r}{|v|}$ por trigonometría.
 \item por la propiedad $\sin^2(\alpha) + \cos^2(\alpha) = 1$, despejamos y calculamos $\cos(\alpha)$
 \item \textbf{calculamos las tangentes:} rotamos el vector $v$ un ángulo $\alpha$ y un ángulo
 $-\alpha$, teniendo en cuenta las propiedades $\sin(-\alpha) = -\sin(\alpha)$ y
@@ -209,7 +209,6 @@ $\vline
 x_2 - x_1 & w_2 - w_1 \\
 y_2 - y_1 & z_2 - z_1 \\
 \end{array}\vline
-\right)  
 = (x_2 - x_1)(z_2 - z_1) - (w_2 - w_1)(y_2 - y_1) = 0$
 \end{center}
 \vspace{0.2cm}
@@ -297,41 +296,41 @@ columnas y las luces con un vector de luces.
 
 A continuación analizamos la complejidad del algoritmo.
 
-Los métodos prodInterno, interSemirrectas, interSemirrectaSeg y intervaloSombra tienen complejidad
-constante, dado que sólo se realizan cálculos matemáticosy se ejecutan linealmente.
+Los métodos prodInterno, interSemirrectas, interSemirrectaSeg y intervaloSombra tienen complejidad 
+constante, dado que sólo se realizan cálculos matemáticos y se ejecutan linealmente.
 
-El método comprimir se puede hacer en $O(n*log(n))$, siendo n el tamaño del vector de entrada. Esto
-es porque al comprimir antes de comenzar a calcular el resultado ordenamos el vector de entrada
-($O(n*log(n))$), luego recorre linealmente el vector de pares ($O(n)$), construyendo el resultado,
+El método comprimir se puede hacer en $O(n*log(n))$, siendo n el tamaño del vector de entrada. Esto 
+es porque al comprimir antes de comenzar a calcular el resultado ordenamos el vector de entrada 
+($O(n*log(n))$), luego recorre linealmente el vector de pares ($O(n)$), construyendo el resultado, 
 y finalmente modificamos el vector de entrada copiándole el resultado ($O(n)$).
 
-El método complemento también se puede hacer en $O(n*log(n))$, pues utiliza comprimir y luego recorre
-linealmente el vector de pares ($O(n)$), construyendo el resultado, y finalmente modificamos el vector
+El método complemento también se puede hacer en $O(n*log(n))$, pues utiliza comprimir y luego recorre 
+linealmente el vector de pares ($O(n)$), construyendo el resultado, y finalmente modificamos el vector 
 de entrada copiándole el resultado ($O(n)$).
 
-El método perimIluminado es la raíz de todos estos métodos. Este método recorre todas las luces y
+El método perimIluminado es la raíz de todos estos métodos. Este método recorre todas las luces y 
 por cada luz recorre todas las columnas.
 
-Veamos que pasa con el ciclo que recorre todas las columnas: para cada columna se llama a
-intervaloSombra, se hace una comparación booleana y se pushean a lo sumo dos elementos detrás de un
+Veamos que pasa con el ciclo que recorre todas las columnas: para cada columna se llama a 
+intervaloSombra, se hace una comparación booleana y se pushean a lo sumo dos elementos detrás de un 
 vector de pares, por lo que el cuerpo del ciclo que recorre todas las columnas es $O(1)$.
 
-Veamos que pasa con el ciclo que recorre todas las luces: para cada luz se recorre todas las columnas
-y se genera un vector de pares de tamaño $C$, siendo $C$ la cantidad de columnas (el mismo C del
-enunciado). Esto cuesta $O(C*log(C))$ y pushea todos los pares resultantes de este complemento en otro
+Veamos que pasa con el ciclo que recorre todas las luces: para cada luz se recorre todas las columnas 
+y se genera un vector de pares de tamaño $C$, siendo $C$ la cantidad de columnas (el mismo C del 
+enunciado). Esto cuesta $O(C*log(C))$ y pushea todos los pares resultantes de este complemento en otro 
 vector de pares, lo que tiene complejidad $O(C)$.
 
-Por lo tanto el ciclo entero que recorre las luces y columnas tiene complejidad $O(L*C*log(C))$. El
-resultado de todo este ciclo es un vector de pares que representan las porciones iluminadas de la pared,
+Por lo tanto el ciclo entero que recorre las luces y columnas tiene complejidad $O(L*C*log(C))$. El 
+resultado de todo este ciclo es un vector de pares que representan las porciones iluminadas de la pared, 
 de tamaño máximo L*C.
 
-A continuación se comprime el vector de pares de porciones iluminadas, lo que tiene complejidad
-$O(L*C*log(L*C))$ y resulta en un vector de tamaño máximo $C+1$. La idea intuitiva de esta cota es que
-el peor caso para el tamaño de este vector es una luz y $C$ columnas, lo que como máximo genera $C+1$
-porciones iluminadas. Al agregar luces no agregamos sombras sino que al contrario, probablemente unimos
+A continuación se comprime el vector de pares de porciones iluminadas, lo que tiene complejidad 
+$O(L*C*log(L*C))$ y resulta en un vector de tamaño máximo $C+1$. La idea intuitiva de esta cota es que 
+el peor caso para el tamaño de este vector es una luz y $C$ columnas, lo que como máximo genera $C+1$ 
+porciones iluminadas. Al agregar luces no agregamos sombras sino que al contrario, probablemente unimos 
 partes iluminadas, lo que decrementa la cantidad de partes iluminadas.
 
-Finalmente, se recorre este vector de porciones iluminadas ya comprimido para aumentar un acumulador que
+Finalmente, se recorre este vector de porciones iluminadas ya comprimido para aumentar un acumulador que 
 resulta ser la respuesta al problema, lo que tiene orden $O(C)$.
 
 Por lo tanto, el orden del algoritmo entero es $O(L*C*log(C) + L*C*log(L*C) + C)$ que es $O(L*C*log(L*C))$.
