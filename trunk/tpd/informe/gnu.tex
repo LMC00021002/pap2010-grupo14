@@ -1,19 +1,80 @@
 \subsection*{Problema y solución}
 
-El objetivo de este problema es calcular la cantidad de apariciones de una
-letra en un string, que se obtiene luego de aplicar reglas de reemplazo.
+El objetivo de este problema es simular reemplazos de caracteres en un
+string, y calcular la cantidad de apariciones de un caracter determinado
+en el string transformado. Los datos de entrada son las reglas $Q_i$ a aplicar,
+un string $s$ que define la frecuencia inicial de cada caracter, el número de
+veces $n$ a aplicar las reglas y el caracter $c$ del que se desea conocer su
+frecuencia.
 
-Representamos las reglas como una matriz cuadrada, donde el valor $i,j$
-representa la cantidad de caracteres $j$ que incorpora una aparición del
-caracter $i$. Aplicar una vez las reglas equivale a multiplicar dicha matriz
-consigo misma.
+Por obvias razones de eficiencia, no ejecutamos los reemplazos sobre el
+string dado, sino que los simulamos guardando en una matriz la frecuencia
+de cada caracter. Esta matriz contiene inicialmente con las frecuencias
+que aporta cada caracter según las reglas, y tiene la propiedad de que,
+al multiplicarla por sí misma mantiene las frecuencias de haber aplicado
+una vez las reglas dadas sobre el string.
+
+Así, para el caso de ejemplo $A \rightarrow BAcX$, y dado el string de inicio
+$ABCcXA$, ejemplos de matriz serán:
+
+$$M =
+\begin{array}{l}
+\begin{matrix}
+	\ \ A & B & C & X & c
+\end{matrix} \\
+\left(
+	\begin{array}{ccccc}
+	1 & 1 & 0 & 1 & 1 \\
+	0 & 1 & 0 & 0 & 0 \\
+	0 & 0 & 1 & 0 & 0 \\
+	0 & 0 & 0 & 1 & 0 \\
+	0 & 0 & 0 & 0 & 1 \\
+	\end{array}
+\right)
+\hspace{1cm}
+M^2 = \left(
+\begin{array}{ccccc}
+1 & 2 & 0 & 2 & 2 \\
+0 & 1 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 \\
+0 & 0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 0 & 1 \\
+\end{array}
+\right)
+\hspace{1cm}
+M^3 = \left(
+\begin{array}{ccccc}
+1 & 3 & 0 & 3 & 3 \\
+0 & 1 & 0 & 0 & 0 \\
+0 & 0 & 1 & 0 & 0 \\
+0 & 0 & 0 & 1 & 0 \\
+0 & 0 & 0 & 0 & 1 \\
+\end{array}
+\right)
+\end{array}
+$$
+
+Así, cada valor $M_{ij}^k$ representa la cantidad de caracteres $j$ que incorpora
+el caracter $i$ en la aplicación de reglas número $k$. La frecuencia
+de un caracter $c$ luego de $n$ aplicaciones resulta ser $\sum_i M_{ic}^n$.
 
 
 \subsection*{Detalles de Implementación}
 
+Dado que los valores se encuentran entre los números 33 y 126 de la tabla ASCII,
+armamos matrices de dimensión $94\times 94$, que representan a todos los valores
+de entrada posibles (al direccionar caracteres en la matriz restamos un offset
+de 33 a su valor ASCII).
+
+
 \subsection*{Análisis de complejidad}
 
-Exponentiation by Repeated Squaring runs in time proportional to the number of
-bits in the binary representation of the exponent (length in bits is
-approximately log of the value of the exponent). The naive implementation runs
-much slower, in time proportional to the value of the exponent.
+Para calcular $M^e$ utilizamos el algoritmo de exponenciación binaria, basado en
+que $x^e = (x^\frac e 2)^2$ (si $e$ es par), disminuyendo la cantidad de
+multiplicaciones en forma logarítmica respecto del valor del exponente. Así, la
+multiplicación de matrices (algoritmo de orden $N^3$, siendo $N$
+la cantidad de columnas) se ejecuta $O(\log e)$ veces.
+
+Rellenar la matriz con las $N$ {\sl queries} toma $O(N^3)$, y calcular la suma
+final de frecuencias toma $O(N)$, por lo que la complejidad total resulta de
+$O(N^3\log e + N)$.
