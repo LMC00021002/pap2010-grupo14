@@ -9,6 +9,17 @@ int orig[MAX_RULE][MAX_RULE];
 int aux[MAX_RULE][MAX_RULE];
 int aux2[MAX_RULE][MAX_RULE];
 
+void show_matrix(int (*a)[MAX_RULE]) {
+	int i, j;
+	forn(i, MAX_RULE) {
+		printf("%c (%i)\t", i+OFFSET, i+OFFSET);
+		forn(j, MAX_RULE)
+			printf("%d", a[i][j]);
+		printf("\n");
+	}
+	printf("\n");
+}
+
 int num_chars(const unsigned char *str, char c) {
 	int i=0, count=0;
 	for (; str[i] != 0; i++)
