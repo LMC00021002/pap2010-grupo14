@@ -337,10 +337,12 @@ genera $C+1$ porciones iluminadas. Al agregar luces no agregamos sombras sino
 que al contrario, probablemente unimos partes iluminadas, lo que decrementa
 la cantidad de partes iluminadas.
 
-Por lo tanto el ciclo entero que recorre las luces y columnas tiene complejidad $O(L*C\log(C))$. El 
-resultado de todo este ciclo es un vector de pares que representan las porciones iluminadas de la pared.
+Por lo tanto el ciclo que recorre las luces y columnas tiene complejidad
+$O(LC\log C)$. El resultado de todo este ciclo es un vector de pares que
+representan las porciones iluminadas de la pared.
 
-Finalmente, se recorre este vector de porciones iluminadas ya comprimido para aumentar un acumulador que 
-resulta ser la respuesta al problema, lo que tiene orden $O(C)$.
+Finalmente, se recorre este vector de porciones iluminadas ya comprimido, para
+aumentar un acumulador que resulta ser la respuesta al problema, lo que tiene
+orden $O(C)$.
 
-Por lo tanto, el orden del algoritmo entero es $O(L*C\log(C) + C)$ que es $O(L*C\log(C))$.
+Por lo tanto, el orden de nuestro algoritmo es $O(LC\log C+C)$, que es $O(LC\log C)$.
