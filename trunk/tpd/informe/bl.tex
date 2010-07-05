@@ -4,13 +4,13 @@ bombillas de luz (se supone que la única fuente de luz es esta) que son fuentes
 luz puntual, y una cantidad dada de columnas, que están ubicadas de forma que no
 intersecan la pared ni entre ellas, pero sí pueden tocarse. Las bombillas de luz están
 ubicadas de forma que no tocan ninguna columna ni la pared. El escenario se presenta
-en dos dimensiones, visto desde arriba (desde el techo del salón). Dado un salón como
-el descripto, queremos saber cuál es el perímetro de la pared que cuenta con iluminación.
-Se supone que la sombra no sufre difusión ni hay fenómenos reflexión de luces.
+en dos dimensiones (visto desde arriba). Dado un salón como
+el descrito, se desea conocer el perímetro de la pared que cuenta con iluminación.
+Se supone que la sombra no sufre difusión ni hay reflexión de luces.
 
 Representamos la bombilla como un punto $(x,y)$ en el plano, las columnas como circulos
 $(x,y,r)$ de centro $(x,y)$ y radio $r$, y las paredes como 4 segmentos: $\overline{AB}$,
-$\overline{BC}$, $\overline{CD}$, $\overline{DA}$, siendo
+$\overline{BC}$, $\overline{CD}$, $\overline{DA}$, siendo, con X e Y dados por el enunciado:
 
 \vspace{0.2cm}
 $A = (0, 0)$
@@ -22,36 +22,35 @@ $C = (X, Y)$
 $D = (0, Y)$
 \vspace{0.2cm}
 
-con X e Y dados por el enunciado, por ejemplo:
-
 \begin{figure}[H]
 \centering
 \label{bl_1}
+\caption{\sc Ejemplo del modelo}
 \includegraphics[scale=1.0]{./figuras/bl_1.png}
-\caption{Ejemplo del modelo}
 \end{figure} 
 
 \subsection*{Solución}
 
-Como dice el enunciado, un punto $p$ dado del perímetro de la pared es iluminado si
+Un punto $p$ del perímetro de la pared tiene iluminación si
 existe un segmento de línea (un rayo de luz) que comienza en una bombilla de luz, finaliza
-en p y no toca o pasa a través de alguna columna, por lo tanto:
+en $p$, y no toca o pasa a través de alguna columna. Por tanto:
+
 \begin{itemize}
-\item Una cierta porción de la pared está iluminada si alguna bombilla la ilumina (por lo tanto
+\item Una cierta porción de la pared está iluminada si alguna bombilla la ilumina (y
 no está iluminada si ninguna bombilla la ilumina, es decir, si todas las columnas proyectan una
 sombra sobre esta parte de la pared).
-\item La sombra que proyecta una columna $c$ a partir de la luz que incide una bombilla $b$
-depende de las tangentes del círculo (que representa la columna $c$) que pasan por el punto
-$b$, de forma que, detrás de la columna (visto desde la bombilla) desde una
-tangente a la otra se proyectará sombra (si ninguna otra bombilla ilumina la porción) y todo
-lo demás se iluminará (si la luz no cruza ninguna otra columna).
+
+\item La sombra que proyecta una columna $c$ a partir de la luz que una bombilla $b$ le incide
+queda determinada por las tangentes del círculo descripto por $c$ que que pasan por $b$.
+Detrás de la columna (visto desde la bombilla) se proyectará sombra de una
+tangente a la otra (si ninguna otra bombilla ilumina esa porción), y
+lo demás quedará iluminado (mientras otras columnas no lo impidan).
 \end{itemize}
 
-La solución que presentamos aprobecha estas características. La idea básica del algoritmo es
-tomar cada luz y para cada una de ellas calcular las porciones de pared que ilumina.
-Para esto recorremos todas las columnas y calculamos la sombra que genera la luz con cada columna
-usando las tangentes de la columna que pasan por el punto que representa la luz,
-y con estas sombras generamos un conjunto de sombras para cada luz.
+La idea de nuestro algoritmo es calcular las partes de pared que ilumina
+cada luz. Para esto recorremos por cada bombilla eléctrica todas las
+columnas, y agregamos la sombra que genera cada columna (según la luz
+actualmente en consideración) al conjunto de sombras de la bombilla.
 
 Para describir el conjunto de sombras vemos la pared como un único intervalo $(0, 2X + 2Y)$, como
 si estuviésemos recorriendo las paredes en sentido antihorario, comenzando desde la pared inferior,
@@ -60,28 +59,28 @@ por ejemplo:
 \begin{figure}[H]
 \centering
 \label{bl_2}
+\caption{\sc Pared vista como un intervalo en $\mathbb R$}
 \includegraphics[scale=1.0]{./figuras/bl_2.png}
-\caption{Pared vista como un intervalo en R}
 \end{figure}
 
-y las sombras como subintervalos del mismo (para ver cómo se hace esta traducción de los segmentos
-de pared a un intervalo ir a la sección de Cálculo de sombras).
-El complemento de un conjunto de sombras son los intervalos de pared iluminada, y resulta simple
-de calcular si antes nos aseguramos que para este conjunto de intervalos todos sus elementos tengan
-intersección vacía. Para esto ``comprimimos'' el conjunto (realizamos la union entre intervalos de
-intersección no vacía) y luego su complemento.
+Detallamos la traducción de segmentos de pared a un intervalo en la sección
+``Cálculo de sombras''. Las sombras resultan entonces subintervalos en $\mathbb R$.
+El complemento del conjunto de sombras serán los intervalos de pared iluminada,
+y podremos calcular su largo en forma sencilla si los intervalos de este conjunto tienen
+intersección vacía. Para esto ``comprimimos'' el conjunto (realizamos la unión
+entre intervalos de intersección no vacía).
 
 Unimos todos los conjuntos de intervalos iluminados por las bombillas, formando otro conjunto.
 Nuevamente, es simple calcular la longitud de las porciones iluminadas del salón si nos aseguramos que
-para este conjunto todos sus elementos tengan intersección vacía. Para esto ``comprimimos'' el conjunto
-en el mismo sentido que antes y calculamos el resultado del problema, que es:
+para este conjunto todos sus elementos tengan intersección vacía. Para esto lo ``comprimimos''
+de similar modo que antes, y calculamos el resultado del problema, que es:
 
-\vspace{0.2cm}
-\begin{center}$\displaystyle\sum_{e \in intIlum}e_y - e_x$\end{center}
-\vspace{0.2cm}
+\begin{center}
+$$\sum_{e\ \in\ intIlum}e_y - e_x$$
+\end{center}
 
-Notar que $(\forall e \in intIlum)e_y > e_x$, por construcción (ver la sección de
-Cálculo de sombras).
+Notar que $(\forall\ e \in intIlum)\ e_y > e_x$ por construcción (ver
+subsección siguiente, ``cálculo de sombras'').
 
 Para contemplar el error de las operaciones entre flotantes utilizamos un $\epsilon = 0.0000001$, 
 de modo que dos flotantes $x_1$ y $x_2$ son considerados iguales si: $abs(x_1 - x_2) < \epsilon$.
@@ -94,20 +93,22 @@ gráfico:
 \begin{figure}[H]
 \centering
 \label{bl_3}
+\caption{\sc Rayos de luz que inciden en la columna}
 \includegraphics[scale=1.0]{./figuras/bl_3.png}
-\caption{los rayos de luz que inciden en la columna}
 \end{figure} 
 
-y con esto:
+Procedemos de la siguiente forma:
 
 \begin{itemize}
-\item calculamos el vector $v = (c_x - l_x, c_y - l_y)$ que es el que va desde la luz hacia
-el centro de la columna.
-\item el largo de la hipotenusa coincide con la norma del vector $v$, por lo tanto calculamos $|v|$.
-\item dado que son triángulos rectángulos, calculamos el seno de alfa como
-$\displaystyle\frac{c_r}{|v|}$ por trigonometría.
-\item por la propiedad $\sin^2(\alpha) + \cos^2(\alpha) = 1$, despejamos y calculamos $\cos(\alpha)$
-\item \textbf{calculamos las tangentes:} rotamos el vector $v$ un ángulo $\alpha$ y un ángulo
+\item Calculamos el vector $v = (c_x-l_x, c_y-l_y)$, que une la luz con el centro de la columna
+      (el largo de la hipotenusa es $|v|$).
+
+\item Dado que son triángulos rectángulos, calculamos el seno de alfa como
+$\displaystyle\frac{c_r}{|v|}$.
+
+\item Por la igualdad $\sin^2(\alpha) + \cos^2(\alpha) = 1$ obtenemos $\cos(\alpha)$
+
+\item \textbf{Calculamos las tangentes:} rotamos el vector $v$ un ángulo $\alpha$ y un ángulo
 $-\alpha$, teniendo en cuenta las propiedades $\sin(-\alpha) = -\sin(\alpha)$ y
 $\cos(-\alpha) = \cos(\alpha)$, multiplicando:
 
@@ -134,14 +135,14 @@ v = t_2$
 esto resulta en dos vectores $t_1$ y $t_2$. A partir de estos vectores consideramos las semirrectas
 $st_1$ y $st_2$, ambas de origen $(l_x, l_y)$ y con vectores generadores $t_1$ y $t_2$
 respectivamente. Las semirrectas las representamos en su forma vectorial.
-\item \textbf{calculamos los puntos de intersección $(x_1, y_1)$ y $(x_2, y_2)$ de las semirrectas
-$st_1$ y $st_2$ respectivamente con los segmentos que representan la pared:} ver sección
-``Intersección entre semirrecta y segmento''.
-\item \textbf{a partir de los puntos de intersección calculamos el intervalo de sombra}
-considerando los 4 segmentos de la pared como un único segmento del largo del perímetro,
-de la siguiente forma:
 
-sea la función de $R^2 \times R$
+\item \textbf{Calculamos los puntos de intersección $(x_1, y_1)$ y $(x_2, y_2)$ de las semirrectas
+$st_1$ y $st_2$ respectivamente con los segmentos que representan la pared} (ver sección
+``intersección entre semirrecta y segmento'').
+
+\item \textbf{A partir de los puntos de intersección calculamos el intervalo de sombra}
+considerando los 4 segmentos de la pared como un único segmento del largo del perímetro,
+de la siguiente forma. Sea la función de $R^2 \times R$:
 
 \vspace{0.2cm}
 \begin{center}
@@ -162,17 +163,20 @@ sea la función de $R^2 \times R$
 entonces el intervalo de sombra lo definimos como $(f(x_1,y_1), f(x_2,y_2))$ si
 $f(x_1,y_1) \le f(x_2,y_2)$, sino definimos la sombra con dos intervalos: $(0, f(x_2,y_2))$ y
 $(f(x_1,y_1), 2X + 2Y)$. Este último caso sucede cuando está el punto $(0,0)$ entre las 
-semirrectas tangentes a la columna.
+semirrectas tangentes.
+
 
 \subsection*{Intersección entre semirrecta y segmento}
 
 Dada una semirrecta de origen $(x_1, y_1)$ y vector generador $(x_2 - x_1, y_2 - y_1)$ y un
 segmento $<(w_1, z_1), (w_2, z_2)>$:
+
 \begin{itemize}
-\item construímos, con el segmento, una semirrecta de origen $(w_1, z_1)$ y vector generador
-$(w_2 - w_1, z_2 - z_1)$.
-\item calculamos la intersección entre estas semirrectas, y para esto hacemos el mismo cálculo que
-para las rectas, y luego restringimos el resultado, de modo que las rectas serían
+\item Construimos con el segmento una semirrecta de origen $(w_1,z_1)$ y vector generador
+$(w_2-w_1, z_2-z_1)$.
+
+\item Calculamos la intersección entre estas semirrectas, y para esto hacemos el mismo cálculo que
+para las rectas. Luego restringimos el resultado, de modo que las rectas resultan:
 
 \vspace{0.2cm}
 $recta_1 = (x_1, y_1) + t(x_2 - x_1, y_2 - y_1)$
@@ -181,25 +185,20 @@ $recta_1 = (x_1, y_1) + t(x_2 - x_1, y_2 - y_1)$
 $recta_2 = (w_1, z_1) + s(w_2 - w_1, z_2 - z_1)$
 \vspace{0.2cm}
 
-\item calculamos la intersección entre las semirrectas resolviendo el sistema 
+\item Calculamos la intersección entre las semirrectas según el sistema:
 
-\vspace{0.2cm}
-\begin{center}$(x_1 + t(x_2 - x_1), y_1 + t(y_2 - y_1)) = (w_1 + s(w_2 - w_1), z_1 + s(z_2 - z_1))$\end{center}
-\vspace{0.2cm}
+$$(x_1 + t(x_2 - x_1), y_1 + t(y_2 - y_1)) = (w_1 + s(w_2 - w_1), z_1 + s(z_2 - z_1))$$
 
-Despejando nos queda
+Despejando:
 
-\vspace{0.2cm}
-\begin{center}
-$s = \displaystyle\frac{(w_1 - x_1)(y_2 - y_1) + (y_1 - z_1)(x_2 - x_1)}
-                       {(x_2 - x_1)(z_2 - z_1) - (w_2 - w_1)(y_2 - y_1)}$
-\end{center}
-\vspace{0.2cm}
+$$s = \displaystyle\frac{(w_1 - x_1)(y_2 - y_1) + (y_1 - z_1)(x_2 - x_1)}
+                       {(x_2 - x_1)(z_2 - z_1) - (w_2 - w_1)(y_2 - y_1)}$$
 
-Por lo tanto este sistema no tiene solución o tiene infinitas soluciones si las semirrectas son
-paralelas (infinitas soluciones si las rectas están una encima de la otra y no tiene solución si
-son paralelas pero no están encimadas), lo que quiere decir que el determinante de la matriz
-formada por los dos vectores generadores
+El sistema puede tener única solución, puede no tener solución (si son
+rectas paralelas distintas), o puede tener infinitas soluciones (si se
+trata de las mismas rectas, una ``encima'' de la otra). En los últimos dos
+casos el determinante de la matriz formada por los vectores generadores da 0
+(vectores LD):
 
 \vspace{0.2cm}
 \begin{center}
@@ -212,122 +211,136 @@ y_2 - y_1 & z_2 - z_1 \\
 \end{center}
 \vspace{0.2cm}
 
-o sea que los vectores generadores son LD.
 \end{itemize}
-Sin embargo calculando la intersección entre semirrectas hay un caso borde en el que el
-determinante es $0$ pero el sistema tiene una única solución: si las semirrectas tienen el mismo
-origen pero sentido contrario, la intersección es el punto de origen. Para saber si tienen sentido
-contrario verificamos si el producto interno entre los vectores generadores es negativo.
 
-Si el determinante de la matriz es distinto de cero, la solución es única. Para saber cual es el
-punto $p$ de intersección simplemente reemplazamos $s$ en alguna de las dos rectas con el valor
-calculado.
+Existe un caso borde en que el determinante es $0$ pero el sistema tiene única
+solución. Si las semirrectas tienen el mismo origen pero sentido contrario,
+la intersección es el punto de origen. Para saber si tienen sentido contrario
+verificamos si el producto interno entre los vectores generadores es negativo.
 
-Para saber si el punto cae sobre ambas semirrectas verificamos para cada una que el producto
-interno entre el vector generador de la semirrecta y el vector que va desde el origen de la
-semirrecta hacia $p$ es positivo, que es lo mismo que ver que estos vectores tienen igual sentido
-que la semirrecta.
+Si el determinante de la matriz es distinto de cero, la solución es única. Para
+encontrar el punto de intersección se reemplaza $s$ en alguna de las rectas con
+el valor calculado.
 
-Finalmente, dado el punto de intersección, para saber si cae sobre el segmento resta verificar si
-es positivo el producto interno entre el vector que va desde el punto $(w_2, z_2)$ a $(w_1, z_1)$
-y el vector que va desde $(w_2, z_2)$ a $p$. Recordemos que no hace falta verificar lo mismo con el
-vector que va desde $(w_1, z_1)$ a $(w_2, z_2)$, pues ya lo hicimos cuando calculamos la
-intersección entre las semirrectas (el origen de una de las semirrectas era $(w_1, z_1)$).
-Intuitivamente esto es lo mismo que verificar que los vectores que van desde los extremos del
-segmento hacia $p$ apuntan hacia ``adentro'' del segmento.
+Para saber si el punto cae sobre ambas semirrectas verificamos que el producto
+interno entre el vector generador de cada semirrecta y el vector que une el
+origen de la semirrecta con $p$ es positivo, lo que significa que los vectores
+tienen igual sentido que la semirrecta.
+
+Finalmente, dado el punto de intersección, para saber si cae sobre el
+segmento resta verificar si el producto interno entre el vector que une el
+punto $(w_2, z_2)$ con $(w_1, z_1)$ y el vector que une $(w_2, z_2)$ con $p$
+es positivo. Recordemos que no hace falta verificar lo mismo con el vector
+que une $(w_1, z_1)$ y $(w_2, z_2)$, pues fue verificado al calcular la
+intersección entre las semirrectas (el origen de una de las semirrectas era
+$(w_1, z_1)$). Intuitivamente esto es lo mismo que verificar que los vectores
+que van desde los extremos del segmento hacia $p$ apuntan ``hacia adentro''
+del segmento.
+
 
 \subsection*{Detalles de Implementación}
 
-Fue implementada la clase \textbf{Par}, que representa un par en $R^2$. Además, para esta
-estructura implementamos el operador de resta y de comparación por menor. La comparación por menor
-para dos pares es
+Implementamos las siguentes {\bf clases}:
 
-\vspace{0.2cm}
+\begin{itemize}
+\item[\tt\small Par] Representa un par en $R^2$. Además, para esta
+estructura implementamos el operador resta y el de comparación por menor, que es:
+
 $(x_1, y_1) < (x_2, y_2) \Leftrightarrow x_1 < x_2 \vee ( abs(x_1 - x_2) < \epsilon \wedge y_1 < y_2 )$
-\vspace{0.2cm}
 
-Se implementó el método \textbf{prodInterno} que para dos pares dados devuelve el producto interno.
+\item[\tt\small Segmento] Es un par de pares.
 
-Se implementó la clase \textbf{Segmento} que es un par de pares.
+\item[\tt\small Semirrecta] Tiene un par que es el origen y un par que es el vector generador.
 
-Se implementó la clase \textbf{Semirrecta} que tiene un par que es el origen y un par que es el 
-vector generador.
+\item[\tt\small Columna] Tiene tres enteros: $x,y$ que son el centro, y $r$ que es el radio de la columna.
 
-Se implementó la clase \textbf{Columna} que tiene tres enteros: $x$, $y$ que son el centro, y $r$
-que es el radio de la columna.
+\item[\tt\small Luz] Tiene dos enteros: $x,y$ que es la ubicación de la luz en los ejes $X$ e $Y$.
+\end{itemize}
 
-Se implementó la clase \textbf{Luz} que tiene dos enteros: $x$, $y$ que es la ubicación de la luz
-en los ejes XY.
+Implementamos los siguentes {\bf métodos}:
 
-Se implementó el método \textbf{interSemirrectas} que dadas dos semirrectas y un par, devuelve un
-booleano que indica si existe o no intersección entre las semirrectas. Si existe intersección la
-devuelve en el par, sino deja el par con los valores originales.
+\begin{itemize}
+\item[\tt\small prodInterno] Devuelve el producto interno de dos pares.
 
-Se implementó el método \textbf{interSemirrectaSeg} que dada una recta, un segmento y un par,
-devuelve un booleano que indica si existe o no intersección entre la semirrecta y el segmento.
-Si existe intersección la devuelve en el par, sino deja el par con los valores originales.
+\item[\tt\small interSemirrectas] Dadas dos semirrectas y un par, devuelve un
+booleano que indica si existe o no intersección entre las semirrectas. Si
+existe intersección la devuelve en el par, en caso contrario no modifica
+los valores del par.
 
-Estos dos últimos métodos son la implementación de lo explicado en la sección ``Intersección entre
-semirrecta y segmento''.
+\item[\tt\small interSemirrectaSeg] Dada una recta, un segmento y un par, devuelve
+un booleano que indica si existe o no intersección entre la semirrecta y
+el segmento. Si existe intersección la devuelve en el par, en caso contrario no
+modifica los valores del par.
 
-Se implementó el método \textbf{intervaloSombra} que dado un objeto Luz y un objeto Columna devuelve
-un par que es el intervalo de la sombra proyectada en la pared a causa de la luz emitida por la
-bombilla que incide en la columna. Este método es la implementación de lo explicado en la sección
-``Cálculo de sombras'', con la diferencia que si la primer coordenada del par es mayor a la segunda
-coordenada del par este método no es el responsable de partirlo, sino que lo devuelve así y luego
-se parte.
+(Estos dos últimos métodos implementan lo explicado en la sección ``Intersección
+entre semirrecta y segmento''.)
 
-Se implementó el método \textbf{comprimir} que dado un vector de pares lo modifica de modo que
-al salir de la función este vector cumple que todo par de elementos tiene intersección vacía.
+\item[\tt\small intervaloSombra] Dado un objeto Luz y un objeto Columna, devuelve
+un par que es el intervalo de sombra que proyectan en la pared la Columna y la Luz
+pasadas por parámetro. Este método implementa parte de lo explicado en la sección
+``Cálculo de sombras'' (no es responsable de ``partir'' el caso particular de
+que la primer coordenada del par sea mayor a la segunda).
 
-Se implementó el método \textbf{complemento} que dado un vector de pares, un valor mín y otro valor
-máx, modifica el vector tal que si lo unimos con el vector original y luego comprimimos el
-resultado sería un par $(min, max)$. Además asegura que el vector resultado cumple que todo par de
-elementos tiene intersección vacía.
+\item[\tt\small comprimir] Dado un vector de pares con potenciales
+intersecciones entre sí, lo devuelve asegurando que todo par de elementos tiene
+intersección vacía.
 
-Se implementó el método \textbf{perimIluminado} resuelve el problema utilizando todos los métodos
+\item[\tt\small complemento] Dado un vector de pares, un valor $min$ y otro
+valor $max$, modifica el vector tal que si lo unimos con el vector original,
+y luego comprimimos el resultado, sería un par $(min,max)$. Además asegura
+que el vector resultado cumple que todo par de elementos tiene intersección
+vacía.
+
+\item[\tt\small perimIluminado] Resuelve el problema utilizando los métodos
 anteriores (como se explicó en la sección ``Solución'').
 
-Representamos la pared con un vector de segmentos de 4 posiciones, las columnas con un vector de 
-columnas y las luces con un vector de luces.
+\end{itemize}
+
+Representamos la pared con un vector de segmentos de 4 posiciones, las columnas
+con un vector de columnas, y las luces con un vector de luces.
+
 
 \subsection*{Análisis de complejidad}
 
-A continuación analizamos la complejidad del algoritmo.
+Los métodos prodInterno, interSemirrectas, interSemirrectaSeg y intervaloSombra
+tienen complejidad constante, dado que sólo realizan cálculos matemáticos.
 
-Los métodos prodInterno, interSemirrectas, interSemirrectaSeg y intervaloSombra tienen complejidad 
-constante, dado que sólo se realizan cálculos matemáticos y se ejecutan linealmente.
+El método comprimir se puede hacer en $O(n\log n)$, siendo $n$ el tamaño
+del vector de entrada. Esto es porque al comprimir antes de comenzar a
+calcular el resultado ordenamos el vector de entrada ($O(n\log(n))$), luego
+recorre linealmente el vector de pares ($O(n)$) construyendo el resultado, y
+finalmente modificamos el vector de entrada copiándole el resultado ($O(n)$).
 
-El método comprimir se puede hacer en $O(n*log(n))$, siendo n el tamaño del vector de entrada. Esto 
-es porque al comprimir antes de comenzar a calcular el resultado ordenamos el vector de entrada 
-($O(n*log(n))$), luego recorre linealmente el vector de pares ($O(n)$), construyendo el resultado, 
-y finalmente modificamos el vector de entrada copiándole el resultado ($O(n)$).
+El método complemento también se puede hacer en $O(n\log n)$, pues
+utiliza comprimir y luego recorre linealmente el vector de pares ($O(n)$)
+construyendo el resultado, y finalmente se modifica el vector de entrada
+copiándole el resultado ($O(n)$).
 
-El método complemento también se puede hacer en $O(n*log(n))$, pues utiliza comprimir y luego recorre 
-linealmente el vector de pares ($O(n)$), construyendo el resultado, y finalmente modificamos el vector 
-de entrada copiándole el resultado ($O(n)$).
+El método perimIluminado es la raíz de todos estos métodos. Este método
+recorre todas las luces y por cada luz recorre todas las columnas.
 
-El método perimIluminado es la raíz de todos estos métodos. Este método recorre todas las luces y 
-por cada luz recorre todas las columnas.
+Analizamos el ciclo que recorre todas las columnas: para cada columna
+se llama a intervaloSombra, se hace una comparación booleana y se hace {\sl push}
+de a lo sumo dos elementos detrás de un vector de pares, por lo que el cuerpo
+del ciclo que recorre las columnas tiene complejidad de $O(1)$.
 
-Veamos qué pasa con el ciclo que recorre todas las columnas: para cada columna se llama a 
-intervaloSombra, se hace una comparación booleana y se pushean a lo sumo dos elementos detrás de un 
-vector de pares, por lo que el cuerpo del ciclo que recorre todas las columnas es $O(1)$.
+Analizamos el ciclo que recorre todas las luces: para cada luz se recorren
+todas las columnas y se genera un vector de pares de tamaño $C$, siendo $C$
+la cantidad de columnas, lo que cuesta $O(C\log C)$. Luego hace
+{\sl push} de todos los pares resultantes de este complemento en otro vector de
+pares (el de porciones iluminadas), lo que tiene complejidad
+$O(C)$. Luego se comprime el vector de porciones iluminadas, lo que tiene
+complejidad $O(2C\log(2C))$ que es $O(C\log C)$. El vector de porciones
+iluminadas tiene un tamaño máximo $C+1$. Esta cota es porque el peor caso
+para el tamaño de este vector es una luz y $C$ columnas, lo que como máximo
+genera $C+1$ porciones iluminadas. Al agregar luces no agregamos sombras sino
+que al contrario, probablemente unimos partes iluminadas, lo que decrementa
+la cantidad de partes iluminadas.
 
-Veamos qué pasa con el ciclo que recorre todas las luces: para cada luz se recorre todas las columnas 
-y se genera un vector de pares de tamaño $C$, siendo $C$ la cantidad de columnas (el mismo C del 
-enunciado). Esto cuesta $O(C*log(C))$ y pushea todos los pares resultantes de este complemento en otro 
-vector de pares que es el vector de porciones iluminadas, lo que tiene complejidad $O(C)$.
-Luego se comprime el vector de porciones iluminadas, lo que tiene complejidad $O(2*C*log(2*C))$ que es
-$O(C*log(C))$. El vector de porciones iluminadas tiene un tamaño máximo $C+1$. Esta cota es porque el
-peor caso para el tamaño de este vector es una luz y $C$ columnas, lo que como máximo genera $C+1$ 
-porciones iluminadas. Al agregar luces no agregamos sombras sino que al contrario, probablemente unimos 
-partes iluminadas, lo que decrementa la cantidad de partes iluminadas.
-
-Por lo tanto el ciclo entero que recorre las luces y columnas tiene complejidad $O(L*C*log(C))$. El 
+Por lo tanto el ciclo entero que recorre las luces y columnas tiene complejidad $O(L*C\log(C))$. El 
 resultado de todo este ciclo es un vector de pares que representan las porciones iluminadas de la pared.
 
 Finalmente, se recorre este vector de porciones iluminadas ya comprimido para aumentar un acumulador que 
 resulta ser la respuesta al problema, lo que tiene orden $O(C)$.
 
-Por lo tanto, el orden del algoritmo entero es $O(L*C*log(C) + C)$ que es $O(L*C*log(C))$.
+Por lo tanto, el orden del algoritmo entero es $O(L*C\log(C) + C)$ que es $O(L*C\log(C))$.
