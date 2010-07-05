@@ -325,9 +325,9 @@ double perimIluminado()
         int sizeIntervalos = intervalos.size();
         forn( i, sizeIntervalos )
             iluminado.push_back( intervalos[i] );
+    
+        comprimir( iluminado );
     }
-
-    comprimir( iluminado );
 
     int sizeIluminado = iluminado.size();
     double res = 0;
