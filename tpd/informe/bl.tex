@@ -71,11 +71,10 @@ de calcular si antes nos aseguramos que para este conjunto de intervalos todos s
 intersección vacía. Para esto ``comprimimos'' el conjunto (realizamos la union entre intervalos de
 intersección no vacía) y luego su complemento.
 
-A continuación unimos todos los conjuntos de intervalos iluminados por las bombillas, formando
-otro conjunto. Nuevamente, es simple calcular la longitud de las porciones iluminadas del salón
-si nos aseguramos que para este conjunto todos sus elementos tengan intersección vacía. Para esto
-``comprimimos'' el conjunto en el mismo sentido que antes y calculamos el resultado del problema,
-que es:
+Unimos todos los conjuntos de intervalos iluminados por las bombillas, formando otro conjunto.
+Nuevamente, es simple calcular la longitud de las porciones iluminadas del salón si nos aseguramos que
+para este conjunto todos sus elementos tengan intersección vacía. Para esto ``comprimimos'' el conjunto
+en el mismo sentido que antes y calculamos el resultado del problema, que es:
 
 \vspace{0.2cm}
 \begin{center}$\displaystyle\sum_{e \in intIlum}e_y - e_x$\end{center}
@@ -311,26 +310,24 @@ de entrada copiándole el resultado ($O(n)$).
 El método perimIluminado es la raíz de todos estos métodos. Este método recorre todas las luces y 
 por cada luz recorre todas las columnas.
 
-Veamos que pasa con el ciclo que recorre todas las columnas: para cada columna se llama a 
+Veamos qué pasa con el ciclo que recorre todas las columnas: para cada columna se llama a 
 intervaloSombra, se hace una comparación booleana y se pushean a lo sumo dos elementos detrás de un 
 vector de pares, por lo que el cuerpo del ciclo que recorre todas las columnas es $O(1)$.
 
-Veamos que pasa con el ciclo que recorre todas las luces: para cada luz se recorre todas las columnas 
+Veamos qué pasa con el ciclo que recorre todas las luces: para cada luz se recorre todas las columnas 
 y se genera un vector de pares de tamaño $C$, siendo $C$ la cantidad de columnas (el mismo C del 
 enunciado). Esto cuesta $O(C*log(C))$ y pushea todos los pares resultantes de este complemento en otro 
-vector de pares, lo que tiene complejidad $O(C)$.
-
-Por lo tanto el ciclo entero que recorre las luces y columnas tiene complejidad $O(L*C*log(C))$. El 
-resultado de todo este ciclo es un vector de pares que representan las porciones iluminadas de la pared, 
-de tamaño máximo L*C.
-
-A continuación se comprime el vector de pares de porciones iluminadas, lo que tiene complejidad 
-$O(L*C*log(L*C))$ y resulta en un vector de tamaño máximo $C+1$. La idea intuitiva de esta cota es que 
-el peor caso para el tamaño de este vector es una luz y $C$ columnas, lo que como máximo genera $C+1$ 
+vector de pares que es el vector de porciones iluminadas, lo que tiene complejidad $O(C)$.
+Luego se comprime el vector de porciones iluminadas, lo que tiene complejidad $O(2*C*log(2*C))$ que es
+$O(C*log(C))$. El vector de porciones iluminadas tiene un tamaño máximo $C+1$. Esta cota es porque el
+peor caso para el tamaño de este vector es una luz y $C$ columnas, lo que como máximo genera $C+1$ 
 porciones iluminadas. Al agregar luces no agregamos sombras sino que al contrario, probablemente unimos 
 partes iluminadas, lo que decrementa la cantidad de partes iluminadas.
+
+Por lo tanto el ciclo entero que recorre las luces y columnas tiene complejidad $O(L*C*log(C))$. El 
+resultado de todo este ciclo es un vector de pares que representan las porciones iluminadas de la pared.
 
 Finalmente, se recorre este vector de porciones iluminadas ya comprimido para aumentar un acumulador que 
 resulta ser la respuesta al problema, lo que tiene orden $O(C)$.
 
-Por lo tanto, el orden del algoritmo entero es $O(L*C*log(C) + L*C*log(L*C) + C)$ que es $O(L*C*log(L*C))$.
+Por lo tanto, el orden del algoritmo entero es $O(L*C*log(C) + C)$ que es $O(L*C*log(C))$.
