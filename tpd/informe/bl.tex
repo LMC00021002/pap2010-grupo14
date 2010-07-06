@@ -1,16 +1,17 @@
 \subsection*{Problema y modelo}
-El problema trata sobre un salón de exposiciones que cuenta con una cantidad dada de
-bombillas de luz (se supone que la única fuente de luz es esta) que son fuentes de
-luz puntual, y una cantidad dada de columnas, que están ubicadas de forma que no
-intersecan la pared ni entre ellas, pero sí pueden tocarse. Las bombillas de luz están
-ubicadas de forma que no tocan ninguna columna ni la pared. El escenario se presenta
-en dos dimensiones (visto desde arriba). Dado un salón como
-el descrito, se desea conocer el perímetro de la pared que cuenta con iluminación.
-Se supone que la sombra no sufre difusión ni hay reflexión de luces.
+El problema trata sobre un salón de exposiciones que cuenta con una cantidad
+de bombillas de luz (la única fuente de luz del ambiente), y una cantidad de
+columnas, ubicadas de forma que no intersecan la pared ni se intersecan entre
+ellas (aunque pueden tocarse). Las bombillas de luz están ubicadas de forma
+que no tocan ninguna columna ni la pared. El escenario se presenta en dos
+dimensiones (visto desde arriba), y se pide calcular el perímetro de la pared
+que cuenta con iluminación. Se supone que la sombra no sufre difusión ni hay
+reflexión de luces.
 
-Representamos la bombilla como un punto $(x,y)$ en el plano, las columnas como circulos
-$(x,y,r)$ de centro $(x,y)$ y radio $r$, y las paredes como 4 segmentos: $\overline{AB}$,
-$\overline{BC}$, $\overline{CD}$, $\overline{DA}$, siendo, con X e Y dados por el enunciado:
+Representamos la bombilla como un punto $(x,y)$ en el plano, las columnas como
+circulos $(x,y,r)$ (de centro $(x,y)$ y radio $r$), y las paredes como 4
+segmentos: $\overline{AB}$, $\overline{BC}$, $\overline{CD}$, $\overline{DA}$,
+siendo ($X$ e $Y$ son datos de entrada):
 
 \vspace{0.2cm}
 $A = (0, 0)$
@@ -36,25 +37,27 @@ existe un segmento de línea (un rayo de luz) que comienza en una bombilla de lu
 en $p$, y no toca o pasa a través de alguna columna. Por tanto:
 
 \begin{itemize}
-\item Una cierta porción de la pared está iluminada si alguna bombilla la ilumina (y
-no está iluminada si ninguna bombilla la ilumina, es decir, si todas las columnas proyectan una
-sombra sobre esta parte de la pared).
+\item Una cierta porción de la pared está iluminada si alguna bombilla la ilumina, y
+no está iluminada si ninguna bombilla la ilumina (es decir, si para todos los focos
+que podrían iluminarla hay columnas que proyectan sombra sobre ella).
 
 \item La sombra que proyecta una columna $c$ a partir de la luz que una bombilla $b$ le incide
-queda determinada por las tangentes del círculo descripto por $c$ que que pasan por $b$.
+queda determinada por las tangentes del círculo descripto por $c$ que pasan por $b$.
 Detrás de la columna (visto desde la bombilla) se proyectará sombra de una
 tangente a la otra (si ninguna otra bombilla ilumina esa porción), y
-lo demás quedará iluminado (mientras otras columnas no lo impidan).
+lo demás quedará iluminado (siempre que otras columnas no lo impidan).
 \end{itemize}
 
 La idea de nuestro algoritmo es calcular las partes de pared que ilumina
-cada luz. Para esto recorremos por cada bombilla eléctrica todas las
+cada luz. Para esto recorremos, por cada bombilla eléctrica, todas las
 columnas, y agregamos la sombra que genera cada columna (según la luz
-actualmente en consideración) al conjunto de sombras de la bombilla.
+actualmente en consideración) al conjunto de sombras de dicha bombilla.
 
-Para describir el conjunto de sombras vemos la pared como un único intervalo $(0, 2X + 2Y)$, como
-si estuviésemos recorriendo las paredes en sentido antihorario, comenzando desde la pared inferior,
-por ejemplo:
+Para describir el conjunto de sombras vemos la pared como un único intervalo
+$(0, 2X + 2Y)$, como si estuviésemos recorriendo las paredes en sentido
+antihorario, comenzando desde la pared inferior. Detallamos la traducción de
+segmentos de pared a un intervalo en la sección ``Cálculo de sombras''. Por
+ejemplo:
 
 \begin{figure}[H]
 \centering
@@ -63,16 +66,16 @@ por ejemplo:
 \includegraphics[scale=1.0]{./figuras/bl_2.png}
 \end{figure}
 
-Detallamos la traducción de segmentos de pared a un intervalo en la sección
-``Cálculo de sombras''. Las sombras resultan entonces subintervalos en $\mathbb R$.
-El complemento del conjunto de sombras serán los intervalos de pared iluminada,
-y podremos calcular su largo en forma sencilla si los intervalos de este conjunto tienen
-intersección vacía y están ordenados (por su primera y segunda coordenadas). Para esto ordenamos y
-``comprimimos'' el conjunto (realizamos la unión entre intervalos de intersección no vacía).
+Las sombras resultan entonces subintervalos en $\mathbb R$. El complemento del
+conjunto de sombras serán los intervalos de pared iluminada, y podremos
+calcular su largo en forma sencilla si dichos intervalos tienen intersección
+vacía y están ordenados (por su primera y segunda coordenadas). Para esto
+ordenamos y ``comprimimos'' el conjunto (efectuando la unión entre intervalos
+de intersección no vacía).
 
 Unimos todos los conjuntos de intervalos iluminados por las bombillas, formando otro conjunto.
 Nuevamente, es simple calcular la longitud de las porciones iluminadas del salón si nos aseguramos que
-para este conjunto todos sus elementos tengan intersección vacía y esten ordenados. Para esto lo
+para este conjunto todos sus elementos tengan intersección vacía y estén ordenados. Para esto lo
 ordenamos y ``comprimimos'' de similar modo que antes, y calculamos el resultado del problema, que es:
 
 \begin{center}
@@ -106,7 +109,7 @@ Procedemos de la siguiente forma:
 \item Dado que son triángulos rectángulos, calculamos el seno de alfa como
 $\displaystyle\frac{c_r}{|v|}$.
 
-\item Por la igualdad $\sin^2(\alpha) + \cos^2(\alpha) = 1$ obtenemos $\cos(\alpha)$
+\item Por la igualdad $\sin^2(\alpha) + \cos^2(\alpha) = 1$ obtenemos $\cos(\alpha)$.
 
 \item \textbf{Calculamos las tangentes:} rotamos el vector $v$ un ángulo $\alpha$ y un ángulo
 $-\alpha$, teniendo en cuenta las propiedades $\sin(-\alpha) = -\sin(\alpha)$ y
@@ -132,12 +135,13 @@ v = t_2$
 \end{center}
 \vspace{0.2cm}
 
-esto resulta en dos vectores $t_1$ y $t_2$. A partir de estos vectores consideramos las semirrectas
-$st_1$ y $st_2$, ambas de origen $(l_x, l_y)$ y con vectores generadores $t_1$ y $t_2$
-respectivamente. Las semirrectas las representamos en su forma vectorial.
+De esto resultan dos vectores $t_1$ y $t_2$, a partir de los cuales
+consideramos las semirrectas $st_1$ y $st_2$, ambas de origen $(l_x, l_y)$, y
+con vectores generadores $t_1$ y $t_2$ (respectivamente). Representamos las
+semirrectas en forma vectorial.
 
 \item \textbf{Calculamos los puntos de intersección $(x_1, y_1)$ y $(x_2, y_2)$ de las semirrectas
-$st_1$ y $st_2$ respectivamente con los segmentos que representan la pared} (ver sección
+$st_1$ y $st_2$ con los segmentos que representan la pared} (ver sección
 ``intersección entre semirrecta y segmento'').
 
 \item \textbf{A partir de los puntos de intersección calculamos el intervalo de sombra}
@@ -160,15 +164,15 @@ de la siguiente forma. Sea la función de $R^2 \times R$:
 
 \end{itemize}
 
-entonces el intervalo de sombra lo definimos como $(f(x_1,y_1), f(x_2,y_2))$ si
-$f(x_1,y_1) \le f(x_2,y_2)$, sino definimos la sombra con dos intervalos: $(0, f(x_2,y_2))$ y
-$(f(x_1,y_1), 2X + 2Y)$. Este último caso sucede cuando está el punto $(0,0)$ entre las 
-semirrectas tangentes.
+Si $f(x_1,y_1) \le f(x_2,y_2)$ definimos el intervalo de sombra como
+$(f(x_1,y_1), f(x_2,y_2))$, sino (caso en que el punto $(0,0)$ está entre las
+semirrectas tangentes) la definimos con dos intervalos: $(0, f(x_2,y_2))$ y
+$(f(x_1,y_1), 2X + 2Y)$.
 
 
 \subsection*{Intersección entre semirrecta y segmento}
 
-Dada una semirrecta de origen $(x_1, y_1)$ y vector generador $(x_2 - x_1, y_2 - y_1)$ y un
+Dada una semirrecta de origen $(x_1, y_1)$ con vector generador $(x_2-x_1, y_2-y_1)$ y un
 segmento $<(w_1, z_1), (w_2, z_2)>$:
 
 \begin{itemize}
