@@ -9,7 +9,7 @@ frecuencia.
 
 Por obvias razones de eficiencia, no ejecutamos los reemplazos sobre el
 string dado, sino que los simulamos guardando en una matriz la frecuencia
-de cada caracter. Esta matriz contiene inicialmente con las frecuencias
+de cada caracter. Esta matriz contiene inicialmente las frecuencias con
 que aporta cada caracter según las reglas, y tiene la propiedad de que,
 al multiplicarla por sí misma mantiene las frecuencias de haber aplicado
 una vez las reglas dadas sobre el string.
@@ -54,8 +54,8 @@ M^3 = \left(
 \end{array}
 $$
 
-Así, cada valor $M_{ij}^k$ representa la cantidad de caracteres $j$ que incorpora
-el caracter $i$ en la aplicación de reglas número $k$. La frecuencia
+Cada valor $M_{ij}^k$ representa la cantidad de caracteres $`j'$ que incorpora
+el caracter $`i'$ en la $k$-ésima aplicación de reglas. La frecuencia
 de un caracter $c$ luego de $n$ aplicaciones resulta ser $\sum_i M_{ic}^n$.
 
 
@@ -63,8 +63,8 @@ de un caracter $c$ luego de $n$ aplicaciones resulta ser $\sum_i M_{ic}^n$.
 
 Dado que los valores se encuentran entre los números 33 y 126 de la tabla ASCII,
 armamos matrices de dimensión $94\times 94$, que representan a todos los valores
-de entrada posibles (al direccionar caracteres en la matriz restamos un offset
-de 33 a su valor ASCII).
+de entrada posibles. Al direccionar caracteres en la matriz restamos un {\sl offset}
+de 33 a su valor ASCII.
 
 
 \subsection*{Análisis de complejidad}
