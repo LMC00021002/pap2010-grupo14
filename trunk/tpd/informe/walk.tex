@@ -149,7 +149,7 @@ Es evidente que si $( y_1 < 0 \wedge y_2 > 0 ) \vee ( y_1 > 0 \wedge y_2 < 0 )$ 
 extremo del segmento cae sobre la recta debemos considerar casos especiales o arreglarlo de algún modo.
 
 La forma de arreglarlo es simple pero requiere ser explicada con detenimiento. La idea es que si algun
-extremo del segmento cae sobre la recta, si el otro extremo del segmento está arriba de la recta, entonces
+extremo del segmento cae sobre la recta, si el su otro extremo está debajo de la recta, entonces
 contamos el cruce, sino no. Este particular método no verifica intersecciones entre cualquier recta y
 cualquier segmento, pero sí nos sirve para el problema de verificar si un punto cae dentro de un polígono.
 
@@ -189,8 +189,8 @@ el polígono, por lo que debe contarse un cruce.
 
 Intuitivamente, estos casos cierran y vuelven a abrir el polígono, por lo que debe mantener la paridad de
 la cantidad de cruces. Si los lados del polígono que tienen este vértice como extremo tienen el otro extremo
-por encima de la recta, la cantidad de cruces contados son 2 (uno por cada segmento), por lo que la paridad se
-mantiene. Si los lados tienen el otro extremo por debajo de la recta, no se cuentan cruces (pues no cumple
+por debajo de la recta, la cantidad de cruces contados son 2 (uno por cada segmento), por lo que la paridad se
+mantiene. Si los lados tienen el otro extremo por encima de la recta, no se cuentan cruces (pues no cumple
 la condición).
 \end{itemize}
 
@@ -332,10 +332,10 @@ La línea 25 llama a {\bf calcularAlturaSubidaYBajada}, que tiene complejidad
 $O(max(a,b)^2)$ en peor caso y $O(max(a,b)*log(max(a,b)))$ en caso promedio,
 como vimos anteriormente. El peor caso en este problema para este algoritmo
 sería que todos los polígonos contengan a Alice o a Bob, por lo que $max(a,b)
-= N$, y en caso promedio sería $max(a,b) = \frac{N}{2}\pm 1$ (según sea par o impar),
+= N$, y en caso promedio sería $max(a,b) = \frac{N}{2}\pm 1$ (según N sea par o impar),
 lo que hace la complejidad $O(N^2)$ en peor caso y $O(N\log N)$ en caso
 promedio.\\
 
-Concluimos que nuestro algoritmo {\bf walk} tiene complejidad $O(Nmax(P_i)+N^2)$ en peor caso,
+Concluímos que nuestro algoritmo {\bf walk} tiene complejidad $O(Nmax(P_i)+N^2)$ en peor caso,
 y $O(Nmax(P_i) + N\log N)$ en caso promedio, siendo $N$ la cantidad de polígonos y
 $P_i$ la cantidad de lados del polígono $i$.
