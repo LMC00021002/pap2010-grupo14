@@ -11,8 +11,9 @@ Por obvias razones de eficiencia, no ejecutamos los reemplazos sobre el
 string dado, sino que los simulamos guardando en una matriz la frecuencia
 de cada caracter. Esta matriz contiene inicialmente las frecuencias con
 que aporta cada caracter según las reglas, y tiene la propiedad de que,
-al multiplicarla por sí misma mantiene las frecuencias de haber aplicado
-una vez las reglas dadas sobre el string.
+al multiplicarla por sí misma (con algunos cuidados, detallados en la sección
+sobre implementación) mantiene las frecuencias de haber aplicado una vez las
+reglas dadas sobre el string.
 
 Así, para el caso de ejemplo $A \rightarrow BAcX$, y dado el string de inicio
 $ABCcXA$, ejemplos de matriz serán:
@@ -25,30 +26,30 @@ $$M =
 \left(
 	\begin{array}{ccccc}
 	1 & 1 & 0 & 1 & 1 \\
-	0 & 1 & 0 & 0 & 0 \\
-	0 & 0 & 1 & 0 & 0 \\
-	0 & 0 & 0 & 1 & 0 \\
-	0 & 0 & 0 & 0 & 1 \\
+	0 & 0 & 0 & 0 & 0 \\
+	0 & 0 & 0 & 0 & 0 \\
+	0 & 0 & 0 & 0 & 0 \\
+	0 & 0 & 0 & 0 & 0 \\
 	\end{array}
 \right)
 \hspace{1cm}
 M^2 = \left(
 \begin{array}{ccccc}
 1 & 2 & 0 & 2 & 2 \\
-0 & 1 & 0 & 0 & 0 \\
-0 & 0 & 1 & 0 & 0 \\
-0 & 0 & 0 & 1 & 0 \\
-0 & 0 & 0 & 0 & 1 \\
+0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 \\
 \end{array}
 \right)
 \hspace{1cm}
 M^3 = \left(
 \begin{array}{ccccc}
 1 & 3 & 0 & 3 & 3 \\
-0 & 1 & 0 & 0 & 0 \\
-0 & 0 & 1 & 0 & 0 \\
-0 & 0 & 0 & 1 & 0 \\
-0 & 0 & 0 & 0 & 1 \\
+0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 \\
+0 & 0 & 0 & 0 & 0 \\
 \end{array}
 \right)
 \end{array}
@@ -61,10 +62,28 @@ de un caracter $c$ luego de $n$ aplicaciones resulta ser $\sum_i M_{ic}^n$.
 
 \subsection*{Detalles de Implementación}
 
+Si no todos los caracteres del string dan inicio a una regla, algunas filas de
+la matriz quedarán nulas, lo que puede dar inicio a pérdidas de información al
+hacer las multiplicaciones. Es fácil ver, en el ejemplo anterior, que $M=M^n\
+\forall\ n$. Dado que el enunciado indica que todo caracter que no aparece en
+una regla se mantiene, podría mantenerse la diagonal en 1 como implementación
+de dicha identidad. Pero por la forma en que calculamos la frecuencia nos fue
+conveniente modificar levemente la multiplicación de matrices para que
+mantenga los datos necesarios. Procedemos de la siguiente manera: antes de
+reemplazar el valor de $M[i][j]$ chequeamos si $j$ es un caracter que da
+inicio a reglas (mediante el vector {\tt in\_queries}). En ese caso, se
+reemplaza $M[i][j]$ normalmente y se continúa la multiplicación; en caso
+contrario, en lugar de reemplazarlo se suma el nuevo valor al que contenía
+antes. De esta manera se lleva cuenta del agregado de caracteres aunque la
+fila correspondiente sea nula.
+
 Dado que los valores se encuentran entre los números 33 y 126 de la tabla ASCII,
 armamos matrices de dimensión $94\times 94$, que representan a todos los valores
 de entrada posibles. Al direccionar caracteres en la matriz restamos un {\sl offset}
 de 33 a su valor ASCII.
+
+Utilizamos el tipo de datos {\tt unsigned long long int} para las matrices y
+el valor de frecuencia.
 
 
 \subsection*{Análisis de complejidad}
