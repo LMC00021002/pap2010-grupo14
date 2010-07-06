@@ -1,16 +1,12 @@
 #include <stdio.h>
 #include <algorithm>
 #include <vector>
-#ifdef _DEBUG
-#include <fstream>
-#endif
 
 using namespace std;
 
 #define forn( i, n ) for( int i = 0; i < (n); i++ )
 #define POSALICE 0
 #define POSBOB 100000
-#define NAN -300001
 
 class Desnivel
 {
@@ -23,9 +19,6 @@ public:
 
 //------------------------------------------------------------------------------------------------
 // METODOS
-
-inline double min( double a, double b ) { return a < b ? a : b; }
-inline double max( double a, double b ) { return a < b ? b : a; }
 
 bool contenido( const Desnivel& a, const Desnivel& b )
 {
@@ -41,63 +34,47 @@ int main()
 {
     int cantTests;
 
-#ifdef _DEBUG
-    ifstream entrada("test.in", ios_base::in );
-    ofstream salida ("test.out", ios_base::out );
-#endif
-
-#ifdef _DEBUG
-    entrada >> cantTests;
-#else
     scanf( "%d", &cantTests );
-#endif
+
     while( cantTests-- > 0 ) {
         vector< Desnivel > poligonosAlice;
         vector< Desnivel > poligonosBob;
         int n;
-#ifdef _DEBUG
-        entrada >> n;
-#else
+
         scanf( "%d", &n );
-#endif
+
         while( n-- > 0 ) {
             int altura, cantVertices, xInicial, yInicial, x1, y1, x2, y2;
             vector< double > crucesEjeX;
 
-#ifdef _DEBUG
-            entrada >> altura >> cantVertices >> xInicial >> yInicial;
-#else
             scanf( "%d %d %d %d", &altura, &cantVertices, &xInicial, &yInicial );
-#endif
+
             x1 = xInicial;
             y1 = yInicial;
             cantVertices--;
             int cantCrucesIzq = 0, cantCrucesMedio = 0;
-            double xMasCercanoIzqAlice = POSALICE, xMasCercanoDerAlice = POSALICE;
-            double xMasCercanoIzqBob = POSBOB, xMasCercanoDerBob = POSBOB;
+            double xIzqAlice = POSALICE, xDerAlice = POSALICE;
+            double xIzqBob = POSBOB, xDerBob = POSBOB;
 
             forn( i, cantVertices ) {
-#ifdef _DEBUG
-                entrada >> x2 >> y2;
-#else
                 scanf( "%d %d", &x2, &y2 );
-#endif
+
                 // si cruza al eje x
                 if( ( y1 < 0 && y2 >= 0 ) || ( y1 >= 0 && y2 < 0 ) ) {
                     double x = cruceEjeX( x1, y1, x2, y2 );
 
                     if ( x < POSALICE ) {
                         cantCrucesIzq++;
-                        xMasCercanoIzqAlice = xMasCercanoIzqAlice == POSALICE ? x : max( xMasCercanoIzqAlice, x );
+                        xIzqAlice = x;
                     }
                     else {
                         if ( x > POSALICE && x < POSBOB ) {
                             cantCrucesMedio++;
-                            xMasCercanoDerAlice = xMasCercanoDerAlice == POSALICE ? x : min( xMasCercanoDerAlice, x );
-                            xMasCercanoIzqBob = xMasCercanoIzqBob == POSBOB ? x : max( xMasCercanoIzqBob, x );
+                            xDerAlice = x;
+                            xIzqBob = x;
                         }
                         else
-                            xMasCercanoDerBob = xMasCercanoDerBob == POSBOB ? x : min( xMasCercanoDerBob, x );
+                            xDerBob = x;
                     }
                 }
 
@@ -112,32 +89,32 @@ int main()
 
                 if ( x < POSALICE ) {
                     cantCrucesIzq++;
-                    xMasCercanoIzqAlice = xMasCercanoIzqAlice == POSALICE ? x : max( xMasCercanoIzqAlice, x );
+                    xIzqAlice = x;
                 }
                 else {
                     if ( x > POSALICE && x < POSBOB ) {
                         cantCrucesMedio++;
-                        xMasCercanoDerAlice = xMasCercanoDerAlice == POSALICE ? x : min( xMasCercanoDerAlice, x );
-                        xMasCercanoIzqBob = xMasCercanoIzqBob == POSBOB ? x : max( xMasCercanoIzqBob, x );
+                        xDerAlice = x;
+                        xIzqBob = x;
                     }
                     else
-                        xMasCercanoDerBob = xMasCercanoDerBob == POSBOB ? x : min( xMasCercanoDerBob, x );
+                        xDerBob = x;
                 }
             }
 
             // si el poligono actual cruza al eje x en un punto de coordenada x menor a la
             // de alice, y si la cantidad de cruces a la izquierda de alice es impar
             // entonces el poligono contiene a alice
-            bool contieneAlice = xMasCercanoIzqAlice != POSALICE && xMasCercanoDerAlice != POSALICE && cantCrucesIzq % 2 == 1;
+            bool contieneAlice = cantCrucesIzq % 2 == 1;
 
             // analogo para bob pero con cantidad de cruces = cantCrucesIzq + cantCrucesMedio
-            bool contieneBob = xMasCercanoIzqBob != POSBOB && xMasCercanoDerBob != POSBOB && (cantCrucesIzq + cantCrucesMedio) % 2 == 1;
+            bool contieneBob = (cantCrucesIzq + cantCrucesMedio) % 2 == 1;
 
             if( ( contieneAlice || contieneBob ) && !( contieneAlice && contieneBob ) ) {
                 if( contieneAlice )
-                    poligonosAlice.push_back( Desnivel( xMasCercanoIzqAlice, xMasCercanoDerAlice, altura ) );
+                    poligonosAlice.push_back( Desnivel( xIzqAlice, xDerAlice, altura ) );
                 else
-                    poligonosBob.push_back( Desnivel( xMasCercanoIzqBob, xMasCercanoDerBob, altura ) );
+                    poligonosBob.push_back( Desnivel( xIzqBob, xDerBob, altura ) );
             }
         }
 
@@ -185,16 +162,8 @@ int main()
             }
         }
 
-#ifdef _DEBUG
-        salida << alturaSubida << " " << alturaBajada << endl;
-#else
         printf( "%d %d\n", alturaSubida, alturaBajada );
-#endif
     }
 
-#ifdef _DEBUG
-    entrada.close();
-    salida.close();
-#endif
     return 0;
 }
