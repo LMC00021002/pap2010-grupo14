@@ -5,23 +5,20 @@ valores de entrada. A partir de estos dos valores se pueden generar los $T$
 valores de salida siguiendo la ecuación de congruencia, definida de la
 siguiente manera:
 
-FIXME: ¿= o $\equiv$?:
-$$X_k = aX_{k-1} + b\ (10001)$$
+$$X_k \equiv aX_{k-1} + b\ (10001)$$
 
 Como los valores de entrada están intercalados con los de salida y definidos
 sobre los impares, el problema se transforma en hallar el par $(a,b)$ que
 resuelve las $T$ ecuaciones, de la siguiente forma:
 
-FIXME: ¿*+?:
-$$X_k \equiv (aX_{k-2} + b) * + b\ (10001)$$
+$$X_k \equiv aX_{k-2} + b + b\ (10001)$$
 
 Como 10001 no es un número primo ($10001 = 137\times 73$), esto se puede
 llevar, por el teorema chino del resto, a hallar el par $(a,b)$ que cumple con
 las siguientes 2 ecuaciones:
 
-FIXME: ¿*+?: 
-$$X_k \equiv (aX_{k-2} + b) * + b\ (137)$$
-$$X_k \equiv (aX_{k-2} + b) * + b\ (73)$$
+$$X_k \equiv aX_{k-2} + b + b\ (137)$$
+$$X_k \equiv aX_{k-2} + b + b\ (73)$$
 
 
 \subsection*{Detalles de Implementación}
