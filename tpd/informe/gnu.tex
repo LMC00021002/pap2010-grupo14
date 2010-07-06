@@ -11,9 +11,24 @@ Por obvias razones de eficiencia no ejecutamos los reemplazos sobre el
 string dado, sino que los simulamos guardando en una matriz la frecuencia
 de cada caracter. Esta matriz contiene inicialmente las frecuencias con
 que aporta cada caracter según las reglas, y tiene la propiedad de que,
-al multiplicarla por sí misma (con algunos cuidados, detallados en la sección
-sobre implementación) mantiene las frecuencias de haber aplicado una vez las
+al multiplicarla por sí misma (con algunos cuidados, detallados a
+continuación) mantiene las frecuencias de haber aplicado una vez las
 reglas dadas sobre el string.
+
+Si hay caracteres en el string que no dan inicio a reglas, algunas filas de
+la matriz quedarán nulas, lo que puede redundar en pérdidas de información al
+hacer las multiplicaciones. Es fácil ver, en el ejemplo anterior, que $M=M^n\
+\forall\ n$. Dado que el enunciado indica que todo caracter que no aparece en
+una regla se mantiene, podría mantenerse la diagonal en 1 como implementación
+de dicha identidad. Pero por la forma en que calculamos la frecuencia nos fue
+conveniente modificar levemente la multiplicación de matrices para que
+mantenga los datos necesarios. Procedemos de la siguiente manera: antes de
+reemplazar el valor de $M_{ij}$ chequeamos si $j$ es un caracter que da
+inicio a reglas (mediante el vector {\tt in\_queries}). En ese caso, se
+reemplaza $M_{ij}$ normalmente y se continúa la multiplicación; en caso
+contrario, en lugar de reemplazarlo, se suma el nuevo valor al que contenía
+dicha celda. De esta manera se lleva cuenta del agregado de caracteres aunque
+la fila correspondiente sea nula.
 
 Así, para el caso de ejemplo $A \rightarrow BAcX$, y dado el string de inicio
 $ABCcXA$, ejemplos de matriz serán:
@@ -63,21 +78,6 @@ $$\sum_i M_{ic}^n \times cant\_apariciones(str, c)$$
 
 
 \subsection*{Detalles de Implementación}
-
-Si hay caracteres en el string que no dan inicio a reglas, algunas filas de
-la matriz quedarán nulas, lo que puede redundar en pérdidas de información al
-hacer las multiplicaciones. Es fácil ver, en el ejemplo anterior, que $M=M^n\
-\forall\ n$. Dado que el enunciado indica que todo caracter que no aparece en
-una regla se mantiene, podría mantenerse la diagonal en 1 como implementación
-de dicha identidad. Pero por la forma en que calculamos la frecuencia nos fue
-conveniente modificar levemente la multiplicación de matrices para que
-mantenga los datos necesarios. Procedemos de la siguiente manera: antes de
-reemplazar el valor de $M_{ij}$ chequeamos si $j$ es un caracter que da
-inicio a reglas (mediante el vector {\tt in\_queries}). En ese caso, se
-reemplaza $M_{ij}$ normalmente y se continúa la multiplicación; en caso
-contrario, en lugar de reemplazarlo, se suma el nuevo valor al que contenía
-dicha celda. De esta manera se lleva cuenta del agregado de caracteres aunque
-la fila correspondiente sea nula.
 
 Dado que los valores se encuentran entre los números 33 y 126 de la tabla ASCII,
 armamos matrices de dimensión $94\times 94$, que representan a todos los valores
