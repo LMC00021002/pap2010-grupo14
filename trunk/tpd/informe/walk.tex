@@ -1,4 +1,72 @@
-\subsection*{Problema y solución}
+\subsection*{Problema y modelo}
+
+El problema trata sobre dos personas Alice y Bob. Viven en una zona montañosa, y alice quiere ir a visitar
+a Bob escalando y descendiendo lo mínimo posible. Nos proveen de una descripcion del terreno con un mapa
+de alturas. Este mapa está compuesto de varios polígonos. Cada polígono nos informa cuál es la altura del
+terreno sobre su perímetro. Los polígonos no se intersecan entre sí ni consigo mismos.
+
+La descripción que nos dan del terreno es parcial, pues no sabemos qué alturas hay en el terreno en medio
+de cualquier par de curvas de altura de polígonos distintos. Por esto, no podemos saber exactamente cuánto
+escala o desciende Alice en la práctica, pero debemos calcular el mínimo suponiendo un escenario óptimo.
+
+Alice se encuentra en las coordenadas $(0, 0)$ del mapa, y Bob se encuentra en las coordenadas
+$(100000, 0)$.
+
+Presentamos un modelo simple en el que representamos los polígonos como un conjunto de segmentos en los
+ejes XY. Cada segmento tiene un valor de altura dado por el enunciado. Alice y Bob se encuentran en las
+coordenadas dadas por el enunciado.
+
+\subsection*{Solución}
+
+La idea de la solución que presentamos se basa en los siguientes principios:
+\begin{itemize}
+\item como dice el enunciado, no existe intersección entre polígonos, de modo que dados dos polígonos
+hay solamente dos casos: uno contiene al otro o son totalmente disjuntos.
+\item discriminar los polígonos según si Alice tiene que cruzarlos obligatoriamente o si puede
+evitarlos, de modo que Alice solamente cruza aquellos que necesariamente debe cruzar para llegar a Bob.
+Un polígono es evitable si existe algún camino entre alice y bob que no lo cruce.
+\item dado que no se puede saber cuáles son las alturas del terreno que se ubica entre dos curvas de
+altura de distintos polígonos, la altura del perímetro de cada polígono es independiente de la de los
+demás.
+\end{itemize}
+
+Cada vez que Alice cruza un polígono la cantidad de altura escalada y bajada aumenta, lo que significa que
+estos valores dependen de la cantidad y el orden de los polígonos que cruza Alice. Logramos una cantidad
+mínima de polígonos cruzados si respetamos el segundo principio.
+
+Podemos clasificar todos los polígonos como:
+\begin{itemize}
+\item contiene solamente a Alice: para llegar a Bob, Alice va a tener que cruzarlo, por lo que estos
+polígonos no son evitables.
+\item contiene solamente a Bob: Alice esta fuera de este polígono, y necesita cruzarlo, pues sino no podrá
+llegar a Bob. Estos polígonos no son evitables.
+\item no contiene a Alice ni a Bob: este polígono es evitable, es decir, Alice no necesita cruzarlo para
+llegar a Bob, pues suponiendo que Alice cruza completamente el polígono (entra y luego sale) y llega a
+algún lugar, siempre existe un camino que lo rodea y llega al mismo lugar sin cruzar otro polígono.
+\item contiene a ambos: Alice se puede mantener dentro de este polígono y no necesita cruzarlo, de modo
+que también es evitable. En caso de que Alice salga de este polígono, luego para llegar a Bob deberá
+cruzarlo. Si consideramos el estado incial de Alice (justo antes de cruzar este polígono) y su estado
+final (justo después de cruzarlo nuevamente) podemos decir que siempre existe un camino entre estos estados
+inicial y final que no lo cruza nunca ni atravieza otros polígonos.
+\end{itemize}
+
+La solución al problema presentada ignora completamente los polígonos evitables, dado que la altura de un
+polígono es independiente de la de los demás. Consideremos entonces los polígonos no evitables.
+
+Notemos que se puede definir un orden total entre los polígonos que contienen solamente a Alice, y otro
+para los que contienen solamente a Bob. Consideramos ordenado a una secuencia de polígonos tal que el
+primero es contenido por todos los siguientes, y el último contiene a todos los anteriores. Esto nos
+permite afirmar que existe una única solución para cada escenario del problema, pues hay una sola forma de
+cruzar los polígonos que contienen a Alice (de ``adentro'' hacia ``afuera'') y una sola forma de cruzar los
+que contienen a Bob(de ``afuera'' hacia ``adentro''). Esta idea justifica la solución presentada.
+
+Dado un escenario, para cada polígono verificamos si contiene a Alice y no a Bob o si contiene a Bob y no
+a Alice (ver sección ``Determinación de pertenencia de un punto a un polígono''). En estos casos traducimos
+el polígono a un par $(x_1, x_2, h)$ tal que $x_1$ y $x_2$ son dos puntos distintos de intersección con el
+eje X, $x_1$ está a la izquierda del punto que verificamos, $x_2$ a la derecha y $h$ es la altura de las
+curvas de altura del polígono. Podemos abstraernos de esta forma gracias a que los polígonos están
+contenidos o totalmente disjuntos, de modo que para definir un orden total entre los que están contenidos
+es suficiente con saber cualquier par de puntos de sus perímetros.
 
 \subsection*{Detalles de Implementación}
 
