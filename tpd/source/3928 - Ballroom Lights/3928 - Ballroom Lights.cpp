@@ -3,19 +3,10 @@
 #include <vector>
 #include <algorithm>
 
-#ifdef _DEBUG
-#include <fstream>
-#include <iomanip>
-#include <assert.h>
-#endif
-
 using namespace std;
 
 #define forn( i, n ) for( int i = 0; i < (n); i++ )
 #define EPSILON 0.0000001l
-
-inline double min( double a, double b ) { return a < b ? a : b; }
-inline double max( double a, double b ) { return a < b ? b : a; }
 
 // ------------------------------------------------------------------------- //
 // ESTRUCTURAS
